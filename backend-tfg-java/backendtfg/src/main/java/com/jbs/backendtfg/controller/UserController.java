@@ -1,0 +1,89 @@
+package com.jbs.backendtfg.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+
+import com.jbs.backendtfg.document.User;
+import com.jbs.backendtfg.dtos.UserDTO;
+import com.jbs.backendtfg.service.DeletionService;
+import com.jbs.backendtfg.service.UserService;
+
+@CrossOrigin(origins = "http://localhost:3000") // Permitir peticiones desde React
+@RestController
+@RequestMapping("/users")
+public class UserController { //Manejamos los mapeos de las peticiones HTTP
+
+    @Autowired
+    private UserService userService; //Invocaremos los métodos que interactúan directamente con el repositorio
+
+    @Autowired
+    private DeletionService deletionService;
+
+    @GetMapping("/getAllUsers") //Obtenemos todos los usuarios de nuestra BD
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    @GetMapping("/getUserEmail/{email}") //Obtenemos un usuario a partir de su email (nombre de usuario)
+    public ResponseEntity<UserDTO> getUserByEmail(@PathVariable String email) {
+        return ResponseEntity.ok(userService.getUserByEmail(email));
+    }
+
+    @GetMapping("/getUserId/{id}") //Obtenemos un usuario a partir de su ID
+    public ResponseEntity<UserDTO> getUserById(@PathVariable String id, @AuthenticationPrincipal User authUser) {
+        return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    @GetMapping("/getUserGroups") //Obtenemos una lista de los IDs de los grupos a los que pertenece el usuario
+    public ResponseEntity<List<String>> getUserGroups(@AuthenticationPrincipal User authUser) {
+        return ResponseEntity.ok(userService.getUserGroupsIds(authUser.getId().toHexString()));
+    }
+
+    @GetMapping("/getUserTasks") //Obtenemos una lista de los IDs de las tareas a los que pertenece el usuario
+    public ResponseEntity<List<String>> getUserTasks(@AuthenticationPrincipal User authUser) {
+        return ResponseEntity.ok(userService.getUserTasksIds(authUser));
+    }
+
+    @GetMapping("/getUserChats") //Obtenemos una lista de los IDs de las tareas a los que pertenece el usuario
+    public ResponseEntity<List<String>> getUserChats(@AuthenticationPrincipal User authUser) {
+        return ResponseEntity.ok(userService.getUserChatsIds(authUser));
+    }
+
+    @GetMapping("/getOtherUserGroups/{id}") //Obtenemos una lista de los IDs de los grupos a los que pertenece el usuario
+    public ResponseEntity<List<String>> getOtherUserGroups(@AuthenticationPrincipal User authUser, @PathVariable String id) {
+        return ResponseEntity.ok(userService.getUserGroupsIds(id));
+    }
+
+    @GetMapping("/getCurrentUser")
+    public ResponseEntity<UserDTO> getCurrentUser (@AuthenticationPrincipal User user){
+        return ResponseEntity.ok(userService.getUserById(user.getId().toHexString()));
+    }
+
+    @GetMapping("/getUsersNameSearch")
+    public ResponseEntity<List<UserDTO>> getUsersNameSearch(@AuthenticationPrincipal User authUser, @RequestParam String nameFragment) {
+        return ResponseEntity.ok(userService.getUsersNameSearch(authUser.getOrganization(), nameFragment));
+    }
+
+    @PostMapping("/changePassword")
+    public ResponseEntity<Void> changePassword(@AuthenticationPrincipal User authUser, @RequestBody Map <String, String> passwords) {
+        userService.changePassword(authUser.getId(), passwords.get("oldPassword"), passwords.get("newPassword"));
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping ("/getUsers") //Obtenemos una lista de usuarios a partir de una lista de IDs
+    public ResponseEntity<List<UserDTO>> getUsers (@AuthenticationPrincipal User authUser, @RequestBody List<String> usersIds){
+        return ResponseEntity.ok(userService.getUsersFromIds(usersIds));
+    }
+
+    @DeleteMapping("/deleteUserId/{id}") //Eliminamos un usuario de nuestra BD
+    public ResponseEntity<Void> deleteUser(@PathVariable String id, @AuthenticationPrincipal User authUser) {
+        deletionService.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
+
+}
