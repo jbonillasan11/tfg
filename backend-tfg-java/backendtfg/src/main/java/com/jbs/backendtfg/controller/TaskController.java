@@ -50,6 +50,26 @@ public class TaskController {
         return ResponseEntity.ok(taskService.saveEmptyTask(authUser));
     }
 
+    @PostMapping("/addUser/{id}")
+    public ResponseEntity<TaskDTO> addUser(@PathVariable String id, @AuthenticationPrincipal User authUser, @RequestBody String idUser) {
+        return ResponseEntity.ok(taskService.addUser(id, idUser));
+    }
+
+    @PostMapping("/setUser/{id}")
+    public ResponseEntity<TaskDTO> setUser(@PathVariable String id, @AuthenticationPrincipal User authUser, @RequestBody String idUser) {
+        return ResponseEntity.ok(taskService.setUser(id, idUser));
+    }
+
+    @PostMapping("/setUsers/{id}")
+    public ResponseEntity<TaskDTO> addUsers(@PathVariable String id, @AuthenticationPrincipal User authUser, @RequestBody List<String> ids) {
+        return ResponseEntity.ok(taskService.setUsers(id, ids));
+    }
+
+    @PostMapping("/deleteUsers/{id}")
+    public ResponseEntity<TaskDTO> deleteUsers(@PathVariable String id, @AuthenticationPrincipal User authUser) {
+        return ResponseEntity.ok(taskService.deleteUsers(id));
+    }
+
     @PutMapping("/{id}") //Actualizamos una tarea existente con nuevos datos
     public ResponseEntity<TaskDTO> updateTask(@PathVariable String id, @AuthenticationPrincipal User authUser, @RequestBody Task task) {    
         return ResponseEntity.ok(taskService.updateTask(task, id));

@@ -2,14 +2,18 @@ import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { useLocalState } from '../utils/useLocalState';
 import fetchService from '../services/fetchService';
+import ModalTest from '../ModalTest';
 
 const TaskViewer = () => {
 
     const[authValue, setAuthValue] = useLocalState("", "authValue");
     const [currentUser, setCurrentUser] = useLocalState("", "currentUser");
+
     const taskId = window.location.href.split("/tasks/")[1]; //Obtenemos el id de la tarea de la URL
     const[task, setTask] = useState("");
     const[creator, setCreator] = useState("");
+
+    const [updatedUserIds, setUpdatedUserIds] = useState([]);
 
     useEffect(() => {
       fetchService(`tasks/${taskId}`, "GET", authValue, null) //Petición asíncrona a nuestra APIRest
@@ -49,8 +53,12 @@ const TaskViewer = () => {
       })
     }
 
-    function shareTask(){
-      //Ventana modal, barra de busqueda para usuarios, muestra los ya agregados, boton agregar para los nuevos, desmarcar checkbox para eliminar a los ya agregados
+    function saveChanges(){
+      console.log(updatedUserIds);
+      if (updatedUserIds.length === 0) fetchService(`tasks/deleteUsers/${taskId}`, "PUT", authValue, null) //Si no hay usuarios
+      else if (updatedUserIds.length === 1) fetchService(`tasks/setUser/${taskId}`, "PUT", authValue, updatedUserIds[0]) //Si solo hay un usuario
+      else fetchService(`tasks/setUsers/${taskId}`, "PUT", authValue, updatedUserIds) //Si hay más de uno
+      
     }
 
     function saveTaskResponse(){
@@ -65,7 +73,7 @@ const TaskViewer = () => {
     return (
         <div>
             {task ? ( 
-              currentUser.userType === "PROFESSOR" ? (
+              currentUser.userType === "PROFESSOR" ? ( //Que muestre ambos como alumno, pero si es profesor y pulsa editar se muestre esto? Uso booleano para renderzar una cosa u otra, su valor cambia atendiendo a si se pulsa el botón
             <>
                 <h1>Tarea: <input type="text" value = {task.name} onChange={(e) => saveFieldUpdate("name", e.target.value)} /></h1>
                 <h3>Creada por: {creator.name} {creator.surname}</h3>
@@ -73,11 +81,13 @@ const TaskViewer = () => {
                 <h3>Descripción: <input type="text" value = {task.description} onChange={(e) => saveFieldUpdate("description", e.target.value)} /></h3>
                 <h3>Tarea repasable: <input type="checkbox" checked={task.redoable} onChange={(e) => saveFieldUpdate("redoable", e.target.checked)} /></h3>
 
-                <button id="shareTask" onClick={() => shareTask()}>Gestionar usuarios</button>
                 <button id="saveTaskButton" onClick={() => saveTaskDB()}>Guardar</button>
                 <button id="deleteTaskButton" onClick={() => deleteTaskDB()}>Eliminar tarea</button>
-                {// Habrá que mostrar la lista de usuarios que tienen acceso a la tarea, que permita acceder a sus respuestas y corregirlas
-                }
+                 <ModalTest
+                    parentTask={task}
+                    onSaveUsers={(updatedUsers) => setUpdatedUserIds(updatedUsers)}
+                    onClose={() => saveChanges()}
+                  />
                 
             </>
             ) : (

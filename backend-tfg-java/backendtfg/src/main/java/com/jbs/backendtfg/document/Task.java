@@ -1,6 +1,7 @@
 package com.jbs.backendtfg.document;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.time.LocalDate;
 
 import org.bson.types.ObjectId;
@@ -17,8 +18,8 @@ public class Task {
     private LocalDate due;
     private ObjectId creatorId;
     private boolean redoable;
-    private ArrayList <ObjectId> assigneesUserIds;
-    private ArrayList <ObjectId> assigneesGroupIds; //Por el momento prescindible
+    private List <ObjectId> assigneesUserIds;
+    private List <ObjectId> assigneesGroupIds; //Por el momento prescindible
     private ObjectId templateId;
     private Object taskData; //Solución subida por el alumno?
     
@@ -64,7 +65,7 @@ public class Task {
     public void addUser(ObjectId userId){ 
         if (!this.assigneesUserIds.contains(userId)){
             this.assigneesUserIds.add(userId);
-        } else throw new IllegalArgumentException("El usuario ya tiene asignada la tarea");
+        }
     }
 
     public void addGroup(ObjectId groupId){
@@ -94,11 +95,11 @@ public class Task {
         this.creatorId = creatorId;
     }
 
-    public void setAssigneesUserIds(ArrayList<ObjectId> assigneesUserIds) {
+    public void setAssigneesUserIds(List<ObjectId> assigneesUserIds) {
         this.assigneesUserIds = assigneesUserIds;
     }
 
-    public void setAssigneesGroupIds(ArrayList<ObjectId> assigneesGroupIds) {
+    public void setAssigneesGroupIds(List<ObjectId> assigneesGroupIds) {
         this.assigneesGroupIds = assigneesGroupIds;
     }
 
@@ -122,11 +123,11 @@ public class Task {
         return redoable;
     }
 
-    public ArrayList<ObjectId> getAssigneesUserIds() {
+    public List<ObjectId> getAssigneesUserIds() {
         return assigneesUserIds;
     }
 
-    public ArrayList<ObjectId> getAssigneesGroupIds() {
+    public List<ObjectId> getAssigneesGroupIds() {
         return assigneesGroupIds;
     }
 

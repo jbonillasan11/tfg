@@ -129,4 +129,10 @@ public class UserService { //Definimos los métodos que se pueden realizar sobre
         }
     }
 
+    public void removeGroupFromUser(ObjectId objectId, ObjectId objectId2) {
+        User targetUser = userRepository.findById(objectId).get();
+        targetUser.removeGroup(objectId2);
+        userRepository.save(targetUser);
+    }
+
 }

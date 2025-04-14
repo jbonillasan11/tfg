@@ -2,6 +2,7 @@ import { useLocalState } from '../utils/useLocalState';
 import { useEffect, useState } from 'react';
 import fetchService from '../services/fetchService';
 import { Link } from 'react-router-dom';
+import ChangePasswordModal from '../Components/ChangePasswordModal';
 
 const UserViewer = () => {
    
@@ -12,6 +13,8 @@ const UserViewer = () => {
     const [ownGroupIds, setOwnGroupIds] = useState([]);
     const [otherGroupIds, setOtherGroupIds] = useState([]);
     const [groups, setGroups] = useState([]);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [passwordChange, setPasswordChange] = useState(false);
     
     useEffect (() => {
       if (userId === currentUser.id) {
@@ -54,33 +57,33 @@ const UserViewer = () => {
         })
     }
 
-    function passwordChange(){
-      const reqBody = {
-        oldPassword: prompt("Ingrese su contraseña actual"), //Habrá que cambiar prompts por ventana emergente que recoja campos de texto
-        newPassword: prompt("Ingrese su nueva contraseña")
-      }
+  const handlePasswordChange = ({oldPasswordInput, newPasswordInput}) => {
 
-      if (reqBody.newPassword === prompt("Repita su nueva contraseña")){
-        fetch("http://localhost:8080/users/changePassword", {
-          method: "POST",
-            headers: {
-              "content-type": "application/json",
-              "authorization": `Bearer ${authValue}`
-            },
-            body: JSON.stringify(reqBody)
-          })   
-          .then(response => {
-            if (response.status === 200) {
-              alert("Contraseña cambiada correctamente");
-            } else {
-              return response.text().then(text => { throw new Error(text) });
-            }
-          })
-          .catch (error => {
-            alert(error.message);
-          })
+    const reqBody = {
+      oldPassword: oldPasswordInput,
+      newPassword: newPasswordInput
     }
+
+    fetch("http://localhost:8080/users/changePassword", {
+      method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "authorization": `Bearer ${authValue}`
+        },
+        body: JSON.stringify(reqBody)
+      })   
+      .then(response => {
+        if (response.status === 200) {
+          alert("Contraseña cambiada correctamente");
+        } else {
+          return response.text().then(text => { throw new Error(text) });
+        }
+      })
+      .catch (error => {
+        alert("Error al cambiar la contraseña" );
+      })
   }
+
     
     return (
         <div>
@@ -111,7 +114,13 @@ const UserViewer = () => {
                 </>
             ) : (
                 <>
-                  <button onClick={() => passwordChange()}>Cambiar contraseña</button>
+                  <button onClick={() => setModalOpen(true)}>Cambiar contraseña</button>
+                  <ChangePasswordModal
+                    isOpen={modalOpen}
+                    onClose={() => setModalOpen(false)}
+                    onSubmit={handlePasswordChange}
+                  />
+                 
                 </>
             )}
            

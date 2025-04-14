@@ -67,5 +67,67 @@ public class TaskService { //Definimos los métodos que se pueden realizar sobre
         }
         return tasks;
     }
+
+    /*public TaskDTO addUser(String id, String idUser) {
+        idUser = (idUser.replace("\"", ""));
+        Task t = taskRepository.findById(new ObjectId(id)).get();
+        User u = userRepository.findById(new ObjectId(idUser)).get();
+        t.addUser(new ObjectId(idUser));     
+        u.addTask(t.getId());
+        userRepository.save(u);
+        return new TaskDTO(taskRepository.save(t));
+    }
+
+    public TaskDTO addUsers(String id, List<String> ids) { //Refactorizable usando addUser?
+        for (String idUser : ids) {
+            idUser = (idUser.replace("\"", ""));
+        }
+        Task t = taskRepository.findById(new ObjectId(id)).get();
+        for (String idUser : ids) {
+            User u = userRepository.findById(new ObjectId(idUser)).get();
+            t.addUser(new ObjectId(idUser));     
+            u.addTask(t.getId());
+            userRepository.save(u);
+        }
+        return new TaskDTO(taskRepository.save(t));
+    }*/
+
+    public TaskDTO addUser(String id, String idUser) {
+        idUser = (idUser.replace("\"", ""));
+        Task t = taskRepository.findById(new ObjectId(id)).get();
+        User u = userRepository.findById(new ObjectId(idUser)).get();
+        t.addUser(new ObjectId(idUser));     
+        u.addTask(t.getId());
+        userRepository.save(u);
+        return new TaskDTO(taskRepository.save(t));
+    }
+
+    public TaskDTO setUsers(String id, List<String> ids) { //SetUsers
+        List<ObjectId> idsUsers = new ArrayList<>();
+        for (String idUser : ids) {
+            idUser = (idUser.replace("\"", ""));
+            idsUsers.add(new ObjectId(idUser));
+        }
+        id = (id.replace("\"", ""));
+        Task t = taskRepository.findById(new ObjectId(id)).get();
+        t.setAssigneesUserIds(idsUsers);
+        return new TaskDTO(taskRepository.save(t));
+    }
+
+    public TaskDTO setUser(String id, String idUser) {
+        idUser = (idUser.replace("\"", ""));
+        Task t = taskRepository.findById(new ObjectId(id)).get();
+        t.setAssigneesUserIds(new ArrayList<>());
+        t.addUser(new ObjectId(idUser));
+        return new TaskDTO(taskRepository.save(t));
+    }
+
+    public TaskDTO deleteUsers(String id) {
+        Task t = taskRepository.findById(new ObjectId(id)).get();
+        t.setAssigneesUserIds(new ArrayList<>());
+        return new TaskDTO(taskRepository.save(t));
+    }
+
 }
+
 

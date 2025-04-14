@@ -19,6 +19,7 @@ const Register = () => {
             "password": password,
             "name": name,
             "surname": surname,
+            "fullname": name + " " + surname,
             "organization": org,
             "userType": selectedOption
         }

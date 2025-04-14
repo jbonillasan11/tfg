@@ -35,15 +35,31 @@ public class GroupController {
         return ResponseEntity.ok(groupService.getGroupById(id));
     }
 
+    @GetMapping("/getGroupsNameSearch")
+    public ResponseEntity<List<GroupDTO>> getGroupsNameSearch(@AuthenticationPrincipal User authUser, @RequestParam String nameFragment) {
+        return ResponseEntity.ok(groupService.getGroupsNameSearch(authUser.getGroupsIds(), nameFragment));
+    }
+
     @PostMapping("/newGroup") //Creamos un grupo nuevo
     public ResponseEntity<GroupDTO> createEmptyGroup(@AuthenticationPrincipal User authUser) {
-        return ResponseEntity.ok(groupService.saveNewGroup(authUser));
+        return ResponseEntity.ok(groupService.saveNewGroup(authUser.getId().toHexString()));
     }
     
     @PostMapping("/getGroupsFromIds") //Obtenemos una lista de grupos a partir de sus IDs
     public ResponseEntity<List<GroupDTO>> getGroupsFromIds(@AuthenticationPrincipal User authUser, @RequestBody List<String> ids) {
         return ResponseEntity.ok(groupService.getGroupsFromIds(ids));
     }
+
+    @PostMapping("/addUserGroup/{id}")
+    public ResponseEntity<GroupDTO> addUserToGroup(@AuthenticationPrincipal User authUser, @RequestBody String idUser, @PathVariable String id) {
+        return ResponseEntity.ok(groupService.addUserToGroup(id, idUser));
+    }
+
+    @PostMapping("/addUsersGroup/{id}")
+    public ResponseEntity<GroupDTO> addUsersToGroup(@AuthenticationPrincipal User authUser, @RequestBody List<String> userIds, @PathVariable String id) {
+        return ResponseEntity.ok(groupService.addUsersToGroup(id, userIds));
+    }
+
 
     @PutMapping("/{id}") //Actualizamos los datos del grupo
     public ResponseEntity<GroupDTO> updateGroup(@PathVariable String id, @AuthenticationPrincipal User authUser, @RequestBody Group group) {

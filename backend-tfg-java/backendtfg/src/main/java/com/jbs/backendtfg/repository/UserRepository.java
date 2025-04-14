@@ -17,7 +17,7 @@ public interface UserRepository extends MongoRepository<User, ObjectId> {
 
     Optional<User> findById(ObjectId id);
 
-    @Query("{ 'organization': ?0, 'fullname': { $regex: ?1} }") //El campo 0 es la organización, el campo 1 es el fragmento de nombre, con regex buscamos tambien coincidencias parciales
+    @Query("{ 'organization': ?0, 'fullname': { $regex: ?1, $options: 'i' } }") //El campo 0 es la organización, el campo 1 es el fragmento de nombre, con regex buscamos tambien coincidencias parciales ignorando mayúsculas y minúsculas
     List<User> findByOrganizationAndFullNameContaining(String organization, String nameFragment);
 
     @Query("{ '_id': { $in: ?0 } }") 
