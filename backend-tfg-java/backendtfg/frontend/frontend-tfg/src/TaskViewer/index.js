@@ -2,7 +2,8 @@ import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { useLocalState } from '../utils/useLocalState';
 import fetchService from '../services/fetchService';
-import ModalTest from '../ModalTest';
+import AddUserToTask from '../ModalWindows/AddUserToTask';
+import { Link } from 'react-router-dom';
 
 const TaskViewer = () => {
 
@@ -38,6 +39,7 @@ const TaskViewer = () => {
     }
 
     function saveTaskDB(){
+      saveChanges(); //Guardamos los cambios de los usuarios
       fetchService(`tasks/${taskId}`, "PUT", authValue, task)
       .then(taskData => {
         setTask(taskData);
@@ -54,19 +56,16 @@ const TaskViewer = () => {
     }
 
     function saveChanges(){
-      console.log(updatedUserIds);
       if (updatedUserIds.length === 0) fetchService(`tasks/deleteUsers/${taskId}`, "PUT", authValue, null) //Si no hay usuarios
-      else if (updatedUserIds.length === 1) fetchService(`tasks/setUser/${taskId}`, "PUT", authValue, updatedUserIds[0]) //Si solo hay un usuario
-      else fetchService(`tasks/setUsers/${taskId}`, "PUT", authValue, updatedUserIds) //Si hay más de uno
-      
+      else fetchService(`tasks/setUsers/${taskId}`, "PUT", authValue, updatedUserIds) //Si hay 
     }
 
     function saveTaskResponse(){
-      
+      //Guardamos respuesta en sesión local o en el usuario
     }
 
     function sendResponse(){  
-      
+      //Guardamos respuesta en el usuario o en la tarea
     }
     
     
@@ -83,11 +82,20 @@ const TaskViewer = () => {
 
                 <button id="saveTaskButton" onClick={() => saveTaskDB()}>Guardar</button>
                 <button id="deleteTaskButton" onClick={() => deleteTaskDB()}>Eliminar tarea</button>
-                 <ModalTest
-                    parentTask={task}
-                    onSaveUsers={(updatedUsers) => setUpdatedUserIds(updatedUsers)}
-                    onClose={() => saveChanges()}
-                  />
+                <AddUserToTask
+                  parentTask={task}
+                  onSaveUsers={(updatedUsers) => setUpdatedUserIds(updatedUsers)}
+                />
+                <p>{task.taskData} {// Escribir plantilla de la tarea
+                } </p>
+                <h3>Usuarios</h3>
+                <ul>
+                  {task.assigneesUserIds && task.assigneesUserIds.map(userId => (
+                    <li key={userId}>
+                      <Link to={"link a la tarea con las respuestas del usuario"}>Nombre y apellido de los usuarios, con estado y fecha de subida</Link>
+                    </li>
+                  ))}
+                </ul>
                 
             </>
             ) : (
@@ -97,8 +105,15 @@ const TaskViewer = () => {
                 <h2>Plazo hasta: {task.due}</h2>
                 <h3>Descripción: {task.description}</h3>
                 <h3>Datos: <input type="text" value = {task.taskData} onChange={(e) => saveFieldUpdate("taskData", e.target.value)} /></h3>
+                {//Si la nota es -1, renderizamos opciones de resolver, etcétera
+                 //Si la nota es otro valor, renderizamos la nota y ocultamos los botones
+                 //Si la tarea es repasable, mostramos la nota y los botones
+                 //Respuestas correctas si no es repasable en otro botón?
+                }
                 <button id="saveTaskResponse" onClick={() => saveTaskResponse()}>Guardar respuesta</button>
                 <button id="sendResponse" onClick={() => sendResponse()}>Enviar respuesta</button>
+                <p>{task.taskData} {// Escribir plantilla de la tarea en la que directamente se pueda escribir
+                } </p>
               </>
               
             )

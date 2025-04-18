@@ -90,7 +90,7 @@ public class User implements UserDetails{
     public void addTask(ObjectId taskId){
         if (!this.tasksIds.contains(taskId)){
             this.tasksIds.add(taskId);
-        } else throw new IllegalArgumentException("El usuario ya tiene acceso a la tarea");
+        }
     }
 
     public void removeGroup(ObjectId groupId){

@@ -1,12 +1,21 @@
 package com.jbs.backendtfg.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.jbs.backendtfg.document.Group;
 import com.jbs.backendtfg.document.User;
@@ -40,6 +49,8 @@ public class GroupController {
         return ResponseEntity.ok(groupService.getGroupsNameSearch(authUser.getGroupsIds(), nameFragment));
     }
 
+
+
     @PostMapping("/newGroup") //Creamos un grupo nuevo
     public ResponseEntity<GroupDTO> createEmptyGroup(@AuthenticationPrincipal User authUser) {
         return ResponseEntity.ok(groupService.saveNewGroup(authUser.getId().toHexString()));
@@ -60,10 +71,14 @@ public class GroupController {
         return ResponseEntity.ok(groupService.addUsersToGroup(id, userIds));
     }
 
-
     @PutMapping("/{id}") //Actualizamos los datos del grupo
     public ResponseEntity<GroupDTO> updateGroup(@PathVariable String id, @AuthenticationPrincipal User authUser, @RequestBody Group group) {
         return ResponseEntity.ok(groupService.updateGroup(group, id));
+    }
+
+    @PutMapping("/setUsers/{id}")
+    public ResponseEntity<GroupDTO> setUsers (@PathVariable String id, @AuthenticationPrincipal User authUser, @RequestBody List<String> userIds){
+        return ResponseEntity.ok(groupService.setUsers(id, userIds));
     }
 
     @DeleteMapping("/deleteGroupId/{id}") //Eliminamos un grupo de nuestra BD

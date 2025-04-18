@@ -1,6 +1,7 @@
 package com.jbs.backendtfg.dtos;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.bson.types.ObjectId;
 
@@ -12,9 +13,9 @@ public class GroupDTO {
     private String id;
     private String name;
     private String creatorId;
-    private ArrayList <String> usersIds;
-    private ArrayList <String> tasksIds;
-    private ArrayList <UserType> allowedUserTypes;
+    private List <String> usersIds;
+    private List <String> tasksIds;
+    private List <UserType> allowedUserTypes;
 
     public GroupDTO (Group g){
         id = g.getId().toHexString();
@@ -43,15 +44,15 @@ public class GroupDTO {
         return creatorId;
     }
 
-    public ArrayList<String> getUsersIds() {
+    public List<String> getUsersIds() {
         return usersIds;
     }
 
-    public ArrayList<String> getTasksIds() {
+    public List<String> getTasksIds() {
         return tasksIds;
     }
 
-    public ArrayList<UserType> getAllowedUserTypes() {
+    public List<UserType> getAllowedUserTypes() {
         return allowedUserTypes;
     }
 

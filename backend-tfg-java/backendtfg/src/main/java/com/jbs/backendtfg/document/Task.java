@@ -1,8 +1,8 @@
 package com.jbs.backendtfg.document;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.time.LocalDate;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -29,8 +29,8 @@ public class Task {
         this.description = "";
         this.due = LocalDate.now();
         this.creatorId = null;
-        this.assigneesUserIds = new ArrayList<ObjectId>();
-        this.assigneesGroupIds = new ArrayList<ObjectId>();
+        this.assigneesUserIds = new ArrayList<>();
+        this.assigneesGroupIds = new ArrayList<>();
         this.taskData = "";
         this.templateId = null;
     }
@@ -40,9 +40,9 @@ public class Task {
         this.description = "";
         this.due = LocalDate.now();
         this.creatorId = creator;
-        this.assigneesUserIds = new ArrayList<ObjectId>();
+        this.assigneesUserIds = new ArrayList<>();
         assigneesUserIds.add(creator); 
-        this.assigneesGroupIds = new ArrayList<ObjectId>();
+        this.assigneesGroupIds = new ArrayList<>();
         this.taskData = "";
         this.templateId = null;
     }
@@ -52,8 +52,8 @@ public class Task {
         this.description = "";
         this.due = LocalDate.now();
         this.creatorId = creator;
-        this.assigneesUserIds = new ArrayList<ObjectId>();
-        this.assigneesGroupIds = new ArrayList<ObjectId>();
+        this.assigneesUserIds = new ArrayList<>();
+        this.assigneesGroupIds = new ArrayList<>();
         this.taskData = "";
         this.templateId = template;
     }
@@ -164,7 +164,7 @@ public class Task {
     }
 
     public void removeAllUsers() {
-        this.assigneesUserIds = new ArrayList<ObjectId>();
+        this.assigneesUserIds = new ArrayList<>();
     }
 
     public ObjectId getTemplateId() {

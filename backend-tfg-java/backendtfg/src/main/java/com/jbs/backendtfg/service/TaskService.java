@@ -1,12 +1,12 @@
 package com.jbs.backendtfg.service; 
 
-import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.jbs.backendtfg.document.Task;
 import com.jbs.backendtfg.document.User;
@@ -68,64 +68,64 @@ public class TaskService { //Definimos los métodos que se pueden realizar sobre
         return tasks;
     }
 
-    /*public TaskDTO addUser(String id, String idUser) {
-        idUser = (idUser.replace("\"", ""));
-        Task t = taskRepository.findById(new ObjectId(id)).get();
-        User u = userRepository.findById(new ObjectId(idUser)).get();
-        t.addUser(new ObjectId(idUser));     
-        u.addTask(t.getId());
-        userRepository.save(u);
-        return new TaskDTO(taskRepository.save(t));
+    public TaskDTO setUsers(String id, List<String> userIds) {
+        Task currentTask = taskRepository.findById(new ObjectId(id)).orElse(null);
+
+        List<ObjectId> newUserIds = new ArrayList<>();
+        for (String newUserId : userIds) { //Preparamos la lista de ids para utilizarla
+            newUserId = (newUserId.replace("\"", ""));
+            newUserIds.add(new ObjectId(newUserId));
+        }
+
+        List<ObjectId> currentUserIds = currentTask.getAssigneesUserIds();
+
+        for (ObjectId currentUserId : currentUserIds) { //Eliminamos la tarea de los usuarios anteriores que ya no pertenecen
+            if (!newUserIds.contains(currentUserId)) {
+                removeUser(id, currentUserId);
+            }
+        }
+
+        for (ObjectId newUserId : newUserIds) { //Añadimos la tarea a los usuarios nuevos
+            if (!currentUserIds.contains(newUserId)) {
+                addUser(id, newUserId);
+            }
+        }
+
+        currentTask.setAssigneesUserIds(newUserIds); //Sobreescribimos la lista de usuarios
+        return new TaskDTO(taskRepository.save(currentTask)); //Devolvemos la tarea actualizada
     }
 
-    public TaskDTO addUsers(String id, List<String> ids) { //Refactorizable usando addUser?
-        for (String idUser : ids) {
-            idUser = (idUser.replace("\"", ""));
-        }
-        Task t = taskRepository.findById(new ObjectId(id)).get();
-        for (String idUser : ids) {
-            User u = userRepository.findById(new ObjectId(idUser)).get();
-            t.addUser(new ObjectId(idUser));     
-            u.addTask(t.getId());
-            userRepository.save(u);
-        }
-        return new TaskDTO(taskRepository.save(t));
-    }*/
-
-    public TaskDTO addUser(String id, String idUser) {
-        idUser = (idUser.replace("\"", ""));
-        Task t = taskRepository.findById(new ObjectId(id)).get();
-        User u = userRepository.findById(new ObjectId(idUser)).get();
-        t.addUser(new ObjectId(idUser));     
-        u.addTask(t.getId());
-        userRepository.save(u);
-        return new TaskDTO(taskRepository.save(t));
+    public void addUser(String id, ObjectId idUser) {
+        User user = userRepository.findById(idUser).get();  
+        user.addTask(new ObjectId(id));
+        userRepository.save(user);
     }
 
-    public TaskDTO setUsers(String id, List<String> ids) { //SetUsers
-        List<ObjectId> idsUsers = new ArrayList<>();
-        for (String idUser : ids) {
-            idUser = (idUser.replace("\"", ""));
-            idsUsers.add(new ObjectId(idUser));
-        }
-        id = (id.replace("\"", ""));
-        Task t = taskRepository.findById(new ObjectId(id)).get();
-        t.setAssigneesUserIds(idsUsers);
-        return new TaskDTO(taskRepository.save(t));
-    }
-
-    public TaskDTO setUser(String id, String idUser) {
-        idUser = (idUser.replace("\"", ""));
-        Task t = taskRepository.findById(new ObjectId(id)).get();
-        t.setAssigneesUserIds(new ArrayList<>());
-        t.addUser(new ObjectId(idUser));
-        return new TaskDTO(taskRepository.save(t));
+    public void removeUser(String id, ObjectId idUser) {
+        User user = userRepository.findById(idUser).get();
+        user.removeTask(new ObjectId(id));
+        userRepository.save(user);
     }
 
     public TaskDTO deleteUsers(String id) {
         Task t = taskRepository.findById(new ObjectId(id)).get();
         t.setAssigneesUserIds(new ArrayList<>());
         return new TaskDTO(taskRepository.save(t));
+    }
+
+    public Object setUser(String id, String idUser) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setUser'");
+    }
+
+    public List<TaskDTO> getTasksNameSearch(ObjectId idCreator, ArrayList<ObjectId> tasksIds, String nameFragment) {
+        List<TaskDTO> toReturn = new ArrayList<>();
+        for (Task task : taskRepository.findByCreatorIdAndNameContainingIgnoreCase(idCreator, nameFragment)) {
+            if (tasksIds.contains(task.getId())) {
+                toReturn.add(new TaskDTO(task));
+            }
+        }
+        return toReturn;
     }
 
 }

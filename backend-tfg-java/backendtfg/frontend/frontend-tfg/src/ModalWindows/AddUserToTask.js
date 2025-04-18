@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
-import { Container, Form, Button, ListGroup } from 'react-bootstrap';
+import { Form, Button, ListGroup } from 'react-bootstrap';
 import fetchService from '../services/fetchService';
 import { useLocalState } from '../utils/useLocalState';
 
-function ModalTest({parentTask, onSaveUsers}) {
+function AddUserToTask({parentTask, onSaveUsers}) {
 
   const [authValue, setAuthValue] = useLocalState("", "authValue");
 
@@ -195,4 +195,4 @@ function ModalTest({parentTask, onSaveUsers}) {
   );
 }
 
-export default ModalTest;
+export default AddUserToTask;

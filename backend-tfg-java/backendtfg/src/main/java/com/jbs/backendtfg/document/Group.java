@@ -1,6 +1,7 @@
 package com.jbs.backendtfg.document;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -13,9 +14,9 @@ public class Group {
     private ObjectId id;
     private String name;
     private ObjectId creatorId;
-    private ArrayList <ObjectId> usersIds = new ArrayList<>();
-    private ArrayList <ObjectId> tasksIds = new ArrayList<>();
-    private ArrayList <UserType> allowedUserTypes = new ArrayList<>();
+    private List <ObjectId> usersIds = new ArrayList<>();
+    private List <ObjectId> tasksIds = new ArrayList<>();
+    private List <UserType> allowedUserTypes = new ArrayList<>();
 
     public Group() {
         this.name = "";
@@ -55,19 +56,19 @@ public class Group {
         this.creatorId = creatorId;
     }
 
-    public ArrayList<ObjectId> getUsersIds() {
+    public List<ObjectId> getUsersIds() {
         return usersIds;
     }
 
-    public void setUsersIds(ArrayList<ObjectId> usersIds) {
+    public void setUsersIds(List<ObjectId> usersIds) {
         this.usersIds = usersIds;
     }
 
-    public ArrayList<ObjectId> getTasksIds() {
+    public List<ObjectId> getTasksIds() {
         return tasksIds;
     }
 
-    public void setTasksIds(ArrayList<ObjectId> tasksIds) {
+    public void setTasksIds(List<ObjectId> tasksIds) {
         this.tasksIds = tasksIds;
     }
 
@@ -95,15 +96,15 @@ public class Group {
         return creatorId;
     }
 
-    public ArrayList<ObjectId> getUsers() {
+    public List<ObjectId> getUsers() {
         return usersIds;
     }
 
-    public ArrayList<ObjectId> getTasks() {
+    public List<ObjectId> getTasks() {
         return tasksIds;
     }
 
-    public ArrayList<UserType> getAllowedUserTypes() {
+    public List<UserType> getAllowedUserTypes() {
         return allowedUserTypes;
     }
 
@@ -123,7 +124,7 @@ public class Group {
         this.tasksIds = new ArrayList<ObjectId>();
     }
 
-    public void setAllowedUserTypes(ArrayList<UserType> types) {
+    public void setAllowedUserTypes(List<UserType> types) {
         this.allowedUserTypes = types;
     }
 

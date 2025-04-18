@@ -20,6 +20,9 @@ function fetchService(url, reqMethod, authValue, reqBody) { //Función que nos p
           .then(response => {
             if (response.status === 200) {
               return response.json();
+            } else if (response.status === 401) {
+              alert("Sesión caducada");
+              window.location.href = "/login";
             }
           })
 

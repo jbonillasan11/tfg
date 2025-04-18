@@ -13,4 +13,6 @@ import com.jbs.backendtfg.document.Task;
 public interface TaskRepository extends MongoRepository<Task, ObjectId> {
     Optional<Task> findByName(String name);
     List<Task> findByCreator(ObjectId id);
+
+    List<Task> findByCreatorIdAndNameContainingIgnoreCase(ObjectId creatorId, String name); //Nombre explicativo
 }

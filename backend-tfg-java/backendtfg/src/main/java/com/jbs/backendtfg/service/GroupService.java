@@ -1,16 +1,18 @@
 package com.jbs.backendtfg.service; 
 
-import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.jbs.backendtfg.document.Group;
+import com.jbs.backendtfg.document.User;
 import com.jbs.backendtfg.dtos.GroupDTO;
 import com.jbs.backendtfg.repository.GroupRepository;
+import com.jbs.backendtfg.repository.UserRepository;
 
 @Service
 public class GroupService { //Definimos los métodos que se pueden realizar sobre el repositorio de grupos
@@ -20,6 +22,9 @@ public class GroupService { //Definimos los métodos que se pueden realizar sobr
 
     @Autowired
     private UserService userService;
+
+    @Autowired 
+    private UserRepository userRepository;
 
     public List<GroupDTO> getAllGroups() { //Obtenemos todos los grupos del repositorio
         List<Group> lGroups= groupRepository.findAll();
@@ -91,6 +96,45 @@ public class GroupService { //Definimos los métodos que se pueden realizar sobr
             lGroupsDTO.add(new GroupDTO(group));
         }
         return lGroupsDTO;
+    }
+
+    public GroupDTO setUsers(String id, List<String> userIds) {
+        Group currentGroup = groupRepository.findById(new ObjectId(id)).get();
+        
+        List<ObjectId> newUserIds = new ArrayList<>();
+        for (String newUserId : userIds) { //Preparamos la lista de ids para utilizarla
+            newUserId = (newUserId.replace("\"", ""));
+            newUserIds.add(new ObjectId(newUserId));
+        }
+
+        List<ObjectId> currentUserIds = currentGroup.getUsers();
+
+        for (ObjectId currentUserId : currentUserIds) { //Eliminamos el grupo de los usuarios anteriores que ya no pertenecen
+            if (!newUserIds.contains(currentUserId)) {
+                removeUser(id, currentUserId);
+            }
+        }
+
+        for (ObjectId newUserId : newUserIds) { //Añadimos el grupo a los usuarios nuevos
+            if (!currentUserIds.contains(newUserId)) {
+                addUser(id, newUserId);
+            }
+        }
+
+        currentGroup.setUsersIds(newUserIds);
+        return new GroupDTO(groupRepository.save(currentGroup));
+    }
+
+    public void addUser(String id, ObjectId userId){
+        User user = userRepository.findById(userId).get();  
+        user.addGroup(new ObjectId(id));
+        userRepository.save(user);
+    }
+
+    public void removeUser(String id, ObjectId userId){
+        User user = userRepository.findById(userId).get();
+        user.removeGroup(new ObjectId(id));
+        userRepository.save(user);
     }
 
 

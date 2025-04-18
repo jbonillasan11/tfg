@@ -10,7 +10,7 @@ import GroupViewer from './GroupViewer';
 import UserViewer from './UserViewer';
 import Chats from './Chats';
 import Chat from './Chat';
-import ModalTest from './ModalTest';
+import AddUserToTask from './ModalWindows/AddUserToTask';
 
 
 function App() { 
@@ -36,7 +36,7 @@ return (
       <Route path="/chats/:id" element={
         <PrivateRoute> <Chat /> </PrivateRoute>
       } />
-      <Route path="/modal" element={<ModalTest />}/>
+      <Route path="/modal" element={<AddUserToTask />} />
       <Route path="/" element={<Homepage />}/> 
       <Route path="/login" element={<Login />}/> 
       <Route path="/register" element={<Register />}/>
