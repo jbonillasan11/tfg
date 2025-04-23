@@ -2,48 +2,101 @@ import React from 'react';
 import { useLocalState } from '../utils/useLocalState';
 import { useState, useEffect } from 'react';
 import fetchService from '../services/fetchService';
-import { Link } from 'react-router-dom';
-import NewChatModal from '../Components/NewChatModal';
+import NewChat from '../ModalWindows/NewChat';
+import { ListGroup } from 'react-bootstrap';
+import TopBar from '../Components/TopBar';
+import { useLocation } from "react-router-dom";
+import Chat from '../Chats/Chat';
 
 const Chats = () => {
 
-    const[authValue, setAuthValue] = useLocalState("", "authValue");
-    const[pastChats, setPastChats] = useState([]);
-    const[modalOpened, setModalOpened] = useState(false);
+    const [authValue, setAuthValue] = useLocalState("", "authValue");
+    const [currentUser, setCurrentUser] = useLocalState("", "currentUser");
+
+    const location = useLocation(); //Obtenemos el id del usuario al que redirigimos desde el chat (si existe)
+
+    const [pastChats, setPastChats] = useState([]);
+    const [currentChat, setCurrentChat] = useState({}); //Chat al que accedemos, por defecto null
+    const [chatNames, setChatNames] = useState({}); //Nombres de los chats, por defecto null
 
     useEffect(() => {
-        fetchService("chats/getUserChats", "GET", authValue, null)
-        .then(responseChats => {
-            setPastChats(responseChats);
+        fetchService("users/getUserChats", "GET", authValue, null)
+        .then((response) => {
+            setPastChats(response);
         })
-    }, [authValue]);
+        if (location.state) { //Si venimos redirigidos del botón chat de un usuario, obtenemos su id y abrimos el chat privado con él automáticamente
+            fetchService("chats/getSingleChatByParticipants", "POST", authValue, [currentUser.id, location.state.otherUserId]) //Si hay más de un chat en el que estén ambos usuarios (grupal), cuál devuelve??
+            .then((response) => {
+                setCurrentChat(response);
+            })
+        }
+    }, []);
 
-    function newChatRedirecter(chatId){ //Al crearse el chat, devolverá el id, que elevará a esta función y que redirigirá al usuario a al ventana del chat
-        console.log(chatId);
-        window.location.href = `/chats/${chatId}`;
+    useEffect(() => {
+        //Obtenemos el chat y lo renderizamos en el lateral
+        if (currentChat){
+            
+        }
+    }, [currentChat]); //Cuando se crea un nuevo chat, se actualiza el estado del chat actual
+
+    useEffect(() => {
+        if (!pastChats || pastChats.length === 0) return;
+
+        pastChats.forEach(chat => {
+            fetchService("users/getUsers", "POST", authValue, chat.participants)
+                .then(users => {
+                    const nameString = users.map(user => user.name).join(", ");
+                    setChatNames(prev => ({ ...prev, [chat.id]: nameString }));
+                });
+        });
+    }, [pastChats, authValue]);
+
+
+    function newChatRedirecter(chat){ //Al crearse el chat, devolverá el id, que elevará a esta función y que redirigirá al usuario a al ventana del chat
+        setCurrentChat(chat); //El chat actual es el recién creado
     }
 
     return (
-        <div>
-            <h1>Chats</h1>
-            <ul>
-                {pastChats && pastChats.length > 0 && pastChats.map(chat => ( //li modificable por div si prefiero que no aparezca con el formato lista
-                    <div key={chat.id}> 
-                        <Link to={`/chats/${chat.id}`} //Cambiar por onClick, quiero que sea un boton o un cuadro, no un link 
-                        > 
-                            ID: {chat.id}, {chat.participants.map(participant => participant.name).join(", ")}
-                        </Link>
-                    </div>
-                ))}
-            </ul>
-            <button onClick={() => setModalOpened(true)}>Nuevo chat</button>
-            <NewChatModal
-                isOpen={modalOpened}
-                onClose={() => setModalOpened(false)}
-                onCreateChat={newChatRedirecter}
-            />
-        </div>
+        <>
+            <TopBar currentUser={currentUser} />
+            <div style={{ display: 'flex', height: '100vh' }}>
+                
+                <div style={{ flex: 1, overflowY: 'auto', backgroundColor: '#f0f0f0', padding: '1rem' }}>
+                    <h1>Chats</h1>
+                    <NewChat
+                        currentUser={currentUser}
+                        onCreateChat={(newChat) => {
+                            setPastChats([...pastChats, newChat]);
+                            setCurrentChat(newChat);
+                            newChatRedirecter(newChat.id);
+                        }}
+                    />
+                    <ListGroup>
+                        {pastChats && pastChats.length > 0 && pastChats.map(chat => (
+                            <ListGroup.Item
+                                key={chat.id}
+                                action
+                                onClick={() => setCurrentChat(chat)}
+                            >
+                                Chat de {chatNames[chat.id]}
+                            </ListGroup.Item>
+                        ))}
+                    </ListGroup>
+                </div>
+
+                <div style={{ flex: 2, overflowY: 'auto', padding: '1rem', backgroundColor: '#ffffff' }}>
+                    {/* AQUI RENDERIZO EL CHAT */}
+                    <Chat
+                        parentChat={currentChat} //El chat que se ha seleccionado
+                        chatNames={chatNames[currentChat.id]} //Los nombres de los participantes del chat
+                    />
+                </div>
+            </div>
+        </>
+        
     );
+    
+    
 };
 
 export default Chats;

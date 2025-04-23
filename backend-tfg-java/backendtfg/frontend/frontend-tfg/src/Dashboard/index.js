@@ -1,12 +1,14 @@
 import { useLocalState } from '../utils/useLocalState';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import fetchService from '../services/fetchService';
-import ChatButton from '../Components/ChatButton';
-import LogoutButton from '../Components/LogoutButton';
-import ProfileButton from '../Components/ProfileButton';
+import { Container, Row, Col } from 'react-bootstrap';
+import { ListGroup } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import TopBar from '../Components/TopBar';
 
 const Dashboard = ({ stateExample }) => {
+
+  const navigate = useNavigate();
 
   const[authValue, setAuthValue] = useLocalState("", "authValue");
   const [currentUser, setCurrentUser] = useLocalState("", "currentUser");
@@ -75,50 +77,61 @@ const Dashboard = ({ stateExample }) => {
     if (!currentUser) return <div>Cargando dashboard...</div>;
     
     return (
-        <>
+        <>  
+          {/*<TopBar currentUser={currentUser} /> */}
+          <TopBar currentUser={currentUser} />
+          <Container fluid>
+            
             <div>
               <h1>Bienvenido, {currentUser.name}</h1>
             </div>
-            <div align="right" style ={{margin: "20px"}}>
-              <h3>Chatea con otros miembros de {currentUser.organization}</h3>
-              <ChatButton />
-            </div>
-            <div>
-              <h2>Tareas</h2>
-              <ul>
-                {tasks && tasks.map(task => ( //li modificable por div si prefiero que no aparezca con el formato lista
-                  <li key={task.id}> 
-                    <Link to={`/tasks/${task.id}`}>{task.name === "" ? "Tarea sin nombre" : task.name}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            {currentUser.userType === "PROFESSOR" ? (
-              <div style ={{margin: "20px"}}>
-                  <button onClick={() => createAssignment()}>Nueva tarea</button>
-              </div>
-            ) : (
-              <></>
-            )}
-            <div>
-              <h2>Grupos</h2>
-              <ul>
-                {groups && groups.map(group => ( //li modificable por div si prefiero que no aparezca con el formato lista
-                  <li key={group.id}> 
-                    <Link to={`/groups/${group.id}`}>{group.name === "" ? "Grupo sin nombre" : group.name}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-              {currentUser.userType === "PROFESSOR" ? ( 
-                <div style ={{margin: "20px"}}>
-                  <button onClick={() => createGroup()}>Nuevo grupo</button>
-                </div>  
-              ) : (
-                <></>
-              )}
-              <ProfileButton id={currentUser.id} />
-              <LogoutButton />
+            <Row>
+              <Col md={6}>
+                <div>
+                  <h2 class = "one">Tareas</h2>
+                  <ListGroup class = "two">
+                    {tasks && tasks.map(task => (
+                      <ListGroup.Item key= {task.id}
+                          action
+                          onClick={ () => navigate(`/tasks/${task.id}`) }>
+                          {task.name === "" ? "Tarea sin nombre" : task.name}
+                      </ListGroup.Item>
+                      ))}
+                  </ListGroup>
+                </div>
+                {currentUser.userType === "PROFESSOR" ? (
+                  <div style ={{margin: "20px"}}>
+                      <button onClick={() => createAssignment()}>Nueva tarea</button>
+                  </div>
+                ) : (
+                  <></>
+                )}
+              </Col> 
+
+              <Col md={6}>
+                <div>
+                  <h2 class = "three">Grupos</h2>
+                  <ListGroup class = "four">
+                    {groups && groups.map(group => (
+                      <ListGroup.Item key= {group.id}
+                          action
+                          onClick={ () => navigate(`/groups/${group.id}`) }>
+                          {group.name === "" ? "Grupo sin nombre" : group.name}
+                      </ListGroup.Item>
+                      ))}
+                  </ListGroup>
+                </div>
+                  {currentUser.userType === "PROFESSOR" ? ( 
+                    <div style ={{margin: "20px"}}>
+                      <button onClick={() => createGroup()}>Nuevo grupo</button>
+                    </div>  
+                  ) : (
+                    <></>
+                  )}
+              </Col>
+            </Row>
+          </Container>
+          
         </>
     );
 }; 

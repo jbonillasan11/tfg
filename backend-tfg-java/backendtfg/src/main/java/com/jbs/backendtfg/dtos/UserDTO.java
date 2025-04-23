@@ -21,7 +21,7 @@ public class UserDTO {
     private ArrayList <String> tasksIds = new ArrayList<>();
     private UserType userType;
     private List<Role> roles= new ArrayList<Role>();
-    private List<String> chatsIDs; 
+    private List<String> chatsIDs = new ArrayList<>(); 
     //Omitimos el campo password para no enviarla al frontend
     //Incluir Map de responses?
 

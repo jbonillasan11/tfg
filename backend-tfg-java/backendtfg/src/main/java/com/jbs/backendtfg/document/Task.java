@@ -18,8 +18,8 @@ public class Task {
     private LocalDate due;
     private ObjectId creatorId;
     private boolean redoable;
-    private List <ObjectId> assigneesUserIds;
-    private List <ObjectId> assigneesGroupIds; //Por el momento prescindible
+    private List <ObjectId> assigneesUserIds = new ArrayList<>();
+    private List <ObjectId> assigneesGroupIds = new ArrayList<>(); //Por el momento prescindible
     private ObjectId templateId;
     private Object taskData; //Solución subida por el alumno?
     
@@ -29,8 +29,6 @@ public class Task {
         this.description = "";
         this.due = LocalDate.now();
         this.creatorId = null;
-        this.assigneesUserIds = new ArrayList<>();
-        this.assigneesGroupIds = new ArrayList<>();
         this.taskData = "";
         this.templateId = null;
     }
@@ -40,9 +38,6 @@ public class Task {
         this.description = "";
         this.due = LocalDate.now();
         this.creatorId = creator;
-        this.assigneesUserIds = new ArrayList<>();
-        assigneesUserIds.add(creator); 
-        this.assigneesGroupIds = new ArrayList<>();
         this.taskData = "";
         this.templateId = null;
     }
@@ -52,8 +47,6 @@ public class Task {
         this.description = "";
         this.due = LocalDate.now();
         this.creatorId = creator;
-        this.assigneesUserIds = new ArrayList<>();
-        this.assigneesGroupIds = new ArrayList<>();
         this.taskData = "";
         this.templateId = template;
     }

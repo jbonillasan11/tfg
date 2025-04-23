@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.jbs.backendtfg.document.User;
+import com.jbs.backendtfg.dtos.ChatDTO;
 import com.jbs.backendtfg.dtos.UserDTO;
 import com.jbs.backendtfg.service.DeletionService;
 import com.jbs.backendtfg.service.UserService;
@@ -49,9 +50,14 @@ public class UserController { //Manejamos los mapeos de las peticiones HTTP
         return ResponseEntity.ok(userService.getUserTasksIds(authUser));
     }
 
-    @GetMapping("/getUserChats") //Obtenemos una lista de los IDs de las tareas a los que pertenece el usuario
-    public ResponseEntity<List<String>> getUserChats(@AuthenticationPrincipal User authUser) {
+    @GetMapping("/getUserChatIds") //Obtenemos una lista de los IDs de las tareas a los que pertenece el usuario
+    public ResponseEntity<List<String>> getUserChatIds(@AuthenticationPrincipal User authUser) {
         return ResponseEntity.ok(userService.getUserChatsIds(authUser));
+    }
+
+    @GetMapping("/getUserChats") //Obtenemos una lista de los IDs de las tareas a los que pertenece el usuario
+    public ResponseEntity<List<ChatDTO>> getUserChats(@AuthenticationPrincipal User authUser) {
+        return ResponseEntity.ok(userService.getUserChats(authUser.getId()));
     }
 
     @GetMapping("/getOtherUserGroups/{id}") //Obtenemos una lista de los IDs de los grupos a los que pertenece el usuario

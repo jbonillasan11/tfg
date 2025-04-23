@@ -194,6 +194,14 @@ public class User implements UserDetails{
         this.chats = chats;
     }
 
+    public void addChat(ObjectId chatId) {
+        this.chats.add(chatId);
+    }
+
+    public void removeChat(ObjectId chatId) {
+        this.chats.remove(chatId);
+    }
+
     @Override
     public boolean equals(Object o){
         if (o == this) return true;

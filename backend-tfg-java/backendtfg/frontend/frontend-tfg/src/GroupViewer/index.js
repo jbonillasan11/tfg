@@ -2,10 +2,14 @@ import React, { useEffect } from 'react';
 import fetchService from '../services/fetchService';
 import { useLocalState } from '../utils/useLocalState';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import AddUserToGroup from '../ModalWindows/AddUserToGroup';
+import { ListGroup } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import TopBar from '../Components/TopBar';
 
 const GroupViewer = () => {
+
+    const navigate = useNavigate();
 
     const [authValue, setAuthValue] = useLocalState("", "authValue");
     const [currentUser, setCurrentUser] = useLocalState("", "currentUser"); //Usuario logueado
@@ -20,15 +24,14 @@ const GroupViewer = () => {
     const [updatedUserIds, setUpdatedUserIds] = useState([]);
 
     useEffect(() => {
-        fetchService(`groups/${groupId}`, "GET", authValue, null) //Petición asíncrona a nuestra APIRest
-            .then(groupData => {
-              setGroup(groupData);
-            })
-            .catch(error => {
-                console.error(error.message);
-                setGroup(null);
-            });
-        console.log(group);
+      fetchService(`groups/${groupId}`, "GET", authValue, null) //Petición asíncrona a nuestra APIRest
+          .then(groupData => {
+            setGroup(groupData);
+          })
+          .catch(error => {
+              console.error(error.message);
+              setGroup(null);
+          });
     }, [])
     
     useEffect(() => {
@@ -43,7 +46,7 @@ const GroupViewer = () => {
     useEffect (() => {
       if (group.usersIds && group.usersIds.length >= 1){
         fetchService("users/getUsers", "POST", authValue, group.usersIds)
-        .then( usersData => {
+        .then(usersData => {
           setGroupUsers(usersData);
         })
       } else {
@@ -51,7 +54,7 @@ const GroupViewer = () => {
       }
       if (group.tasksIds && group.tasksIds.length > 0){
         fetchService("tasks/getTasksFromIds", "POST", authValue, {tasksIDs: group.tasksIds})
-        .then( tasksData => {
+        .then(tasksData => {
           setGroupTasks(tasksData);
         })
       }
@@ -72,11 +75,17 @@ const GroupViewer = () => {
       setGroup(groupCopy);
     }
 
+    function confirmGroupDeletion(){
+      if (window.confirm("¿Estás seguro de que quieres eliminar el grupo? Esta acción no se puede deshacer.")) { //Sustituir por ventana emergente
+        deleteGroupDB();
+      }
+    }
+
     function deleteGroupDB(){
       fetchService(`groups/deleteGroupId/${groupId}`, "DELETE", authValue, null)
-      .then(groupData => {
+      .then(() => {
         alert("Grupo eliminado con éxito");
-        window.location.href = "/dashboard"; //Redirigimos al dashboard
+        navigate("/dashboard") ; //Redirigimos al dashboard
       })
     }
 
@@ -85,28 +94,38 @@ const GroupViewer = () => {
       else fetchService(`groups/setUsers/${groupId}`, "PUT", authValue, updatedUserIds) //Si hay 
     }
 
+    function groupForum(){
+
+    }
+
     return (
+      <>
+        <TopBar currentUser={currentUser} />
         <div>
           {group ? (
           <>
               <h1> Grupo <input type="text" value = {group.name} onChange={(e) => saveFieldUpdate("name", e.target.value)} /></h1>
-              <h3>Creado por: {creator.name} {creator.surname}</h3>
-              <h3>Tareas</h3>
-              <ul>
+              <h3> Creado por: {creator.name} {creator.surname} </h3>
+              <h3> Tareas </h3>
+              <ListGroup>
                 {groupTasks && groupTasks.map(task => (
-                  <li key={task.id}> 
-                  <Link to={`/tasks/${task.id}`}>{task.name}</Link>
-                  </li>
-                ))}
-              </ul>
+                  <ListGroup.Item key= {task.id}
+                      action
+                      onClick={() => navigate(`/tasks/${task.id}`)}>
+                      {task.name}
+                  </ListGroup.Item>
+                  ))}
+              </ListGroup>
               <h3>Miembros</h3>
-              <ul>
+              <ListGroup>
                 {groupUsers && groupUsers.map(member => (
-                  <li key={member.id}>
-                    <Link to={`/user/${member.id}`}>{member.name} {member.surname}</Link>
-                  </li>
-                ))}
-              </ul>
+                  <ListGroup.Item key= {member.id}
+                      action
+                      onClick={() => navigate(`/user/${member.id}`)}>
+                      {member.name} {member.surname}
+                  </ListGroup.Item>
+                  ))}
+              </ListGroup>
                 {currentUser.id === group.creatorId ? (
                 <>
                   <AddUserToGroup
@@ -114,7 +133,8 @@ const GroupViewer = () => {
                     onSaveUsers={(updatedUsers) => setUpdatedUserIds(updatedUsers)}
                   />
                   <button id="saveGroupButton" onClick={() => saveGroupDB()}>Guardar cambios</button>
-                  <button id="deleteGroupButton" onClick={() => deleteGroupDB()}>Eliminar grupo</button>
+                  <button id="deleteGroupButton" onClick={() => confirmGroupDeletion()}>Eliminar grupo</button>
+                  <button id="groupForum" onClick={() => groupForum()}>Foro del grupo</button>
                 </>
                 ) : (
                   <></>
@@ -126,7 +146,8 @@ const GroupViewer = () => {
               </>
           )
           }
-        </div>
+          </div>
+      </>
     );
 };
 

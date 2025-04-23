@@ -113,11 +113,6 @@ public class TaskService { //Definimos los métodos que se pueden realizar sobre
         return new TaskDTO(taskRepository.save(t));
     }
 
-    public Object setUser(String id, String idUser) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUser'");
-    }
-
     public List<TaskDTO> getTasksNameSearch(ObjectId idCreator, ArrayList<ObjectId> tasksIds, String nameFragment) {
         List<TaskDTO> toReturn = new ArrayList<>();
         for (Task task : taskRepository.findByCreatorIdAndNameContainingIgnoreCase(idCreator, nameFragment)) {

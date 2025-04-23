@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.jbs.backendtfg.document.User;
+import com.jbs.backendtfg.dtos.ChatDTO;
 import com.jbs.backendtfg.dtos.UserDTO;
 import com.jbs.backendtfg.repository.UserRepository;
 
@@ -21,6 +22,9 @@ public class UserService { //Definimos los métodos que se pueden realizar sobre
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ChatService chatService;
 
     public List<UserDTO> getAllUsers() { //Obtenemos todos los usuarios del repositorio
         List<User> lUsers = userRepository.findAll();
@@ -133,6 +137,15 @@ public class UserService { //Definimos los métodos que se pueden realizar sobre
         User targetUser = userRepository.findById(objectId).get();
         targetUser.removeGroup(objectId2);
         userRepository.save(targetUser);
+    }
+
+    public List<ChatDTO> getUserChats(ObjectId userId) {
+        UserDTO targetUser = getUserById(userId.toHexString());
+        List<ChatDTO> chats = new ArrayList<>();
+        for (ChatDTO c: chatService.getChatsByIds(targetUser.getChatsIDs())) {
+            chats.add(c);
+        }
+        return chats;
     }
 
 }

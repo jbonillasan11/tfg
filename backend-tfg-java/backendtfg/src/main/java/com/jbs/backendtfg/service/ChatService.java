@@ -3,6 +3,7 @@ package com.jbs.backendtfg.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +16,13 @@ import com.jbs.backendtfg.dtos.ChatDTO;
 import com.jbs.backendtfg.dtos.MessageDTO;
 import com.jbs.backendtfg.repository.ChatRepository;
 import com.jbs.backendtfg.repository.MessageRepository;
+import com.jbs.backendtfg.repository.UserRepository;
 
 @Service
 public class ChatService {
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private ChatRepository chatRepository;
@@ -40,6 +45,14 @@ public class ChatService {
             return null;
     }
 
+    public List<ChatDTO> getChatsByIds (List<String> ids){ //Obtenemos todos los chats de un usuario
+        List<ChatDTO> chatDTOs = new ArrayList<>(); 
+        for (String id : ids) {
+            chatDTOs.add(getChatById(id));
+        }
+        return chatDTOs;
+    }
+
     public List<ChatDTO> getChatsByParticipant (User u){ //Obtenemos todos los chats de un usuario
         List<ChatDTO> chatDTOs = new ArrayList<>(); 
         for (Chat chat : chatRepository.findByParticipantsContaining(u.getId())) {
@@ -48,29 +61,26 @@ public class ChatService {
         return chatDTOs;
     }
 
-    public ChatDTO newGroupChat(User u, List<String> participantsIds) {
-        ArrayList <ObjectId> participants = new ArrayList<>();
-        participants.add(u.getId());
+    public ChatDTO newGroupChat(List<String> participantsIds) {
+        ArrayList<ObjectId> participants = new ArrayList<>();
         for (String id : participantsIds) {
             participants.add(new ObjectId(id));
         }
-        if (chatRepository.findByParticipants(participants).isPresent()) { //Si existe un chat con los mismos participantes, lo devolvemos sin crear uno nuevo
-            return new ChatDTO(chatRepository.findByParticipants(participants).get());
-        } else {
+    
+        Optional<Chat> existingChat = chatRepository.findByParticipants(participants);
+        if (existingChat.isPresent()) { //Si ya existe un chat con esos participantes, lo devolvemos
+            return new ChatDTO(existingChat.get());
+        } else { //Si no existe, lo creamos
             Chat chat = new Chat(participants);
-            return new ChatDTO(chatRepository.save(chat)); //Si no existe, lo creamos
-        }
-    }
+            chat = chatRepository.save(chat); 
 
-    public ChatDTO newChat(User u, String participantId) {
-        ArrayList <ObjectId> participants = new ArrayList<>();
-        participants.add(u.getId());
-        participants.add(new ObjectId(participantId.replaceAll("\"", ""))); //Dado que el frontend nos devuelve el string del id con comillas, las suprimimos para hcer la conversión a ObjectId (ObjectId requiere 24 caracteres)
-        if (chatRepository.findByParticipants(participants).isPresent()) {
-            return new ChatDTO(chatRepository.findByParticipants(participants).get());
-        } else {
-            Chat chat = new Chat(participants);
-            return new ChatDTO(chatRepository.save(chat));
+            for (String id : participantsIds) { //Por cada participante, añadimos el chat a su lista de chats
+                User user = userRepository.findById(new ObjectId(id)).get();
+                user.addChat(chat.getId());
+                userRepository.save(user);
+            }
+    
+            return new ChatDTO(chat);
         }
     }
 
@@ -89,6 +99,14 @@ public class ChatService {
             messageDTOs.add(new MessageDTO(message));
         }
         return messageDTOs;
+    }
+
+    public ChatDTO getSingleChatByParticipants(List<String> participants) { //Obtenemos el chat de la BD con los participantes recibidos
+        ArrayList<ObjectId> participantsIds = new ArrayList<>();
+        for (String id : participants) {
+            participantsIds.add(new ObjectId(id));
+        }
+        return newGroupChat(participants);
     }
     
 }

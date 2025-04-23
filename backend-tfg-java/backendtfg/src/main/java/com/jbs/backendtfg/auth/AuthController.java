@@ -39,41 +39,24 @@ public class AuthController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    /*@PostMapping("/login") //Exponemos el endpoint login
-    public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest request) {
-        AuthenticationResponse response = authenticationService.authenticate(request); //Enviamos usuario y pwd al AuthenticationService
-        return ResponseEntity.ok(response); //Devolvemos el token en caso de que se autentique correctamente
-    }*/
 
     @PostMapping("/login") //Exponemos el endpoint login
     public ResponseEntity<?> login(@RequestBody AuthenticationRequest request) {
-            try{
-                Authentication authenticate = authenticationManager
-                    .authenticate(
-                        new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-                    );
-                User user = (User) authenticate.getPrincipal();
-                
-                return ResponseEntity.ok()
-                    .header("Access-Control-Expose-Headers", HttpHeaders.AUTHORIZATION) //Expone el header?
-                    .header(HttpHeaders.AUTHORIZATION, jwtService.generateToken(user))
-                    .body(user);
-            } catch (BadCredentialsException e){
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-    }
-
-    /*@PostMapping("/register") //El frontend maneja JSON, por lo que este metodo no sirve (devuelve texto plano) 
-    public ResponseEntity<?> registerUser(@RequestBody User user) {
-        if (userRepository.findByEmail(user.getEmail()) == null) {
-            return ResponseEntity
-                .status(HttpStatus.CONFLICT) // 409 CONFLICT si ya existe
-                .body("El correo ya está registrado.");
+        try{
+            Authentication authenticate = authenticationManager
+                .authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+                );
+            User user = (User) authenticate.getPrincipal();
+            
+            return ResponseEntity.ok()
+                .header("Access-Control-Expose-Headers", HttpHeaders.AUTHORIZATION) //Expone el header?
+                .header(HttpHeaders.AUTHORIZATION, jwtService.generateToken(user))
+                .body(user);
+        } catch (BadCredentialsException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
-        userRepository.save(user);
-        return ResponseEntity.ok("Usuario registrado correctamente.");
-    }*/
+    }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody User user) {

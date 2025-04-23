@@ -43,20 +43,21 @@ public class ChatController {
         return ResponseEntity.ok(chatService.getChatById(id));
     }
 
-    @PostMapping("/newGroupChat")
-    public ResponseEntity<ChatDTO> createNewGroupChat(@AuthenticationPrincipal User authUser, @RequestBody List<String> participants){
-        return ResponseEntity.ok(chatService.newGroupChat(authUser, participants));
-    }
-
-    @PostMapping("/newChat")
-    public ResponseEntity<ChatDTO> createNewChat(@AuthenticationPrincipal User authUser, @RequestBody String userId){
-        return ResponseEntity.ok(chatService.newChat(authUser, userId));
-    }
-
     @GetMapping("/getChatMessages/{chatId}")
     public ResponseEntity<List<MessageDTO>> getChatMessages(@PathVariable String chatId, @AuthenticationPrincipal User authUser){
         return ResponseEntity.ok(chatService.getChatMessages(chatId));
     } 
+
+    @PostMapping("/getSingleChatByParticipants")
+    public ResponseEntity<ChatDTO> getSingleChatByParticipants(@RequestBody List<String> participants){
+        return ResponseEntity.ok(chatService.getSingleChatByParticipants(participants));
+    }
+
+    @PostMapping("/newChat")
+    public ResponseEntity<ChatDTO> createNewGroupChat(@AuthenticationPrincipal User authUser, @RequestBody List<String> participants){
+        return ResponseEntity.ok(chatService.newGroupChat(participants));
+    }
+
 
     /*@MessageMapping("/sendMessage")
     @SendTo("/topic/chat")

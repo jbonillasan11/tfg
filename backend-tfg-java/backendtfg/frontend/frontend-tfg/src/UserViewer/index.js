@@ -1,20 +1,25 @@
 import { useLocalState } from '../utils/useLocalState';
 import { useEffect, useState } from 'react';
 import fetchService from '../services/fetchService';
-import { Link } from 'react-router-dom';
-import ChangePasswordModal from '../Components/ChangePasswordModal';
+import { ListGroup } from 'react-bootstrap';
+import ChangePasswordModal from '../ModalWindows/ChangePasswordModal';
+import { useNavigate } from 'react-router-dom';
+import TopBar from '../Components/TopBar';
 
 const UserViewer = () => {
+
+    const navigate = useNavigate();
    
     const [authValue, setAuthValue] = useLocalState("", "authValue");
     const [currentUser, setCurrentUser] = useLocalState("", "currentUser");
+
     const userId = window.location.href.split("/user/")[1];
+
     const [userData, setUserData] = useState("");
     const [ownGroupIds, setOwnGroupIds] = useState([]);
     const [otherGroupIds, setOtherGroupIds] = useState([]);
     const [groups, setGroups] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
-    const [passwordChange, setPasswordChange] = useState(false);
     
     useEffect (() => {
       if (userId === currentUser.id) {
@@ -51,14 +56,12 @@ const UserViewer = () => {
     }, [authValue, ownGroupIds, otherGroupIds])
 
     function chatWithUser(){
-      fetchService("chats/newChat", "POST", authValue, userId)
-        .then (response => {
-          window.location.href = `/chats/${response.id}`;
-        })
+      navigate("/chats", {
+        state: {otherUserId: userId} //Transferimos el id del usuario a la ventana de chats
+      });
     }
 
   const handlePasswordChange = ({oldPasswordInput, newPasswordInput}) => {
-
     const reqBody = {
       oldPassword: oldPasswordInput,
       newPassword: newPasswordInput
@@ -73,11 +76,7 @@ const UserViewer = () => {
         body: JSON.stringify(reqBody)
       })   
       .then(response => {
-        if (response.status === 200) {
-          alert("Contraseña cambiada correctamente");
-        } else {
-          return response.text().then(text => { throw new Error(text) });
-        }
+        alert("Contraseña cambiada correctamente");
       })
       .catch (error => {
         alert("Error al cambiar la contraseña" );
@@ -86,6 +85,8 @@ const UserViewer = () => {
 
     
     return (
+      <>
+        <TopBar currentUser={currentUser} />
         <div>
             <h1>Perfil</h1>
             {userData !== "" ? (
@@ -103,13 +104,15 @@ const UserViewer = () => {
             {userId !== currentUser.id ? (
                 <> 
                   <h3>Grupos en común: </h3>
-                    <ul>
-                      {groups && groups.map(group => (
-                        <li key={group.id}> 
-                          <Link to={`/groups/${group.id}`}>ID: {group.id}, Nombre:{group.name}</Link>
-                        </li>
+                  <ListGroup>
+                  {groups && groups.map(group => (
+                      <ListGroup.Item key= {group.id}
+                          action
+                          onClick={() => navigate(`/groups/${group.id}`)}>
+                          {group.name}
+                      </ListGroup.Item>
                       ))}
-                    </ul>
+                  </ListGroup>
                   <button onClick={() => chatWithUser()}>Chat</button>
                 </>
             ) : (
@@ -120,11 +123,10 @@ const UserViewer = () => {
                     onClose={() => setModalOpen(false)}
                     onSubmit={handlePasswordChange}
                   />
-                 
                 </>
             )}
-           
         </div>
+      </>
     );
 };
 
