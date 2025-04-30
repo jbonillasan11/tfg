@@ -1,6 +1,7 @@
 package com.jbs.backendtfg.dtos;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import com.jbs.backendtfg.document.Message;
 
@@ -8,7 +9,7 @@ public class MessageDTO {
     
     private String id;
     private String sender;
-    private LocalDateTime timestamp;
+    private String timestamp;
     private String content;
     private String chatId;
 
@@ -17,9 +18,15 @@ public class MessageDTO {
     public MessageDTO(Message m){
         id = m.getId().toHexString();
         sender = m.getSender().toHexString();
-        timestamp = m.getTimestamp();
+        timestamp = formatTimestamp(m.getTimestamp());  
         content = m.getContent();
         chatId = m.getChatId().toHexString();
+    }
+
+    // Método para formatear el timestamp a un string con la estructura "dd/mm hh:mm"
+    private String formatTimestamp(LocalDateTime timestamp) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM HH:mm");
+        return timestamp.format(formatter);
     }
 
     public String getId() {
@@ -34,12 +41,12 @@ public class MessageDTO {
         this.sender = sender;
     }
 
-    public LocalDateTime getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
     public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
+        this.timestamp = formatTimestamp(timestamp);
     }
 
     public String getContent() {

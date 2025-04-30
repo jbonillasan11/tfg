@@ -27,7 +27,7 @@ public class User implements UserDetails{
     private String password; 
     private String organization;
     private ArrayList <ObjectId> groupsIds= new ArrayList <>();
-    private ArrayList <ObjectId> tasksIds= new ArrayList <>(); //Unificar las 3 colecciones?
+    private ArrayList <ObjectId> tasksIds= new ArrayList <>(); //Refactorizar a que la lista de tareas sean las keys del mapa?
     private Map <ObjectId, UserResponse> responses= new HashMap<>();
     private UserType userType;
     private List <Role> roles= new ArrayList<>();
@@ -61,6 +61,40 @@ public class User implements UserDetails{
         } else this.userType = UserType.STUDENT;
     }
 
+    public void addGroup(ObjectId groupId){
+        if (!this.groupsIds.contains(groupId)){
+            this.groupsIds.add(groupId);
+        } else throw new IllegalArgumentException("El usuario ya pertenece al grupo");
+    }
+
+    public void addTask(ObjectId taskId){
+        if (!this.tasksIds.contains(taskId)){
+            this.tasksIds.add(taskId); //Añado entrada para la tarea en el mapa
+            addResponse(taskId, new UserResponse());
+        }
+    }
+
+    public void removeGroup(ObjectId groupId){
+        if (this.groupsIds.contains(groupId)){
+            this.groupsIds.remove(groupId);
+        } else throw new IllegalArgumentException("El usuario no pertenece al grupo que se quiere eliminar");  
+    }
+
+    public void removeTask(ObjectId taskId){
+        if (this.tasksIds.contains(taskId)){
+            this.tasksIds.remove(taskId);
+            deleteResponse(taskId); //Elimino la entrada de la tarea del mapa
+        } else throw new IllegalArgumentException("El usuario no tiene acceso a la tarea que se quiere eliminar");
+    }
+
+    public void addResponse(ObjectId key, UserResponse data){
+        responses.put(key, data);
+    }
+
+    public void deleteResponse(ObjectId key){
+        responses.remove(key);
+    }
+
     public String getFullname() {
         return fullname;
     }
@@ -79,30 +113,6 @@ public class User implements UserDetails{
 
     public ObjectId getId(){
         return this.id;
-    }
-
-    public void addGroup(ObjectId groupId){
-        if (!this.groupsIds.contains(groupId)){
-            this.groupsIds.add(groupId);
-        } else throw new IllegalArgumentException("El usuario ya pertenece al grupo");
-    }
-
-    public void addTask(ObjectId taskId){
-        if (!this.tasksIds.contains(taskId)){
-            this.tasksIds.add(taskId);
-        }
-    }
-
-    public void removeGroup(ObjectId groupId){
-        if (this.groupsIds.contains(groupId)){
-            this.groupsIds.remove(groupId);
-        } else throw new IllegalArgumentException("El usuario no pertenece al grupo que se quiere eliminar");  
-    }
-
-    public void removeTask(ObjectId taskId){
-        if (this.tasksIds.contains(taskId)){
-            this.tasksIds.remove(taskId);
-        } else throw new IllegalArgumentException("El usuario no tiene acceso a la tarea que se quiere eliminar");
     }
 
     public String getName() {
@@ -129,10 +139,6 @@ public class User implements UserDetails{
         return groupsIds;
     }
 
-    public ArrayList<ObjectId> getTasks() {
-        return tasksIds;
-    }
-
     public UserType getUserType() {
         return userType;
     }
@@ -141,13 +147,6 @@ public class User implements UserDetails{
         return responses.get(key);
     }
 
-    public void addResponse(ObjectId key, UserResponse data){
-        responses.put(key, data);
-    }
-
-    public void deleteResponse(ObjectId key){
-        responses.remove(key);
-    }
 
     public void setName(String name) {
         this.name = name;
@@ -170,7 +169,7 @@ public class User implements UserDetails{
         this.groupsIds = groupsIds;
     }
 
-    public ArrayList<ObjectId> getTasksIds() {
+    public ArrayList<ObjectId> getTasksIds() { //Refactorizable a getKeys del mapa de respuestas
         return tasksIds;
     }
 

@@ -46,7 +46,7 @@ public class TaskService { //Definimos los métodos que se pueden realizar sobre
     
     public TaskDTO saveEmptyTask(User u) { //Guardamos una nueva tarea vacía
         Task savedTask = taskRepository.save(new Task(u.getId()));
-        u.addTask(savedTask.getId());
+        u.addTask(savedTask.getId()); //El creador guarda referencia a la tarea como asignada
         userRepository.save(u); //Añadimos la tarea a las asignadas del usuario
         return new TaskDTO(savedTask);
     }

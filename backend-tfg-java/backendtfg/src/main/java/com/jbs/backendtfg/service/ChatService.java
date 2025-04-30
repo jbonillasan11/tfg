@@ -67,7 +67,7 @@ public class ChatService {
             participants.add(new ObjectId(id));
         }
     
-        Optional<Chat> existingChat = chatRepository.findByParticipants(participants);
+        Optional<Chat> existingChat = chatRepository.findChatByParticipants(participants);
         if (existingChat.isPresent()) { //Si ya existe un chat con esos participantes, lo devolvemos
             return new ChatDTO(existingChat.get());
         } else { //Si no existe, lo creamos

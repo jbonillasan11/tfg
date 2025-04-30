@@ -25,6 +25,14 @@ public class Message {
         this.chatId = chatId;
     }
 
+    public Message(String id, String sender, LocalDateTime timestamp, String content, String chatId){
+        this.id = new ObjectId(id); 
+        this.sender = new ObjectId(sender);
+        this.timestamp = timestamp;
+        this.content = content;
+        this.chatId = new ObjectId(chatId);
+    }
+
     public ObjectId getId() {
         return id;
     }

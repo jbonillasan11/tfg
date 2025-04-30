@@ -3,7 +3,7 @@ package com.jbs.backendtfg.document;
 public class UserResponse {
 
     private Double calification;
-    private Object response;
+    private Object response; // O lista de respuestas?
     private TaskState taskState;
 
     public UserResponse(){
@@ -34,6 +34,12 @@ public class UserResponse {
         this.response = response;
     }
 
-    
+    public TaskState getTaskState() {
+        return taskState;
+    }
+
+    public void setTaskState(TaskState taskState) {
+        this.taskState = taskState;
+    }
 
 }

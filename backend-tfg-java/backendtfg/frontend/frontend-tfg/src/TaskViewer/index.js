@@ -20,12 +20,15 @@ const TaskViewer = () => {
 
     const [updatedUserIds, setUpdatedUserIds] = useState([]);
 
+    const [reloadPage, setReloadPage] = useState(false);
+
     useEffect(() => {
       fetchService(`tasks/${taskId}`, "GET", authValue, null) //Petición asíncrona a nuestra APIRest
         .then(taskData => {
           setTask(taskData);
+          setUpdatedUserIds(taskData.assigneesUserIds);
         });
-    }, [authValue, taskId])
+    }, [authValue, taskId, reloadPage])
 
     useEffect(() => {
       if (task !== ""){
@@ -48,6 +51,7 @@ const TaskViewer = () => {
       .then(taskData => {
         setTask(taskData);
         alert("Tarea guardada con éxito");
+        setReloadPage(!reloadPage); //Recargamos la página para que se vean los cambios
       })
     }
 
@@ -59,9 +63,9 @@ const TaskViewer = () => {
 
     function deleteTaskDB(){
       fetchService(`tasks/deleteTaskId/${taskId}`, "DELETE", authValue, null)
-      .then(taskData => {
+      .then(() => {
         alert("Tarea eliminada con éxito");
-        window.location.href = "/dashboard"; //Redirigimos al dashboard
+        navigate("/dashboard"); //Redirigimos al dashboard
       })
     }
 
@@ -94,7 +98,7 @@ const TaskViewer = () => {
               <h3>Creada por: {creator.name} {creator.surname}</h3>
               <h2>Plazo hasta: <input type="date" value={task.due} onChange={(e) => saveFieldUpdate("due", e.target.value)} /></h2>
               <h3>Descripción: <input type="text" value = {task.description} onChange={(e) => saveFieldUpdate("description", e.target.value)} /></h3>
-              <h3>Tarea repasable: <input type="checkbox" checked={task.redoable} onChange={(e) => saveFieldUpdate("redoable", e.target.checked)} /></h3>
+              <h3>Tarea repasable: <input type="checkbox" checked={task.redoable} onChange={(e) => {saveFieldUpdate("redoable", e.target.checked); console.log(task.redoable)} }/></h3>
 
               <button id="editTask" onClick={() => editTaskData()}>Tarea</button>
               <button id="saveTaskButton" onClick={() => saveTaskDB()}>Guardar cambios</button>

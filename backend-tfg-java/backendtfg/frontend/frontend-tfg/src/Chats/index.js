@@ -16,8 +16,10 @@ const Chats = () => {
     const location = useLocation(); //Obtenemos el id del usuario al que redirigimos desde el chat (si existe)
 
     const [pastChats, setPastChats] = useState([]);
-    const [currentChat, setCurrentChat] = useState({}); //Chat al que accedemos, por defecto null
+    const [currentChat, setCurrentChat] = useState(null); //Chat al que accedemos, por defecto null
+
     const [chatNames, setChatNames] = useState({}); //Nombres de los chats, por defecto null
+    const [participantsData, setParticipantsData] = useState([]); //Datos de los chats, por defecto null
 
     useEffect(() => {
         fetchService("users/getUserChats", "GET", authValue, null)
@@ -33,21 +35,16 @@ const Chats = () => {
     }, []);
 
     useEffect(() => {
-        //Obtenemos el chat y lo renderizamos en el lateral
-        if (currentChat){
-            
-        }
-    }, [currentChat]); //Cuando se crea un nuevo chat, se actualiza el estado del chat actual
-
-    useEffect(() => {
         if (!pastChats || pastChats.length === 0) return;
 
         pastChats.forEach(chat => {
             fetchService("users/getUsers", "POST", authValue, chat.participants)
                 .then(users => {
+                    setParticipantsData(prev => ({ ...prev, [chat.id]: users }));
                     const nameString = users.map(user => user.name).join(", ");
                     setChatNames(prev => ({ ...prev, [chat.id]: nameString }));
                 });
+            
         });
     }, [pastChats, authValue]);
 
@@ -86,11 +83,15 @@ const Chats = () => {
 
                 <div style={{ flex: 2, overflowY: 'auto', padding: '1rem', backgroundColor: '#ffffff' }}>
                     {/* AQUI RENDERIZO EL CHAT */}
+                    {currentChat && authValue && (
                     <Chat
-                        parentChat={currentChat} //El chat que se ha seleccionado
-                        chatNames={chatNames[currentChat.id]} //Los nombres de los participantes del chat
-                    />
-                </div>
+                        parentChat={currentChat}
+                        participantsData={participantsData[currentChat.id]}
+                        senderId={currentUser.id}
+                        authValue={authValue}
+                        currentUser={currentUser}
+                    /> )}
+                </div>    
             </div>
         </>
         

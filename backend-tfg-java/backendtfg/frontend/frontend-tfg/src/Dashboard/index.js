@@ -6,7 +6,7 @@ import { ListGroup } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import TopBar from '../Components/TopBar';
 
-const Dashboard = ({ stateExample }) => {
+const Dashboard = () => {
 
   const navigate = useNavigate();
 
@@ -30,9 +30,10 @@ const Dashboard = ({ stateExample }) => {
 
   useEffect(() => {
     fetchService("users/getUserTasks", "GET", authValue, null) //Petición asíncrona a nuestra APIRest
-    .then(tasksListIds => {
-        setTaskIds(tasksListIds); //Tenemos la lista de Ids de tareas
-    })  
+      .then(tasksListIds => {
+          setTaskIds(tasksListIds); //Tenemos la lista de Ids de tareas
+      }) ;
+     
   }, [authValue])
 
   useEffect(() => {
@@ -60,17 +61,17 @@ const Dashboard = ({ stateExample }) => {
         })
     }, [groupIds])
 
-        function createAssignment() {
+    function createAssignment() {
       fetchService("tasks/newEmptyTask", "POST", authValue, null) //Peticion asíncrona a nuestra APIRest
           .then(task => {
-            window.location.href = `/tasks/${task.id}`;
+            navigate(`/tasks/${task.id}`);
           })
     }
 
     function createGroup() {
       fetchService("groups/newGroup", "POST", authValue, null) //Peticion asíncrona a nuestra APIRest
         .then(group => {
-          window.location.href = `/groups/${group.id}`;
+          navigate(`/groups/${group.id}`);
         })
     }
 

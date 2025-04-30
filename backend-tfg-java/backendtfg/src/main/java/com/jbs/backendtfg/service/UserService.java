@@ -45,7 +45,7 @@ public class UserService { //Definimos los métodos que se pueden realizar sobre
 
     public UserDTO getUserById(String id) { //Buscamos un usuario por su ID en el repositorio
         return new UserDTO(userRepository.findById(new ObjectId(id))
-            .orElseThrow(() -> new RuntimeException("El usuario no existe en nuestro sistema")));
+            .orElse(null));
     }
     
     public UserDTO updateUser(User user) { //Actualizamos o guardamos un nuevo usuario

@@ -20,8 +20,7 @@ public class Task {
     private boolean redoable;
     private List <ObjectId> assigneesUserIds = new ArrayList<>();
     private List <ObjectId> assigneesGroupIds = new ArrayList<>(); //Por el momento prescindible
-    private ObjectId templateId;
-    private Object taskData; //Solución subida por el alumno?
+    private Content content;
     
 
     public Task() { 
@@ -29,8 +28,6 @@ public class Task {
         this.description = "";
         this.due = LocalDate.now();
         this.creatorId = null;
-        this.taskData = "";
-        this.templateId = null;
     }
 
     public Task(ObjectId creator) { 
@@ -38,8 +35,6 @@ public class Task {
         this.description = "";
         this.due = LocalDate.now();
         this.creatorId = creator;
-        this.taskData = "";
-        this.templateId = null;
     }
 
     public Task(ObjectId creator, ObjectId template) { 
@@ -47,8 +42,6 @@ public class Task {
         this.description = "";
         this.due = LocalDate.now();
         this.creatorId = creator;
-        this.taskData = "";
-        this.templateId = template;
     }
 
     public ObjectId getId(){
@@ -148,24 +141,8 @@ public class Task {
         this.creatorId = creatorId;
     }
 
-    public Object getTaskData() {
-        return taskData;
-    }
-
-    public void setTaskData(Object taskData) {
-        this.taskData = taskData;
-    }
-
     public void removeAllUsers() {
         this.assigneesUserIds = new ArrayList<>();
-    }
-
-    public ObjectId getTemplateId() {
-        return templateId;
-    }
-
-    public void setTemplateId(ObjectId templateId) {
-        this.templateId = templateId;
     }
 
     @Override
