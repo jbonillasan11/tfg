@@ -1,12 +1,15 @@
 package com.jbs.backendtfg.dtos;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bson.types.ObjectId;
 
 import com.jbs.backendtfg.document.Role;
 import com.jbs.backendtfg.document.User;
+import com.jbs.backendtfg.document.UserResponse;
 import com.jbs.backendtfg.document.UserType;
 
 
@@ -22,8 +25,9 @@ public class UserDTO {
     private UserType userType;
     private List<Role> roles= new ArrayList<Role>();
     private List<String> chatsIDs = new ArrayList<>(); 
+    private Map <String, UserResponse> responses= new HashMap<>();
     //Omitimos el campo password para no enviarla al frontend
-    //Incluir Map de responses?
+
 
     public UserDTO (User u){
         id = u.getId().toHexString();
@@ -51,6 +55,8 @@ public class UserDTO {
                 tasksIds.add(id.toHexString());
             }
         }
+
+        responses = u.getResponses();
     }
 
     public String getId() {
@@ -95,6 +101,10 @@ public class UserDTO {
 
     public void setChatsIDs(List<String> chatsIDs) {
         this.chatsIDs = chatsIDs;
+    }
+
+    public Map<String, UserResponse> getResponses() {
+        return responses;
     }
 
     

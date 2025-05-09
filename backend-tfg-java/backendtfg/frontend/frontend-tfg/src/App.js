@@ -9,8 +9,9 @@ import Register from './Register';
 import GroupViewer from './GroupViewer';
 import UserViewer from './UserViewer';
 import Chats from './Chats';
-
-
+import TaskEditor from './TaskEditor';
+import TaskResolver from './TaskResolver';
+import TaskCorrector from './TaskCorrector';
 
 function App() { 
 
@@ -31,6 +32,15 @@ return (
       } />
       <Route path="/chats" element={
         <PrivateRoute> <Chats /> </PrivateRoute>
+      } />
+      <Route path="/tasks/:id/edit" element={
+        <PrivateRoute> <TaskEditor /> </PrivateRoute>
+      } />
+      <Route path="/tasks/:id/responses/:userId" element={
+        <PrivateRoute> <TaskResolver /> </PrivateRoute>
+      } />
+      <Route path="/tasks/:id/corrector/:userId" element={
+        <PrivateRoute> <TaskCorrector /> </PrivateRoute>
       } />
       <Route path="/" element={<Homepage />}/> 
       <Route path="/login" element={<Login />}/> 

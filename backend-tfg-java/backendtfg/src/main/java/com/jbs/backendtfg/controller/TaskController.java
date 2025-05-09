@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import com.jbs.backendtfg.document.Content;
 import com.jbs.backendtfg.document.Task;
 import com.jbs.backendtfg.document.User;
 import com.jbs.backendtfg.dtos.TaskDTO;
@@ -50,16 +51,6 @@ public class TaskController {
         return ResponseEntity.ok(taskService.saveEmptyTask(authUser));
     }
 
-    /*@PostMapping("/addUser/{id}")
-    public ResponseEntity<TaskDTO> addUser(@PathVariable String id, @AuthenticationPrincipal User authUser, @RequestBody String idUser) {
-        return ResponseEntity.ok(taskService.addUser(id, idUser));
-    }
-
-    @PutMapping("/setUser/{id}")
-    public ResponseEntity<TaskDTO> setUser(@PathVariable String id, @AuthenticationPrincipal User authUser, @RequestBody String idUser) {
-        return ResponseEntity.ok(taskService.setUser(id, idUser));
-    }*/
-
     @PutMapping("/setUsers/{id}")
     public ResponseEntity<TaskDTO> addUsers(@PathVariable String id, @AuthenticationPrincipal User authUser, @RequestBody List<String> ids) {
         return ResponseEntity.ok(taskService.setUsers(id, ids));
@@ -71,7 +62,7 @@ public class TaskController {
     }
 
     @PutMapping("/{id}") //Actualizamos una tarea existente con nuevos datos
-    public ResponseEntity<TaskDTO> updateTask(@PathVariable String id, @AuthenticationPrincipal User authUser, @RequestBody Task task) {    
+    public ResponseEntity<TaskDTO> updateTask(@PathVariable String id, @AuthenticationPrincipal User authUser, @RequestBody Task task) { 
         return ResponseEntity.ok(taskService.updateTask(task, id));
     }
 

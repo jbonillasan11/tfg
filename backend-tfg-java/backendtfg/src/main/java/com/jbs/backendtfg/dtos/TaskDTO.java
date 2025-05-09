@@ -2,9 +2,11 @@ package com.jbs.backendtfg.dtos;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.bson.types.ObjectId;
 
+import com.jbs.backendtfg.document.Content;
 import com.jbs.backendtfg.document.Task;
 
 public class TaskDTO {
@@ -17,7 +19,7 @@ public class TaskDTO {
     private String creatorId;
     private boolean redoable;
     private ArrayList <String> assigneesUserIds = new ArrayList<>();
-    private Object taskData;
+    private List<Content> content;
 
     public TaskDTO (Task t){
         id = t.getId().toHexString();
@@ -29,7 +31,7 @@ public class TaskDTO {
         for (ObjectId uIds : t.getAssigneesUserIds()) {
             assigneesUserIds.add(uIds.toHexString());
         }
-        taskData = t.getTaskData();
+        content = t.getContent();
     }
 
     public String getId() {
@@ -60,8 +62,8 @@ public class TaskDTO {
         return assigneesUserIds;
     }
 
-    public Object getTaskData() {
-        return taskData;
+    public List<Content> getContent() {
+        return content;
     }
 
     

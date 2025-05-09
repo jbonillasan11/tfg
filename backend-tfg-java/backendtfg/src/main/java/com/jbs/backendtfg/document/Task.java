@@ -20,7 +20,7 @@ public class Task {
     private boolean redoable;
     private List <ObjectId> assigneesUserIds = new ArrayList<>();
     private List <ObjectId> assigneesGroupIds = new ArrayList<>(); //Por el momento prescindible
-    private Content content;
+    private List<Content> content = new ArrayList<>();
     
 
     public Task() { 
@@ -117,6 +117,10 @@ public class Task {
         return assigneesGroupIds;
     }
 
+    public List<Content> getContent() {
+        return content;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -139,6 +143,10 @@ public class Task {
 
     public void setCreator(ObjectId creatorId) {
         this.creatorId = creatorId;
+    }
+
+    public void setContent(List<Content> content) {
+        this.content = content;
     }
 
     public void removeAllUsers() {

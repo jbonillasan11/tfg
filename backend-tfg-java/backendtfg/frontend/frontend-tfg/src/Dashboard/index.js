@@ -10,7 +10,7 @@ const Dashboard = () => {
 
   const navigate = useNavigate();
 
-  const[authValue, setAuthValue] = useLocalState("", "authValue");
+  const [authValue, setAuthValue] = useLocalState("", "authValue");
   const [currentUser, setCurrentUser] = useLocalState("", "currentUser");
   
   const [taskIds, setTaskIds] = useState([]);
@@ -89,8 +89,8 @@ const Dashboard = () => {
             <Row>
               <Col md={6}>
                 <div>
-                  <h2 class = "one">Tareas</h2>
-                  <ListGroup class = "two">
+                  <h2 className = "one">Tareas</h2>
+                  <ListGroup className = "two">
                     {tasks && tasks.map(task => (
                       <ListGroup.Item key= {task.id}
                           action
@@ -111,8 +111,8 @@ const Dashboard = () => {
 
               <Col md={6}>
                 <div>
-                  <h2 class = "three">Grupos</h2>
-                  <ListGroup class = "four">
+                  <h2 className = "three">Grupos</h2>
+                  <ListGroup className = "four">
                     {groups && groups.map(group => (
                       <ListGroup.Item key= {group.id}
                           action

@@ -28,7 +28,7 @@ public class User implements UserDetails{
     private String organization;
     private ArrayList <ObjectId> groupsIds= new ArrayList <>();
     private ArrayList <ObjectId> tasksIds= new ArrayList <>(); //Refactorizar a que la lista de tareas sean las keys del mapa?
-    private Map <ObjectId, UserResponse> responses= new HashMap<>();
+    private Map <String, UserResponse> responses= new HashMap<>();
     private UserType userType;
     private List <Role> roles= new ArrayList<>();
     private List <ObjectId> chats = new ArrayList<>();
@@ -70,7 +70,7 @@ public class User implements UserDetails{
     public void addTask(ObjectId taskId){
         if (!this.tasksIds.contains(taskId)){
             this.tasksIds.add(taskId); //Añado entrada para la tarea en el mapa
-            addResponse(taskId, new UserResponse());
+            addResponse(taskId.toHexString(), new UserResponse());
         }
     }
 
@@ -83,15 +83,15 @@ public class User implements UserDetails{
     public void removeTask(ObjectId taskId){
         if (this.tasksIds.contains(taskId)){
             this.tasksIds.remove(taskId);
-            deleteResponse(taskId); //Elimino la entrada de la tarea del mapa
+            deleteResponse(taskId.toHexString()); //Elimino la entrada de la tarea del mapa
         } else throw new IllegalArgumentException("El usuario no tiene acceso a la tarea que se quiere eliminar");
     }
 
-    public void addResponse(ObjectId key, UserResponse data){
+    public void addResponse(String key, UserResponse data){
         responses.put(key, data);
     }
 
-    public void deleteResponse(ObjectId key){
+    public void deleteResponse(String key){
         responses.remove(key);
     }
 
@@ -143,7 +143,7 @@ public class User implements UserDetails{
         return userType;
     }
 
-    public Object getResponse(ObjectId key){
+    public Object getResponse(String key){
         return responses.get(key);
     }
 
@@ -177,11 +177,11 @@ public class User implements UserDetails{
         this.tasksIds = tasksIds;
     }
 
-    public Map<ObjectId, UserResponse> getResponses() {
+    public Map<String, UserResponse> getResponses() {
         return responses;
     }
 
-    public void setResponses(Map<ObjectId, UserResponse> responses) {
+    public void setResponses(Map<String, UserResponse> responses) {
         this.responses = responses;
     }
 
