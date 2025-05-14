@@ -10,24 +10,42 @@ function AddQuestion ({onSaveQuestion}) {
     const [correctAnswer, setCorrectAnswer] = useState("");
     const [answerText, setAnswerText] = useState("");
     const [multipleAnswers, setMultipleAnswers] = useState([]);
+    const [maxScore, setMaxScore] = useState(0);
 
     const [showSubmit, setShowSubmit] = useState(false);
 
     const [file, setFile] = useState(null);
 
     useEffect(() => {
-        if (questionType === "FILL_THE_BLANK" && questionText.includes("_")) {
-            setShowSubmit(true);
-        } else if ((questionType === "MULTIPLE_CHOICE" || questionType === "DRAG") && multipleAnswers.length > 1 && correctAnswer) {
-            setShowSubmit(true);
-        } else if (questionType === "TRUE_FALSE" && correctAnswer) {
-            setShowSubmit(true);
-        } else if (questionType === "OPEN_ANSWER" && questionText) {
-            setShowSubmit(true);
-        } else { 
+        if (maxScore > 0) {
+            switch (questionType) {
+                case "FILL_THE_BLANK":
+                    if (questionText.includes("_")) {
+                        setShowSubmit(true);
+                    } break;
+                case "MULTIPLE_CHOICE":
+                    if (multipleAnswers.length > 1 && correctAnswer) {
+                        setShowSubmit(true);
+                    } break;
+                case "TRUE_FALSE":
+                    if (correctAnswer) {
+                        setShowSubmit(true);
+                    } break;
+                case "OPEN_ANSWER":
+                    if (questionText) {
+                        setShowSubmit(true);
+                    } break;
+                case "DRAG":
+                    if (questionText.includes("_") && multipleAnswers.length > 1) {
+                        setShowSubmit(true);
+                    } break;
+                default:
+                    setShowSubmit(false);
+            }
+        } else {
             setShowSubmit(false);
         }
-    }, [questionType, questionText, multipleAnswers, correctAnswer, answerText]);
+    }, [questionType, questionText, multipleAnswers, correctAnswer, answerText, maxScore]);
 
     function resetFields(){
         setQuestionText("");
@@ -35,6 +53,7 @@ function AddQuestion ({onSaveQuestion}) {
         setCorrectAnswer("");
         setAnswerText("");
         setMultipleAnswers([]);
+        setMaxScore(0);
         setFile(null);
     }
 
@@ -52,7 +71,8 @@ function AddQuestion ({onSaveQuestion}) {
                     question: questionText,
                     correctAnswer: correctAnswer,
                     options: multipleAnswers,
-                    media: file
+                    media: file,
+                    maxPoints: maxScore
                 }
             );
         }
@@ -122,7 +142,7 @@ function AddQuestion ({onSaveQuestion}) {
                             </Form.Group>
                         )}
 
-                        {(questionType === "MULTIPLE_CHOICE" || questionType === "DRAG") && (
+                        {questionType === "MULTIPLE_CHOICE" && (
                             <>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Introduce respuesta</Form.Label>
@@ -163,19 +183,50 @@ function AddQuestion ({onSaveQuestion}) {
                         )}
 
                         {questionType === "FILL_THE_BLANK" && (
-                            <> Coloca el símbolo "_" en el hueco a rellenar por el alumno </>
+                            <> Coloca el símbolo "_" en el hueco a rellenar por el alumno. Puedes dejar varios huecos en blanco </>
                         )}
 
-                    </>
+                        {questionType === "DRAG" && (
+                            <>
+                                <> Coloca el símbolo "_" en el hueco a rellenar por el alumno. Puedes dejar varios huecos en blanco </>
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Introduce respuesta</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        value={answerText}
+                                        onChange={(e) => setAnswerText(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            setMultipleAnswers([...multipleAnswers, answerText]);
+                                            setAnswerText("");
+                                            }
+                                        }}
+                                    />
+                                </Form.Group>
+                                <ListGroup>
+                                {multipleAnswers.map((answer, index) => (
+                                    <ListGroup.Item key={index} action onClick={() => removeAnswer(answer)}>
+                                        {answer}
+                                    </ListGroup.Item>
+                                    ))}
+                                </ListGroup>
+                            </>
+                        )}
+                    </>  
                 )}
                 <input type="file" onChange={setFile} />
+                <Form.Group className="mb-3">
+                    <Form.Label>Puntuación de la pregunta</Form.Label>
+                    <Form.Control
+                        type="double"
+                        value={maxScore}
+                        onChange={(e) => setMaxScore(e.target.value)}
+                    />
+                </Form.Group>
                 {showSubmit && (
                     <Button onClick={() => handleCloseSave()} className="me-2">Añadir</Button>
-                )
-
-                }
-                
-
+                )}
             </Modal.Body>
 
             </Modal>

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.jbs.backendtfg.document.User;
+import com.jbs.backendtfg.document.UserResponse;
 import com.jbs.backendtfg.dtos.ChatDTO;
 import com.jbs.backendtfg.dtos.UserDTO;
 import com.jbs.backendtfg.service.DeletionService;
@@ -84,6 +85,11 @@ public class UserController { //Manejamos los mapeos de las peticiones HTTP
     @PostMapping ("/getUsers") //Obtenemos una lista de usuarios a partir de una lista de IDs
     public ResponseEntity<List<UserDTO>> getUsers (@AuthenticationPrincipal User authUser, @RequestBody List<String> usersIds){
         return ResponseEntity.ok(userService.getUsersFromIds(usersIds));
+    }
+
+    @PutMapping("/{userId}/saveResponses/{taskId}") //Actualizamos las respuestas de un usuario
+    public ResponseEntity<UserDTO> updateUserResponses(@PathVariable String userId, @PathVariable String taskId, @RequestBody UserResponse response) {
+        return ResponseEntity.ok(userService.updateUserResponses(userId, taskId, response));
     }
 
     @DeleteMapping("/deleteUserId/{id}") //Eliminamos un usuario de nuestra BD

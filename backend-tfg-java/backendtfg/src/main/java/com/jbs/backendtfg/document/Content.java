@@ -9,23 +9,26 @@ public class Content {
     private TaskType type;
     private String question;
     private List<String> options = new ArrayList<>();
-    private String correctAnswer;
+    private List<String> correctAnswers;
     private Media media;
+    private Double maxPoints;
 
     public Content() {
         this.type = TaskType.OPEN_ANSWER;
         this.question = "";
         this.options = null;
-        this.correctAnswer = null;
+        this.correctAnswers = null;
         this.media = null;
+        this.maxPoints = 0.0;
     }
 
-    public Content(TaskType type, String question, List<String> options, String correctAnswer, Media media) {
+    public Content(TaskType type, String question, List<String> options, List<String> correctAnswers, Media media, Double maxPoints) {
         this.type = type;
         this.question = question;
         this.options = options;
-        this.correctAnswer = correctAnswer;
+        this.correctAnswers = correctAnswers;
         this.media = media;
+        this.maxPoints = maxPoints;
     }
 
     public TaskType getType() {
@@ -73,12 +76,12 @@ public class Content {
         this.options = options;
     }
 
-    public String getCorrectAnswer() {
-        return correctAnswer;
+    public List<String> getCorrectAnswers() {
+        return correctAnswers;
     }
 
-    public void setCorrectAnswer(String correctAnswer) {
-        this.correctAnswer = correctAnswer;
+    public void setCorrectAnswers(List<String> correctAnswers) {
+        this.correctAnswers = correctAnswers;
     }
 
     public Media getMedia() {
@@ -87,6 +90,18 @@ public class Content {
 
     public void setMedia(Media media) {
         this.media = media;
+    }
+
+    public void setType(TaskType type) {
+        this.type = type;
+    }
+
+    public Double getMaxPoints() {
+        return maxPoints;
+    }
+
+    public void setMaxPoints(Double maxPoints) {
+        this.maxPoints = maxPoints;
     }
 
 }

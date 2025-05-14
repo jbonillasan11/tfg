@@ -71,9 +71,9 @@ const TaskEditor = () => {
                             <p key={index}>{option}</p>
                         )   
                     ))}
+                    {newQuestion.maxPoints && <p>Puntuación máxima: {newQuestion.maxPoints}</p>}
                 </div>
             ))}
-            {console.log(task)}
             {shownQuestions && shownQuestions.map((element, index) => (
                 <div key={index}>
                     <h2>Pregunta {index+1}: {element.type}</h2>
@@ -87,6 +87,7 @@ const TaskEditor = () => {
                             ))}
                         </>
                         )}
+                    {element.maxPoints && <p>Puntuación máxima: {element.maxPoints}</p>}
                     <p>{element.media}</p>
                     {<Button onClick={() => deleteQuestion(index)}>Eliminar pregunta</Button>}
                 </div>

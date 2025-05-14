@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import com.jbs.backendtfg.document.Content;
 import com.jbs.backendtfg.document.Task;
 import com.jbs.backendtfg.document.User;
 import com.jbs.backendtfg.dtos.TaskDTO;

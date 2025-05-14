@@ -59,12 +59,6 @@ public class ChatController {
     }
 
 
-    /*@MessageMapping("/sendMessage")
-    @SendTo("/topic/chat")
-    public MessageDTO broadcastMessage(MessageDTO message) {
-        return new MessageDTO(chatService.sendMessage(message.getSender(), message.getChatId(), message.getContent()));
-    }*/
-
     ///////////////////////////
     
 

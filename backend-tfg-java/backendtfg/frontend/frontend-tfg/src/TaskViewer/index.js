@@ -20,6 +20,7 @@ const TaskViewer = () => {
 
     const [users, setUsers] = useState([]);
     const [response, setResponse] = useState({});
+    const [correction, setCorrection] = useState({});
 
     const [updatedUserIds, setUpdatedUserIds] = useState([]);
 
@@ -92,16 +93,23 @@ const TaskViewer = () => {
     function editTaskData(){
       navigate(`/tasks/${taskId}/edit`, {state: {task}});
     }
-    
 
+    function handleUserCorrection(userId){
+      navigate(`/tasks/${taskId}/corrector/${userId}`, {state: {task, userId}})
+    }
+
+    //Agrupar en un effect?
     let showButton = false;
+    let showCorrectionButton
 
-    if (response){
+    if (response && (response.taskState === "PENDING" || response.taskState === "IN_PROGRESS")) {
       if (response.calification !== -1 && !task.redoable) {
         showButton = false;
       } else if (response.calification !== -1 && task.redoable) {
         showButton = true;
       } else showButton = true;
+    } else if (response && response.taskState === "CORRECTED") {
+        showCorrectionButton = true;
     }
     
     
@@ -136,12 +144,12 @@ const TaskViewer = () => {
                   <ListGroup.Item
                     key={user.id}
                     action
-                    onClick={() => navigate(`/tasks/${taskId}/corrector/${user.id}`, {state: {task, response}})}
+                    onClick={() => handleUserCorrection(user.id)}
                   >
                     <div><strong>{user.name} {user.surname}</strong></div>
-                    <div>Estado: {response.taskState}</div> {/* Estilo según su valor, color */}	
-                    <div>Fecha de subida: {response.uploadDate}</div> {/* Que se muestre solo cuando haya sido entregada */}	
-                    <div>Calificación: {response.calification !== -1 ? response.calification : "No calificado"}</div>
+                    <div>Estado: {user.responses[taskId].taskState}</div> {/* Estilo según su valor, color */}	
+                    <div>Fecha de subida: {user.responses[taskId].uploadDate}</div> {/* Que se muestre solo cuando haya sido entregada */}	
+                    <div>Calificación: {user.responses[taskId].calification !== -1 ? user.responses[taskId].calification : "No calificado"}</div>
                   </ListGroup.Item>
                 );
               })}
@@ -152,11 +160,6 @@ const TaskViewer = () => {
               <h3>Creada por: {creator.name} {creator.surname}</h3>
               <h2>Plazo hasta: {task.due}</h2>
               <h3>Descripción: {task.description}</h3>
-              {//Si la nota es -1, renderizamos opciones de resolver, etcétera
-                //Si la nota es otro valor, renderizamos la nota y ocultamos los botones
-                //Si la tarea es repasable, mostramos la nota y los botones
-                //Respuestas correctas si no es repasable en otro botón?
-              }
               {showButton && (
                 <Button id="goToTask" onClick={() => navigate(`/tasks/${taskId}/responses/${currentUser.id}`, {state: {task, response}})}>
                   Resolver
@@ -170,6 +173,11 @@ const TaskViewer = () => {
                     <div>{(!response.calification || response.calification !== -1) ? {Calificación: response.calification} : "No calificado"}</div>
                   </div>
               }</div>
+              )}
+              {showCorrectionButton && (
+                <Button id="goToTaskCorrection" onClick={() => navigate(`/tasks/${taskId}/correction/${currentUser.id}`, {state: {task, response, correction}})}>
+                  Resolver
+                </Button>
               )}
             </>
             

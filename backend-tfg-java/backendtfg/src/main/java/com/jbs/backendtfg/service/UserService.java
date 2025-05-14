@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.jbs.backendtfg.document.User;
+import com.jbs.backendtfg.document.UserResponse;
 import com.jbs.backendtfg.dtos.ChatDTO;
 import com.jbs.backendtfg.dtos.UserDTO;
 import com.jbs.backendtfg.repository.UserRepository;
@@ -146,6 +147,17 @@ public class UserService { //Definimos los métodos que se pueden realizar sobre
             chats.add(c);
         }
         return chats;
+    }
+
+    public UserDTO updateUserResponses(String userId, String taskId, UserResponse response) {
+        User user = userRepository.findById(new ObjectId(userId)).get();
+        UserResponse ur = user.getResponses().get(taskId);
+        //Podría directamente sobreescribir la respuesta?
+        ur.setResponse(response.getResponse());
+        ur.setTaskState(response.getTaskState());
+        ur.setUploadDate();
+        user.getResponses().put(taskId, ur);
+        return new UserDTO(userRepository.save(user));
     }
 
 }

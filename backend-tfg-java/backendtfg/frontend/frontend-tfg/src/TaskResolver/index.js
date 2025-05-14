@@ -4,87 +4,94 @@ import fetchService from '../services/fetchService';
 import { useLocalState } from '../utils/useLocalState';
 import { Button } from 'react-bootstrap';
 import { useState } from 'react';
-import { Form } from 'react-bootstrap';
+import FillTheBlank from '../QuestionRenders/FillTheBlank';
+import MultipleChoice from '../QuestionRenders/MultipleChoice';
+import TrueOrFalse from '../QuestionRenders/TrueOrFalse';
+import OpenAnswer from '../QuestionRenders/OpenAnswer';
+import DragAndDrop from '../QuestionRenders/DragAndDrop';
+import { useNavigate } from 'react-router-dom';
 
 const TaskResolver = () => {
 
     const [authValue] = useLocalState("", "authValue");
     const [currentUser] = useLocalState("", "currentUser");
 
+    const navigate = useNavigate();
+
     const location = useLocation();
     const state = location.state || {};
     const task = state.task || null;
-    const [responses, setResponses] = useState([], state.response); 
-
-    function saveResponseUpdate(index, value) { //Función que guarda los datos de la tarea y nos permite modificarlo las veces que queramos
-        const responsesCopy = {...responses};
-        responsesCopy[index] = value;
-        setResponses(responsesCopy);
-      }
+    const [responses, setResponses] = useState(state.response.response || []);
+    
+    function saveResponseUpdate(index, value) {
+        const copy = [...responses];
+        copy[index] = value;
+        setResponses(copy);
+    }
 
     function questionRender(question, index){
         switch (question.type) { //Por cada pregunta renderiza los elementos propios del tipo. La respuesta quedará guardada en un índice dentro de responses
-            case "FILL_THE_BLANK":{
-                const segmentos = question.question.split("_"); //Revisar, qué ocurre si hay más de un _, cómo gestiono las respuestas
+            case "FILL_THE_BLANK":
                 return (
-                <div key={index}>
-                    <h4>Rellenar los huecos</h4>
-                    {segmentos.map((segmento, i) => (
-                    <span key={i}>
-                        {segmento}
-                        {i < segmentos.length - 1 && (
-                        <Form.Control
-                            type="text"
-                            value={responses[index]?.[i] || ""}
-                            onChange={(e) => {
-                                const current = [...(responses[index] || [])];
-                                current[i] = e.target.value;
-                                saveResponseUpdate(index, current);
-                            }}
-                            style={{ display: "inline-block", width: "auto", margin: "0 5px" }}
-                        />
-                        )}
-                        {console.log(responses)}
-                    </span>
-                    ))}
-                </div>
+                    <FillTheBlank
+                        question={question}
+                        index={index}
+                        responsesParent={responses[index]}
+                        onResponseUpdate={saveResponseUpdate}
+                    />
                 );
-            }               
+
             case "MULTIPLE_CHOICE":
-                return (
-                    <div>
-                        <h4>Opción múltiple</h4>
-                    </div>
+                return (    
+                    <MultipleChoice
+                        question={question}
+                        index={index}
+                        responseParent={responses[index]}
+                        onResponseUpdate={saveResponseUpdate}
+                    />
                 );
-            case "DRAG":
+
+            case "DRAG": 
                 return (
-                    <div>
-                        <h4>Arrastrar y soltar</h4>
-                    </div>
+                    <DragAndDrop
+                        question={question}
+                        index={index}
+                        responsesParent={responses[index]}
+                        onResponseUpdate={saveResponseUpdate}
+                    />
                 );
+
             case "TRUE_FALSE":
                 return (
-                    <div>
-                        <h4>Verdadero o falso</h4>
-                    </div>
+                    <TrueOrFalse
+                        question={question}
+                        index={index}
+                        responseParent={responses[index]}
+                        onResponseUpdate={saveResponseUpdate}
+                    />
                 );
             case "OPEN_ANSWER":
                 return (
-                    <div>
-                        <h4>Respuesta abierta</h4>
-                    </div>
+                    <OpenAnswer
+                        question={question}
+                        index={index}
+                        responseParent={responses[index]}
+                        onResponseUpdate={saveResponseUpdate}
+                    />
                 );
             default:
                 return (<></>);
         }
-    }
+    };
 
     function saveChanges(state){
         const reqBody = {
             taskState: state,
-            responses: responses
+            response: responses.map(r =>
+                Array.isArray(r) ? r : [r] //Convierto las respuestas individuales en arrays para que lo reciba el backend
+            )
         }
-        fetchService(`users/saveResponses`, "PUT", authValue, reqBody) //Envía la lista de String de responses
+        fetchService(`users/${currentUser.id}/saveResponses/${task.id}`, "PUT", authValue, reqBody)
     }
 
     return (
@@ -92,11 +99,12 @@ const TaskResolver = () => {
             {task && (
                 <div> 
                     <h1>Tarea: {task.name}</h1>
-                    <Button onClick={() => saveChanges("IN_PROGRESS")}>Guardar progreso</Button>
-                    <Button onClick={() => saveChanges("COMPLETED")}>Guardar y enviar</Button>
+                    <Button onClick={() => {saveChanges("IN_PROGRESS"); alert("Respuestas guardadas")}}>Guardar progreso</Button>
+                    <Button onClick={() => {saveChanges("COMPLETED"); alert("Respuestas enviadas"); navigate("/dashboard")}}>Guardar y enviar</Button>
                     <div>
                         {task && task.content.map((question, index) => (
-                            questionRender(question, index)
+                            <div key={index}> {questionRender(question, index)} </div>
+                            
                         ))}
                     </div>
                 </div>
