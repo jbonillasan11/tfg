@@ -1,15 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import fetchService from '../services/fetchService';
 import { useLocalState } from '../utils/useLocalState';
 import { Button } from 'react-bootstrap';
 import { useState } from 'react';
-import FillTheBlank from '../QuestionRenders/FillTheBlank';
-import MultipleChoice from '../QuestionRenders/MultipleChoice';
-import TrueOrFalse from '../QuestionRenders/TrueOrFalse';
-import OpenAnswer from '../QuestionRenders/OpenAnswer';
-import DragAndDrop from '../QuestionRenders/DragAndDrop';
+import FillTheBlankRender from '../QuestionRenders/FillTheBlankRender';
 import { useNavigate } from 'react-router-dom';
+import DragAndDropRender from '../QuestionRenders/DragAndDropRender';
+import MultipleChoiceRender from '../QuestionRenders/MultipleChoiceRender';
+import OpenAnswerRender from '../QuestionRenders/OpenAnswerRender';
+import TrueOrFalseRender from '../QuestionRenders/TrueOrFalseRender';
 
 const TaskResolver = () => {
 
@@ -22,6 +22,7 @@ const TaskResolver = () => {
     const state = location.state || {};
     const task = state.task || null;
     const [responses, setResponses] = useState(state.response.response || []);
+    const [corrections, setCorrections] = useState(state.response.corrections || []);
     
     function saveResponseUpdate(index, value) {
         const copy = [...responses];
@@ -29,54 +30,70 @@ const TaskResolver = () => {
         setResponses(copy);
     }
 
+    function saveCorrectionUpdate(index, value) {
+        const copy = [...corrections];
+        copy[index] = value;
+        setCorrections(copy);
+    }
+
     function questionRender(question, index){
         switch (question.type) { //Por cada pregunta renderiza los elementos propios del tipo. La respuesta quedará guardada en un índice dentro de responses
             case "FILL_THE_BLANK":
                 return (
-                    <FillTheBlank
+                    <FillTheBlankRender
                         question={question}
                         index={index}
-                        responsesParent={responses[index]}
+                        responseParent={responses[index]}
                         onResponseUpdate={saveResponseUpdate}
+                        responsesObject={responses}
+                        isTeacher={currentUser.userType === "PROFESSOR"}
                     />
                 );
 
             case "MULTIPLE_CHOICE":
                 return (    
-                    <MultipleChoice
+                    <MultipleChoiceRender
                         question={question}
                         index={index}
                         responseParent={responses[index]}
                         onResponseUpdate={saveResponseUpdate}
+                        responsesObject={responses}
+                        isTeacher={currentUser.userType === "PROFESSOR"}
                     />
                 );
 
             case "DRAG": 
                 return (
-                    <DragAndDrop
+                    <DragAndDropRender
                         question={question}
                         index={index}
-                        responsesParent={responses[index]}
+                        responseParent={responses[index]}
                         onResponseUpdate={saveResponseUpdate}
+                        responsesObject={responses}
+                        isTeacher={currentUser.userType === "PROFESSOR"}
                     />
                 );
 
             case "TRUE_FALSE":
                 return (
-                    <TrueOrFalse
+                    <TrueOrFalseRender
                         question={question}
                         index={index}
                         responseParent={responses[index]}
                         onResponseUpdate={saveResponseUpdate}
+                        responsesObject={responses}
+                        isTeacher={currentUser.userType === "PROFESSOR"}
                     />
                 );
             case "OPEN_ANSWER":
                 return (
-                    <OpenAnswer
+                    <OpenAnswerRender
                         question={question}
                         index={index}
                         responseParent={responses[index]}
                         onResponseUpdate={saveResponseUpdate}
+                        responsesObject={responses}
+                        isTeacher={currentUser.userType === "PROFESSOR"}
                     />
                 );
             default:

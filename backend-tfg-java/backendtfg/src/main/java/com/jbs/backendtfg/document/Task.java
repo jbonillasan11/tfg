@@ -153,6 +153,10 @@ public class Task {
         this.assigneesUserIds = new ArrayList<>();
     }
 
+    public int getNumberOfQuestions() {
+        return content.size();
+    }
+
     @Override
     public String toString() {
         return "Tarea: " + name + ", descripción:" + description + ", creada por:" + creatorId + ", entregable hasta el:" + due;

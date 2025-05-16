@@ -9,10 +9,13 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.jbs.backendtfg.document.Correction;
+import com.jbs.backendtfg.document.Task;
 import com.jbs.backendtfg.document.User;
 import com.jbs.backendtfg.document.UserResponse;
 import com.jbs.backendtfg.dtos.ChatDTO;
 import com.jbs.backendtfg.dtos.UserDTO;
+import com.jbs.backendtfg.repository.TaskRepository;
 import com.jbs.backendtfg.repository.UserRepository;
 
 @Service
@@ -20,6 +23,9 @@ public class UserService { //Definimos los métodos que se pueden realizar sobre
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired 
+    private TaskRepository taskRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -128,7 +134,7 @@ public class UserService { //Definimos los métodos que se pueden realizar sobre
             u.setPassword(passwordEncoder.encode(newPassword));
             userRepository.save(u);
         }
-        //Aquí podemos incluir validaciones de contraseña (mayusc, simbolos, numeros, etc.)
+        //Aquí podemos incluir validaciones de contraseña
         else {
             throw new RuntimeException("Contraseña incorrecta");
         }
@@ -149,14 +155,24 @@ public class UserService { //Definimos los métodos que se pueden realizar sobre
         return chats;
     }
 
+    public List<Correction> initializeCorrections(String taskId) { //Inicializamos la lista de correcciones con el número de preguntas de la tarea
+        Task task = taskRepository.findById(new ObjectId(taskId)).get();
+        List<Correction> corrections = new ArrayList<>();
+        for (int i = 0; i < task.getNumberOfQuestions(); i++) {
+            corrections.add(new Correction());
+        }
+        return corrections;
+    }
+
     public UserDTO updateUserResponses(String userId, String taskId, UserResponse response) {
         User user = userRepository.findById(new ObjectId(userId)).get();
         UserResponse ur = user.getResponses().get(taskId);
-        //Podría directamente sobreescribir la respuesta?
+        ur.setCorrections(initializeCorrections(taskId)); //INICIALIZAMOS TAMBIÉN LAS RESPUESTAS PARA COMODIDAD DEL FRONTEND
         ur.setResponse(response.getResponse());
         ur.setTaskState(response.getTaskState());
         ur.setUploadDate();
         user.getResponses().put(taskId, ur);
+        
         return new UserDTO(userRepository.save(user));
     }
 

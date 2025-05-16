@@ -69,7 +69,7 @@ function AddQuestion ({onSaveQuestion}) {
                 {
                     type: questionType,
                     question: questionText,
-                    correctAnswer: correctAnswer,
+                    correctAnswers: [correctAnswer],
                     options: multipleAnswers,
                     media: file,
                     maxPoints: maxScore

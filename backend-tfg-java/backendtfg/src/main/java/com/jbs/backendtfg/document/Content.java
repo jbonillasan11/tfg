@@ -9,7 +9,7 @@ public class Content {
     private TaskType type;
     private String question;
     private List<String> options = new ArrayList<>();
-    private List<String> correctAnswers;
+    private List<String> correctAnswers = new ArrayList<>();
     private Media media;
     private Double maxPoints;
 
@@ -17,7 +17,6 @@ public class Content {
         this.type = TaskType.OPEN_ANSWER;
         this.question = "";
         this.options = null;
-        this.correctAnswers = null;
         this.media = null;
         this.maxPoints = 0.0;
     }

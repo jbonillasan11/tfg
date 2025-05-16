@@ -1,31 +1,17 @@
 import React from 'react';
 import { Card, Form } from 'react-bootstrap';
+import { useState } from 'react';
 
-const DragAndDrop = ({question, index, responsesParent = [], correctionsParent = [], onResponseUpdate, onCorrectionUpdate, isTeacher = false}) => {
+const DragAndDrop = ({question, index, responseParent = [], onResponseUpdate}) => {
 
+    const [response, setResponse] = useState(responseParent); //Array de respuestas de la pregunta
 
     function saveResponseUpdate(i, value) {
-        if (isTeacher) return;
-        const copy = [...responsesParent];
+        const copy = [...response];
         copy[i] = value;
+        setResponse(copy);
         onResponseUpdate(index, copy);
     }
-
-    function saveCorrectionUpdate(i, value) {
-        if (!isTeacher) return;
-        const copy = [...correctionsParent];
-        copy[i] = value;
-    }
-
-    function saveScoreUpdate(value) {
-        const copy = [...correctionsParent.corrections];
-        const toReturn = {
-            calification: value,
-            corrections: copy
-        }
-        onCorrectionUpdate(index, toReturn);
-    }
-
     const onDragStart = (e, text) => {
         e.dataTransfer.setData('text/plain', text);
     }
@@ -41,12 +27,10 @@ const DragAndDrop = ({question, index, responsesParent = [], correctionsParent =
                                 {i < segmentos.length - 1 && (
                                 <Form.Control
                                     type="text"
-                                    value={responsesParent?.[i] || ""}
+                                    value={response?.[i] || ""}
                                     readOnly
                                     onChange={(e) => {
-                                        const current = [...(responsesParent[i] || [])];
-                                        current[i] = e.target.value;
-                                        saveResponseUpdate(index, current);
+                                        saveResponseUpdate(i, e.target.value);
                                     }}
                                     style={{ display: "inline-block", width: "auto", margin: "0 5px" }}
                                     onDrop={(e) => {
@@ -55,29 +39,12 @@ const DragAndDrop = ({question, index, responsesParent = [], correctionsParent =
                                         saveResponseUpdate(i, text);
                                     }}
                                     onDragOver={(e) => e.preventDefault()}
-                                    
                                 />
                                 )}
-                                {isTeacher && (
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Corrección"
-                                        value={correctionsParent?.[i] || ""}
-                                        onChange={(e) => saveCorrectionUpdate(i, e.target.value)}
-                                        style={{
-                                            display: "inline-block",
-                                            width: "auto",
-                                            margin: "0 5px",
-                                            marginTop: "5px",
-                                            backgroundColor: "#fff3cd" // color suave para correcciones
-                                        }}
-                                    />
-                                )}
                             </span>
-                            
                         ))}
                         
-                        {!isTeacher && question.options && question.options.map((option, i) => (
+                        {question.options && question.options.map((option, i) => (
                             <div key={i}
                                 draggable
                                 onDragStart={(e) => onDragStart(e, option)}
@@ -90,21 +57,6 @@ const DragAndDrop = ({question, index, responsesParent = [], correctionsParent =
                             </div>
                             
                         ))}
-                        {isTeacher && (
-                            <Form.Control
-                                type="double"
-                                placeholder="score"
-                                value={correctionsParent.calification|| 0}
-                                onChange={(e) => saveScoreUpdate(e.target.value)}
-                                style={{
-                                    display: "inline-block",
-                                    width: "auto",
-                                    margin: "0 5px",
-                                    marginTop: "5px",
-                                }}
-                            />
-                        )}
-                        
                         </Card.Body>
                 <Card.Footer>
                     <p>Puntuación máxima: {question.maxPoints}</p>

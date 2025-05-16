@@ -8,10 +8,10 @@ import java.util.List;
 public class UserResponse {
 
     private Double calification;
-    private List<List<String>> response = new ArrayList<>(new ArrayList<>());
+    private List<List<String>> response = new ArrayList<>(); //Cada pregunta puede tener varias respuestas
     private TaskState taskState;
     private LocalDate uploadDate;
-    private List<Correction> corrections = new ArrayList<>();
+    private List<Correction> corrections = new ArrayList<>(); //Corrección de cada pregunta
 
     public UserResponse(){
         calification = -1.0;

@@ -3,11 +3,11 @@ import { useLocation } from 'react-router-dom';
 import { useLocalState } from '../utils/useLocalState';
 import { useState } from 'react';
 import fetchService from '../services/fetchService';
-import FillTheBlank from '../QuestionRenders/FillTheBlank';
-import MultipleChoice from '../QuestionRenders/MultipleChoice';
-import TrueOrFalse from '../QuestionRenders/TrueOrFalse';
-import OpenAnswer from '../QuestionRenders/OpenAnswer';
-import DragAndDrop from '../QuestionRenders/DragAndDrop';
+import FillTheBlankRender from '../QuestionRenders/FillTheBlankRender';
+import DragAndDropRender from '../QuestionRenders/DragAndDropRender';
+import MultipleChoiceRender from '../QuestionRenders/MultipleChoiceRender';
+import OpenAnswerRender from '../QuestionRenders/OpenAnswerRender';
+import TrueOrFalseRender from '../QuestionRenders/TrueOrFalseRender';
 
 const TaskCorrector = () => {
 
@@ -17,35 +17,42 @@ const TaskCorrector = () => {
     const location = useLocation();
     const state = location.state || {};
     const task = state.task || null;
+    const userId = state.userId || null;
 
-    const [studentUser, setStudentUser] = useState(state.userId || null);
-    const [responses, setResponses] = useState(state.response.response || []);
-    const [corrections, setCorrections] = useState(state.response.correction || []);
+    const [responsesObject, setResponsesObject] = useState([]); //Objeto formado por calificación, respuestas, correcciones, estado, fecha de subida
+
+    const [calification, setCalification] = useState([]);
 
     useEffect(() => {
-        fetchService(`users/getUserId/${studentUser}`, "GET", authValue)
+        fetchService(`users/getUserId/${userId}`, "GET", authValue)
         .then(userData => {
-            setStudentUser(userData); //Usuario
-            setResponses(userData.responses[task.id].response); //Respuestas del usuario
-            setCorrections(userData.responses[task.id].corrections); //Correcciones previas del usuario
+            setResponsesObject(userData.responses[task.id]); //Respuestas del usuario
         });
     }, []);
     
     function saveCorrectionUpdate(index, value) {
-        const copy = [...corrections];
-        copy[index] = value;
-        setCorrections(copy);
+        const correctionsCopy = [...responsesObject.corrections];
+        correctionsCopy[index] = value;
+
+        const calificationCopy = [...calification];
+        calificationCopy[index] = value.calification;
+
+        setCalification(calificationCopy);
+        setResponsesObject(prev => ({
+            ...prev,
+            corrections: correctionsCopy
+        }));
     }
 
     function questionRender(question, index){
         switch (question.type) { //Por cada pregunta renderiza los elementos propios del tipo. La respuesta quedará guardada en un índice dentro de responses
             case "FILL_THE_BLANK":
                 return (
-                    <FillTheBlank
+                    <FillTheBlankRender
                         question={question}
                         index={index}
-                        responsesParent={responses[index]}
-                        correctionsParent={corrections[index]}
+                        responseParent={responsesObject.response[index]}
+                        responsesObject={responsesObject}
                         onCorrectionUpdate={saveCorrectionUpdate}
                         isTeacher={currentUser.userType === "PROFESSOR"} //En teoría siempre es true
                     />
@@ -53,11 +60,11 @@ const TaskCorrector = () => {
 
             case "MULTIPLE_CHOICE":
                 return (    
-                    <MultipleChoice
+                    <MultipleChoiceRender
                         question={question}
                         index={index}
-                        responsesParent={responses[index]}
-                        correctionsParent={corrections[index]} //Sustituir por respuesta correcta?
+                        responseParent={responsesObject.response[index]}
+                        responsesObject={responsesObject}
                         onCorrectionUpdate={saveCorrectionUpdate}
                         isTeacher={currentUser.userType === "PROFESSOR"}
                     />
@@ -65,11 +72,11 @@ const TaskCorrector = () => {
 
             case "DRAG": 
                 return (
-                    <DragAndDrop
+                    <DragAndDropRender
                         question={question}
                         index={index}
-                        responsesParent={responses[index]}
-                        correctionsParent={corrections[index]}  //Sustituir por respuesta correcta?
+                        responseParent={responsesObject.response[index]}
+                        responsesObject={responsesObject}
                         onCorrectionUpdate={saveCorrectionUpdate}
                         isTeacher={currentUser.userType === "PROFESSOR"}
                     />
@@ -77,22 +84,22 @@ const TaskCorrector = () => {
 
             case "TRUE_FALSE":
                 return (
-                    <TrueOrFalse
+                    <TrueOrFalseRender
                         question={question}
                         index={index}
-                        responsesParent={responses[index]}
-                        correctionsParent={corrections[index]}  //Sustituir por respuesta correcta?
+                        responseParent={responsesObject.response[index]}
+                        responsesObject={responsesObject}
                         onCorrectionUpdate={saveCorrectionUpdate}
                         isTeacher={currentUser.userType === "PROFESSOR"}
                     />
                 );
             case "OPEN_ANSWER":
                 return (
-                    <OpenAnswer
+                    <OpenAnswerRender
                         question={question}
                         index={index}
-                        responsesParent={responses[index]}
-                        correctionsParent={corrections[index]}
+                        responseParent={responsesObject.response[index]}
+                        responsesObject={responsesObject}
                         onCorrectionUpdate={saveCorrectionUpdate}
                         isTeacher={currentUser.userType === "PROFESSOR"}
                     />
@@ -104,9 +111,13 @@ const TaskCorrector = () => {
 
     return (
         <div>
-            {task && task.content.map((question, index) => (
+            {task && responsesObject?.response && task.content.map((question, index) => (
                 <div key={index}> {questionRender(question, index)} </div>
             ))}
+            <div style={{ marginTop: "20px" }}>
+                <h4>Nota total:</h4>
+                    {calification.reduce((sum, val) => sum + (parseFloat(val) || 0), 0)}
+            </div>
         </div>
     );
 };
