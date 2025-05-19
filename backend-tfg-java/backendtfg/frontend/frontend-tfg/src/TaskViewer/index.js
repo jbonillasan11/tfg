@@ -51,9 +51,11 @@ const TaskViewer = () => {
     }, [task])
 
     useEffect(() => {
-      if (currentUser.userType === "STUDENT"){
-        setResponse(currentUser.responses[taskId]);
-      }
+      if (currentUser.userType === "PROFESSOR") return;
+      fetchService(`users/getUserId/${currentUser.id}`, "GET", authValue)
+      .then(userData => {
+          setResponse(userData.responses[taskId]); //Respuestas del usuario
+      });
     }, [])
 
     function saveFieldUpdate(field, value) { //Función que guarda los datos de la tarea y nos permite modificarlo las veces que queramos
@@ -94,8 +96,8 @@ const TaskViewer = () => {
       navigate(`/tasks/${taskId}/edit`, {state: {task}});
     }
 
-    function handleUserCorrection(userId){
-      navigate(`/tasks/${taskId}/corrector/${userId}`, {state: {task, userId}})
+    function handleUserCorrection(user){
+      navigate(`/tasks/${taskId}/corrector/${user.id}`, {state: {task, user}})
     }
 
     //Agrupar en un effect?
@@ -118,7 +120,7 @@ const TaskViewer = () => {
         <div>
           <TopBar currentUser={currentUser} />
           {task ? ( 
-            currentUser.userType === "PROFESSOR" ? ( //Que muestre ambos como alumno, pero si es profesor y pulsa editar se muestre esto? Uso booleano para renderzar una cosa u otra, su valor cambia atendiendo a si se pulsa el botón
+            currentUser.userType === "PROFESSOR" ? ( //RENDERIZADO PARA DOCENTES
           <>
               <h1>Tarea: <input type="text" value = {task.name} onChange={(e) => saveFieldUpdate("name", e.target.value)} /></h1>
               <h3>Creada por: {creator.name} {creator.surname}</h3>
@@ -144,7 +146,7 @@ const TaskViewer = () => {
                   <ListGroup.Item
                     key={user.id}
                     action
-                    onClick={() => handleUserCorrection(user.id)}
+                    onClick={() => handleUserCorrection(user)}
                   >
                     <div><strong>{user.name} {user.surname}</strong></div>
                     <div>Estado: {user.responses[taskId].taskState}</div> {/* Estilo según su valor, color */}	
@@ -154,7 +156,7 @@ const TaskViewer = () => {
                 );
               })}
           </>
-          ) : (
+          ) : ( //RENDERIZADO PARA ESTUDIANTES
             <>
               <h1>Tarea: {task.name}</h1>
               <h3>Creada por: {creator.name} {creator.surname}</h3>
@@ -170,13 +172,19 @@ const TaskViewer = () => {
                   <div>
                     <div>Estado: {response.taskState}</div> {/* Estilo según su valor, color */}	
                     <div>Fecha de subida: {response.uploadDate}</div> {/* Que se muestre solo cuando haya sido entregada */}	
-                    <div>{(!response.calification || response.calification !== -1) ? {Calificación: response.calification} : "No calificado"}</div>
+                    <div>
+                      {response.calification != null && response.calification !== -1 ? (
+                        <>Calificación: {response.calification}</>
+                      ) : (
+                        "No calificado"
+                      )}
+                    </div>
                   </div>
               }</div>
               )}
               {showCorrectionButton && (
-                <Button id="goToTaskCorrection" onClick={() => navigate(`/tasks/${taskId}/correction/${currentUser.id}`, {state: {task, response, correction}})}>
-                  Resolver
+                <Button id="goToTaskCorrection" onClick={() => navigate(`/tasks/${taskId}/correction/${currentUser.id}`, {state: {task, response}})}>
+                  Revisar corrección
                 </Button>
               )}
             </>
@@ -187,10 +195,10 @@ const TaskViewer = () => {
                   <h2>Tarea no encontrada</h2>
               </>
           )
-          }
-        </div>
-      </>
-    );
+        }
+      </div>
+    </>
+  );
 };
 
 export default TaskViewer;

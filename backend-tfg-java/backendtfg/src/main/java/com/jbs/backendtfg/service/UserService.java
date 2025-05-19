@@ -176,4 +176,15 @@ public class UserService { //Definimos los métodos que se pueden realizar sobre
         return new UserDTO(userRepository.save(user));
     }
 
+    public UserDTO updateUserCorrections(String userId, String taskId, UserResponse response) {
+        User user = userRepository.findById(new ObjectId(userId)).get();
+        UserResponse ur = user.getResponses().get(taskId);
+        ur.setCalification(response.getCalification());
+        ur.setCorrections(response.getCorrections());
+        ur.setTaskState(response.getTaskState());
+        user.getResponses().put(taskId, ur);
+        
+        return new UserDTO(userRepository.save(user));
+    }
+
 }

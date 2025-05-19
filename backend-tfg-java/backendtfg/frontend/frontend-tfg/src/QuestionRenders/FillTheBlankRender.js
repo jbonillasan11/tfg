@@ -1,20 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, Form } from 'react-bootstrap';
 import { useState} from 'react';
 
-const FillTheBlankRender = ({question, index, responseParent = [], onResponseUpdate, responsesObject = {}, onCorrectionUpdate, isTeacher}) => {
+const FillTheBlankRender = ({question, index, responseParent = [], onResponseUpdate, responsesObject = {}, onCorrectionUpdate, isTeacher = false, isReview = false}) => {
 
     const [response, setResponse] = useState(responseParent); //Array de respuestas de la pregunta
-    
-    const [corrections, setCorrections] = useState(responsesObject.corrections || {});
 
-    const [comment, setComment] = useState(corrections.comment || "");
-    const [score, setScore] = useState(corrections.calification || 0);
-    const [inputValue, setInputValue] = useState(responsesObject.corrections.calification || 0);
+    const [comment, setComment] = useState(responsesObject.corrections[index].comment || "");
+    const [score, setScore] = useState(responsesObject.corrections[index].calification || 0);
+
 
     function saveCorrectionUpdate(value) {
         setComment(value);
-        setCorrections(value);
         onCorrectionUpdate(index, {
             calification: score,
             comment: value
@@ -28,18 +25,6 @@ const FillTheBlankRender = ({question, index, responseParent = [], onResponseUpd
         onResponseUpdate(index, copy);
     }
 
-    /*function saveScoreUpdate(value) {
-        setInputValue(value);
-        value = value.replace(',', '.');
-        let score = parseFloat(value);
-        score = Math.min(Math.max(0, score), question.maxPoints);
-        setScore(score);
-        onCorrectionUpdate(index, {
-            calification: score,
-            corrections: corrections
-        });
-    }*/
-
     const handleChange = (e) => {
         const input = e.target.value.replace(",", ".");
         if (/^-?\d*\.?\d*$/.test(input)) {
@@ -52,6 +37,10 @@ const FillTheBlankRender = ({question, index, responseParent = [], onResponseUpd
         let sanitized = score.replace(",", ".");
         let num = parseFloat(sanitized);
         if (isNaN(num)) {
+            onCorrectionUpdate(index, {
+                calification: 0,
+                comment: comment
+            });
             setScore(0);
             return;
         }
@@ -63,7 +52,7 @@ const FillTheBlankRender = ({question, index, responseParent = [], onResponseUpd
         setScore(num.toString());
         onCorrectionUpdate(index, {
             calification: num,
-            corrections: corrections
+            comment: comment
         });
     };
 
@@ -76,7 +65,7 @@ const FillTheBlankRender = ({question, index, responseParent = [], onResponseUpd
                 {segmentos.map((segmento, i) => (
                     <span key={i}>
                         {segmento}
-                        {i < segmentos.length - 1 && (!isTeacher ? (
+                        {i < segmentos.length - 1 && (!isTeacher && !isReview ? ( //RENDERIZADO ESTUDIANTE RESOLVIENDO
                         <Form.Control
                             type="text"
                             value={response?.[i] || ""}
@@ -93,13 +82,15 @@ const FillTheBlankRender = ({question, index, responseParent = [], onResponseUpd
                         )}
                     </span>
                 ))}
-                {isTeacher && (
+
+                {/* RENDERIZADOS CONDICIONALES */}
+                {isReview ? ( //RENDERIZADO ESTUDIANTE REVISANDO
                     <>
                         <Form.Control
                             type="text"
                             placeholder="Corrección"
-                            value={comment || ""}
-                            onChange={(e) => saveCorrectionUpdate(e.target.value)}
+                            value={comment}
+                            redOnly
                             style={{
                                 display: "inline-block",
                                 width: "auto",
@@ -112,12 +103,40 @@ const FillTheBlankRender = ({question, index, responseParent = [], onResponseUpd
                             type="text"
                             inputMode="decimal"
                             value={score}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
+                            readOnly
                             placeholder={"Puntuación"}
                         />
                     </>
+                ) : (
+                    <>
+                        {isTeacher && ( //RENDERIZADO DOCENTE CORRIGIENDO
+                            <>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Corrección"
+                                    value={comment || ""}
+                                    onChange={(e) => saveCorrectionUpdate(e.target.value)}
+                                    style={{
+                                        display: "inline-block",
+                                        width: "auto",
+                                        margin: "0 5px",
+                                        marginTop: "5px",
+                                        backgroundColor: "#fff3cd" // color suave para correcciones
+                                    }}
+                                />
+                                <input
+                                    type="text"
+                                    inputMode="decimal"
+                                    value={score}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    placeholder={"Puntuación"}
+                                />
+                            </>
+                        )}
+                    </>
                 )}
+                
             </Card.Body>
             <Card.Footer>
                 <p>Puntuación máxima: {question.maxPoints}</p>

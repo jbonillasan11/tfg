@@ -2,34 +2,20 @@ import React, { useEffect } from 'react';
 import { Card, Form } from 'react-bootstrap';
 import { useState } from 'react';
 
-const DragAndDropRender = ({question, index, responseParent = [], onResponseUpdate, responsesObject = {}, onCorrectionUpdate, isTeacher}) => {
+const DragAndDropRender = ({question, index, responseParent = [], onResponseUpdate, responsesObject = {}, onCorrectionUpdate, isTeacher = false, isReview = false}) => {
 
     const [response, setResponse] = useState(responseParent); //Array de respuestas de la pregunta
 
-    const [corrections, setCorrections] = useState(responsesObject.corrections || {});
-
-    const [comment, setComment] = useState(corrections.comment || "");
-    const [score, setScore] = useState(corrections.calification || 0);
+    const [comment, setComment] = useState(responsesObject.corrections[index].comment || "");
+    const [score, setScore] = useState(responsesObject.corrections[index].calification || 0);
 
     function saveCorrectionUpdate(value) {
         setComment(value);
-        setCorrections(value);
         onCorrectionUpdate(index, {
             calification: score,
             comment: value
         });
     } 
-
-    function saveScoreUpdate(value) {
-        value = value.replace(',', '.');
-        let score = parseFloat(value);
-        score = Math.min(Math.max(0, score), question.maxPoints);
-        setScore(score);
-        onCorrectionUpdate(index, {
-            calification: score,
-            corrections: corrections
-        });
-    }
     
     function saveResponseUpdate(i, value) {
         const copy = [...response];
@@ -54,6 +40,10 @@ const DragAndDropRender = ({question, index, responseParent = [], onResponseUpda
         let sanitized = score.replace(",", ".");
         let num = parseFloat(sanitized);
         if (isNaN(num)) {
+            onCorrectionUpdate(index, {
+                calification: 0,
+                comment: comment
+            });
             setScore(0);
             return;
         }
@@ -65,7 +55,7 @@ const DragAndDropRender = ({question, index, responseParent = [], onResponseUpda
         setScore(num.toString());
         onCorrectionUpdate(index, {
             calification: num,
-            corrections: corrections
+            comment: comment
         });
     };
     
@@ -105,26 +95,16 @@ const DragAndDropRender = ({question, index, responseParent = [], onResponseUpda
                         )}
                         </span>
                     ))}
-                    {!isTeacher && question.options ? (
-                        question.options.map((option, i) => (
-                            <div key={i}
-                                draggable
-                                onDragStart={(e) => onDragStart(e, option)}
-                            >
-                                <Form.Control
-                                    type="text"
-                                    value={option}
-                                    disabled
-                                />
-                            </div>
-                        ))
-                    ) : (
+
+                    {/* RENDERIZADOS CONDICIONALES */}
+
+                    {isReview ? ( //RENDERIZADO ESTUDIANTE REVISANDO
                         <>
                             <Form.Control
                                 type="text"
                                 placeholder="Corrección"
-                                value={comment || ""}
-                                onChange={(e) => saveCorrectionUpdate(e.target.value)}
+                                value={comment}
+                                readOnly
                                 style={{
                                     display: "inline-block",
                                     width: "auto",
@@ -137,13 +117,54 @@ const DragAndDropRender = ({question, index, responseParent = [], onResponseUpda
                                 type="text"
                                 inputMode="decimal"
                                 value={score}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
+                                readOnly
                                 placeholder={"Puntuación"}
                             />
                         </>
-                        
-                    )}
+                    ) : (
+                        <>
+                        {!isTeacher ? ( //RENDERIZADO ESTUDIANTE RESOLVIENDO
+                        question.options.map((option, i) => (
+                            <div key={i}
+                                draggable
+                                onDragStart={(e) => onDragStart(e, option)}
+                            >
+                                <Form.Control
+                                    type="text"
+                                    value={option}
+                                    disabled
+                                />
+                            </div>
+                        ))
+                        ) : ( //RENDERIZADO DOCENTE CORRIGIENDO
+                            <>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Corrección"
+                                    value={comment || ""}
+                                    onChange={(e) => saveCorrectionUpdate(e.target.value)}
+                                    style={{
+                                        display: "inline-block",
+                                        width: "auto",
+                                        margin: "0 5px",
+                                        marginTop: "5px",
+                                        backgroundColor: "#fff3cd" // color suave para correcciones
+                                    }}
+                                />
+                            <input
+                                    type="text"
+                                    inputMode="decimal"
+                                    value={score}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    placeholder={"Puntuación"}
+                                />
+                            </>
+                            
+                        )}
+                    </>
+                )}
+                    
                 </Card.Body>
             <Card.Footer>
                 <p>Puntuación máxima: {question.maxPoints}</p>

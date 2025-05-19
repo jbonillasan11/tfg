@@ -2,29 +2,16 @@ import React from 'react';
 import { Card, Form } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 
-const OpenAnswerRender = ({question, index, responseParent = [], responsesObject = {}, onResponseUpdate, onCorrectionUpdate, isTeacher = false}) => {
+const OpenAnswerRender = ({question, index, responseParent = [], responsesObject = {}, onResponseUpdate, onCorrectionUpdate, isTeacher = false, isReview = false}) => {
 
-    const [calculatedScore, setCalculatedScore] = useState(responsesObject.corrections?.[index]?.calification || 0);
-    const [comment, setComment] = useState(responsesObject.corrections?.[index]?.corrections || "");
-    const [inputValue, setInputValue] = useState(responsesObject.corrections.calification || 0);
-
-    function saveScoreUpdate(value) {
-        setInputValue(value);
-        value = value.replace(',', '.');
-        let score = parseFloat(value);
-        score = Math.min(Math.max(0, score), question.maxPoints);
-        setCalculatedScore(score);
-        onCorrectionUpdate(index, {
-            calification: score,
-            corrections: ""
-        });
-    }
+    const [calculatedScore, setCalculatedScore] = useState(responsesObject.corrections[index].calification || 0);
+    const [comment, setComment] = useState(responsesObject.corrections[index].comment || "");
 
     function saveCorrectionUpdate(value) {
         setComment(value);
         const newCorrection = {
             calification: calculatedScore,
-            corrections: value
+            comment: value
         };
         onCorrectionUpdate(index, newCorrection);
     }
@@ -41,6 +28,10 @@ const OpenAnswerRender = ({question, index, responseParent = [], responsesObject
         let sanitized = calculatedScore.replace(",", ".");
         let num = parseFloat(sanitized);
         if (isNaN(num)) {
+            onCorrectionUpdate(index, {
+                calification: 0,
+                comment: comment
+            });
             setCalculatedScore(0);
             return;
         }
@@ -52,7 +43,7 @@ const OpenAnswerRender = ({question, index, responseParent = [], responsesObject
         setCalculatedScore(num.toString());
         onCorrectionUpdate(index, {
             calification: num,
-            corrections: ""
+            comment: comment
         });
     };
 
@@ -61,14 +52,10 @@ const OpenAnswerRender = ({question, index, responseParent = [], responsesObject
             <Card.Title>Respuesta abierta</Card.Title>
             <Card.Body>
                 <p>{question.question}</p>
-                {!isTeacher ? (
-                <Form.Control
-                    as="textarea"
-                    value={responseParent || ""}
-                    onChange={(e) => onResponseUpdate(index, e.target.value)}
-                    rows={5} 
-                />
-                ) : (
+
+                {/* RENDERIZADOS CONDICIONALES */}
+
+                {isReview ? ( //RENDERIZADO ESTUDIANTE REVISANDO
                     <>
                         <Form.Control
                             as="textarea"
@@ -79,7 +66,7 @@ const OpenAnswerRender = ({question, index, responseParent = [], responsesObject
                             type="text"
                             placeholder="Corrección"
                             value={comment || ""}
-                            onChange={(e) => saveCorrectionUpdate(e.target.value)}
+                            readOnly
                             style={{
                                 display: "inline-block",
                                 width: "auto",
@@ -92,12 +79,53 @@ const OpenAnswerRender = ({question, index, responseParent = [], responsesObject
                             type="text"
                             inputMode="decimal"
                             value={calculatedScore}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
+                            readOnly
                             placeholder={"Puntuación"}
                         />
                     </>
+                ) : ( 
+                    <>
+                        {!isTeacher ? ( //RENDERIZADO ESTUDIANTE RESOLVIENDO
+                            <Form.Control
+                                as="textarea"
+                                value={responseParent || ""}
+                                onChange={(e) => onResponseUpdate(index, e.target.value)}
+                                rows={5} 
+                            />
+                        ) : ( //RENDERIZADO DOCENTE CORRIGIENDO
+                            <>
+                                <Form.Control
+                                    as="textarea"
+                                    value={responseParent || ""}
+                                    rows={5} 
+                                />
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Corrección"
+                                    value={comment || ""}
+                                    onChange={(e) => saveCorrectionUpdate(e.target.value)}
+                                    style={{
+                                        display: "inline-block",
+                                        width: "auto",
+                                        margin: "0 5px",
+                                        marginTop: "5px",
+                                        backgroundColor: "#fff3cd"
+                                    }}
+                                />
+                                <input
+                                    type="text"
+                                    inputMode="decimal"
+                                    value={calculatedScore}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    placeholder={"Puntuación"}
+                                />
+                            </>
+                        )}
+                    </>
                 )}
+
+                
             </Card.Body>
             <Card.Footer>
                 <p>Puntuación máxima: {question.maxPoints}</p>   

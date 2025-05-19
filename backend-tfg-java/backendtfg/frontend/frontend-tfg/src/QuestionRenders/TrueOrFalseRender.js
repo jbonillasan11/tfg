@@ -2,33 +2,13 @@ import React from 'react';
 import { Card, Form } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 
-const TrueOrFalseRender = ({question, index, responseParent = [], responsesObject = {}, onResponseUpdate, onCorrectionUpdate, isTeacher = false}) => {
+const TrueOrFalseRender = ({question, index, responseParent = [], responsesObject = {}, onResponseUpdate, onCorrectionUpdate, isTeacher = false, isReview = false}) => {
     
-    const [calculatedScore, setCalculatedScore] = useState(responsesObject.corrections?.[index]?.calification || 0);
-    const [inputValue, setInputValue] = useState(responsesObject.corrections.calification || 0);
-    
-    function saveScoreUpdate(value) {
-        setInputValue(value);
-        let score;
-        if (typeof value === "string") {
-            const cleaned = value.replace(',', '.');
-            score = parseFloat(cleaned);
-        } else if (typeof value === "number") {
-            score = value;
-        } else {
-            score = NaN;
-        }
-        score = Math.min(Math.max(0, score), question.maxPoints);
-        setCalculatedScore(score);
-        onCorrectionUpdate(index, {
-            calification: score,
-            corrections: ""
-        });
-    }
+    const [calculatedScore, setCalculatedScore] = useState(responsesObject.corrections[index].calification || 0);
 
     useEffect(() => {
         if (responseParent[0] === question.correctAnswers[0]) {
-            saveScoreUpdate(question.maxPoints);
+            setCalculatedScore(String(question.maxPoints));
         }
     }, [])
 
@@ -44,6 +24,10 @@ const TrueOrFalseRender = ({question, index, responseParent = [], responsesObjec
         let sanitized = calculatedScore.replace(",", ".");
         let num = parseFloat(sanitized);
         if (isNaN(num)) {
+            onCorrectionUpdate(index, {
+                calification: 0,
+                comment: ""
+            });
             setCalculatedScore(0);
             return;
         }
@@ -55,7 +39,7 @@ const TrueOrFalseRender = ({question, index, responseParent = [], responsesObjec
         setCalculatedScore(num.toString());
         onCorrectionUpdate(index, {
             calification: num,
-            corrections: ""
+            comment: ""
         });
     };
 
@@ -64,19 +48,11 @@ const TrueOrFalseRender = ({question, index, responseParent = [], responsesObjec
             <Card.Title>Verdadero o falso</Card.Title>
             <Card.Body>
                 <p>{question.question}</p>
-                {!isTeacher ? (
-                    <Form.Group className="mb-3">
-                    <Form.Select
-                        aria-label="Selecciona la respuesta"
-                        value={responseParent || ""}
-                        onChange={(e) => onResponseUpdate(index, e.target.value)}
-                    >
-                        <option disabled value="">Respuesta</option>
-                        <option value="true">Verdadero</option>
-                        <option value="false">Falso</option>
-                    </Form.Select>
-                </Form.Group>) : (
-                     <>
+
+                {/* RENDERIZADOS CONDICIONALES */}
+
+                {isReview ? (
+                    <>
                         <Form.Select value={responseParent} disabled>
                             <option value={responseParent}>{responseParent}</option>
                         </Form.Select>
@@ -96,12 +72,54 @@ const TrueOrFalseRender = ({question, index, responseParent = [], responsesObjec
                             type="text"
                             inputMode="decimal"
                             value={calculatedScore}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
+                            readOnly
                             placeholder={"Puntuación"}
                         />
                     </>
+                ) : (
+                    <>
+                        {!isTeacher ? (
+                            <Form.Group className="mb-3">
+                            <Form.Select
+                                aria-label="Selecciona la respuesta"
+                                value={responseParent || ""}
+                                onChange={(e) => onResponseUpdate(index, e.target.value)}
+                            >
+                                <option disabled value="">Respuesta</option>
+                                <option value="true">Verdadero</option>
+                                <option value="false">Falso</option>
+                            </Form.Select>
+                        </Form.Group>
+                        ) : (
+                            <>
+                                <Form.Select value={responseParent} disabled>
+                                    <option value={responseParent}>{responseParent}</option>
+                                </Form.Select>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Corrección"
+                                    value={"Respuesta correcta: " + question.correctAnswers}
+                                    style={{
+                                        display: "inline-block",
+                                        width: "auto",
+                                        margin: "0 5px",
+                                        marginTop: "5px",
+                                        backgroundColor: "#fff3cd"
+                                    }}
+                                />
+                                <input
+                                    type="text"
+                                    inputMode="decimal"
+                                    value={calculatedScore}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    placeholder={"Puntuación"}
+                                />
+                            </>
+                        )}
+                    </>
                 )}
+
             </Card.Body>
             <Card.Footer>
                 <p>Puntuación máxima: {question.maxPoints}</p>

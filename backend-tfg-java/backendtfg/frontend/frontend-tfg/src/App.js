@@ -12,6 +12,7 @@ import Chats from './Chats';
 import TaskEditor from './TaskEditor';
 import TaskResolver from './TaskResolver';
 import TaskCorrector from './TaskCorrector';
+import TaskCorrection from './TaskCorrection';
 
 function App() { 
 
@@ -41,6 +42,9 @@ return (
       } />
       <Route path="/tasks/:id/corrector/:userId" element={
         <PrivateRoute> <TaskCorrector /> </PrivateRoute>
+      } />
+      <Route path="/tasks/:id/correction/:userId" element={
+        <PrivateRoute> <TaskCorrection /> </PrivateRoute>
       } />
       <Route path="/" element={<Homepage />}/> 
       <Route path="/login" element={<Login />}/> 

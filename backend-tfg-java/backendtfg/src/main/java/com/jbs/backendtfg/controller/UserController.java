@@ -92,6 +92,12 @@ public class UserController { //Manejamos los mapeos de las peticiones HTTP
         return ResponseEntity.ok(userService.updateUserResponses(userId, taskId, response));
     }
 
+    @PutMapping("/{userId}/saveCorrections/{taskId}") //Actualizamos las correcciones de un usuario. Funcionamiento muy similar al saveResponese, separado por claridad
+    public ResponseEntity<UserDTO> updateUserCorrections(@PathVariable String userId, @PathVariable String taskId, @RequestBody UserResponse response) {
+        return ResponseEntity.ok(userService.updateUserCorrections(userId, taskId, response));
+    }
+
+
     @DeleteMapping("/deleteUserId/{id}") //Eliminamos un usuario de nuestra BD
     public ResponseEntity<Void> deleteUser(@PathVariable String id, @AuthenticationPrincipal User authUser) {
         deletionService.deleteUser(id);

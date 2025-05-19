@@ -1,8 +1,5 @@
 package com.jbs.backendtfg.document;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,9 +10,10 @@ import lombok.Setter;
 public class Correction {
 
     private Double calification;
-    private List<String> comment = new ArrayList<>();
+    private String comment;
 
     public Correction() {
         this.calification = 0.0;
+        this.comment = "";
     }
 }
