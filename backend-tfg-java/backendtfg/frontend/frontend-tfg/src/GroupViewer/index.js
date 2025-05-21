@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import fetchService from '../services/fetchService';
 import { useLocalState } from '../utils/useLocalState';
 import { useState } from 'react';
@@ -11,8 +11,8 @@ const GroupViewer = () => {
 
     const navigate = useNavigate();
 
-    const [authValue, setAuthValue] = useLocalState("", "authValue");
-    const [currentUser, setCurrentUser] = useLocalState("", "currentUser"); //Usuario logueado
+    const [authValue] = useLocalState("", "authValue");
+    const [currentUser] = useLocalState("", "currentUser"); //Usuario logueado
     
     const groupId = window.location.href.split("/groups/")[1]; //Obtenemos el id de la tarea de la URL
     const [group, setGroup] = useState(""); //Grupo al que accedemos
@@ -24,13 +24,13 @@ const GroupViewer = () => {
     const [updatedUserIds, setUpdatedUserIds] = useState([]);
 
     useEffect(() => {
-      fetchService(`groups/${groupId}`, "GET", authValue, null) //Petición asíncrona a nuestra APIRest
+      fetchService(`groups/${groupId}`, "GET", authValue, null)
           .then(groupData => {
             setGroup(groupData);
           })
           .catch(error => {
-              console.error(error.message);
-              setGroup(null);
+            console.error(error.message);
+            setGroup("");
           });
     }, [])
     
@@ -60,16 +60,23 @@ const GroupViewer = () => {
       }
     }, [group])
 
+    useEffect(() => {
+      console.log(group)
+    })
+
     function saveGroupDB(){
+      console.log(group)
       addUsersGroup(); //Actualizamos los usuarios por fuera del PUT, ya que es un método algo más complejo
-        fetchService(`groups/${groupId}`, "PUT", authValue, group)
-        .then(groupData => {
-          setGroup(groupData);
-          alert("Grupo guardado con éxito");
-        })
+      console.log(group)
+      fetchService(`groups/${groupId}`, "PUT", authValue, group)
+      .then(groupData => {
+        setGroup(groupData);
+        alert("Grupo guardado con éxito");
+      })
+      window.location.reload();
     }
 
-    function saveFieldUpdate(field, value) { //Función que guarda los datos de la tarea y nos permite modificarlo las veces que queramos
+    function saveFieldUpdate(field, value) { //Función que guarda los datos del grupo y nos permite modificarlo las veces que queramos
       const groupCopy = {...group};
       groupCopy[field] = value;
       setGroup(groupCopy);
@@ -90,13 +97,15 @@ const GroupViewer = () => {
     }
 
     function addUsersGroup(){
-      if (updatedUserIds.length === 0) fetchService(`group/deleteUsers/${groupId}`, "PUT", authValue, null) //Si no hay usuarios
+      if (updatedUserIds.length === 0) fetchService(`groups/setUsers/${groupId}`, "PUT", authValue, [currentUser.id]) //Si no hay usuarios, eliminamos a todos menos al actual
       else fetchService(`groups/setUsers/${groupId}`, "PUT", authValue, updatedUserIds) //Si hay 
     }
 
     function groupForum(){
 
     }
+
+    console.log(group) 
 
     return (
       <>

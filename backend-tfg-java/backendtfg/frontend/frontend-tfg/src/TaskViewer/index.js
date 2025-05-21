@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useState } from 'react';
 import { useLocalState } from '../utils/useLocalState';
 import fetchService from '../services/fetchService';
@@ -20,7 +20,6 @@ const TaskViewer = () => {
 
     const [users, setUsers] = useState([]);
     const [response, setResponse] = useState({});
-    const [correction, setCorrection] = useState({});
 
     const [updatedUserIds, setUpdatedUserIds] = useState([]);
 
@@ -41,7 +40,7 @@ const TaskViewer = () => {
       }
     }, [authValue, task])
 
-    useEffect(() => { //hook que obtiene la información de los usuarios en la tarea, solo para profesores
+    useEffect(() => { //Obtenemos la información de los usuarios en la tarea, solo para profesores
       if (task !== "" && currentUser.userType === "PROFESSOR"){
         fetchService("users/getUsers", "POST", authValue, task.assigneesUserIds)
         .then(usersData => {
@@ -90,6 +89,7 @@ const TaskViewer = () => {
     function saveChanges(){
       if (updatedUserIds.length === 0) fetchService(`tasks/deleteUsers/${taskId}`, "PUT", authValue, null) //Si no hay usuarios
       else fetchService(`tasks/setUsers/${taskId}`, "PUT", authValue, updatedUserIds) //Si hay 
+      window.location.reload();
     }
 
     function editTaskData(){
@@ -105,9 +105,9 @@ const TaskViewer = () => {
     let showCorrectionButton
 
     if (response && (response.taskState === "PENDING" || response.taskState === "IN_PROGRESS")) {
-      if (response.calification !== -1 && !task.redoable) {
+      if (response.calification !== -1) {
         showButton = false;
-      } else if (response.calification !== -1 && task.redoable) {
+      } else if (response.calification !== -1) {
         showButton = true;
       } else showButton = true;
     } else if (response && response.taskState === "CORRECTED") {
@@ -171,7 +171,7 @@ const TaskViewer = () => {
                 <div>Tu tarea: {
                   <div>
                     <div>Estado: {response.taskState}</div> {/* Estilo según su valor, color */}	
-                    <div>Fecha de subida: {response.uploadDate}</div> {/* Que se muestre solo cuando haya sido entregada */}	
+                    {(response.status === "COMPLETED" && (<div>Fecha de subida: {response.uploadDate}</div>))}
                     <div>
                       {response.calification != null && response.calification !== -1 ? (
                         <>Calificación: {response.calification}</>
@@ -183,9 +183,19 @@ const TaskViewer = () => {
               }</div>
               )}
               {showCorrectionButton && (
-                <Button id="goToTaskCorrection" onClick={() => navigate(`/tasks/${taskId}/correction/${currentUser.id}`, {state: {task, response}})}>
-                  Revisar corrección
-                </Button>
+                <>
+                  {task.redoable ? (
+                    <Button id="goToTaskRedo" onClick={ () =>{ 
+                        const resetResponse = {...response, response: [], calification: -1, taskState: "PENDING"};
+                        navigate(`/tasks/${taskId}/responses/${currentUser.id}`, {state: {task, response: resetResponse}})
+                      }}>
+                        Resolver de nuevo
+                    </Button>
+                  ) : (<Button id="goToTaskCorrection" onClick={() => navigate(`/tasks/${taskId}/correction/${currentUser.id}`, {state: {task, response}})}>
+                      Revisar corrección
+                    </Button>)}
+                </>
+                
               )}
             </>
             

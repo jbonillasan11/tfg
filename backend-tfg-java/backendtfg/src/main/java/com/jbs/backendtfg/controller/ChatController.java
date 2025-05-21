@@ -28,33 +28,33 @@ public class ChatController {
     @Autowired
     private ChatService chatService;
 
-    @GetMapping("/getAllChats")
+    @GetMapping("/getAllChats") //Obtenemos todos los chats
     public ResponseEntity<List<ChatDTO>> getAllChats(){
         return ResponseEntity.ok(chatService.getAllChats());
     }
 
-    @GetMapping("/getUserChats")
+    @GetMapping("/getUserChats") //Obtenemos todos los chats del usuario
     public ResponseEntity<List<ChatDTO>> getAllUserChats(@AuthenticationPrincipal User authUser){
         return ResponseEntity.ok(chatService.getChatsByParticipant(authUser));
     }
 
-    @GetMapping("/getChatById/{id}")
+    @GetMapping("/getChatById/{id}") //Obtenemos un chat a partir de su id
     public ResponseEntity<ChatDTO> getChatById(@PathVariable String id, @AuthenticationPrincipal User authUser){
         return ResponseEntity.ok(chatService.getChatById(id));
     }
 
-    @GetMapping("/getChatMessages/{chatId}")
+    @GetMapping("/getChatMessages/{chatId}") //Obtenemos los mensajes de un chat
     public ResponseEntity<List<MessageDTO>> getChatMessages(@PathVariable String chatId, @AuthenticationPrincipal User authUser){
         return ResponseEntity.ok(chatService.getChatMessages(chatId));
     } 
 
-    @PostMapping("/getSingleChatByParticipants")
+    @PostMapping("/getSingleChatByParticipants") //Obtenemos, como coincidencia única, un chat a partir de sus participantes
     public ResponseEntity<ChatDTO> getSingleChatByParticipants(@RequestBody List<String> participants){
         return ResponseEntity.ok(chatService.getSingleChatByParticipants(participants));
     }
 
-    @PostMapping("/newChat")
-    public ResponseEntity<ChatDTO> createNewGroupChat(@AuthenticationPrincipal User authUser, @RequestBody List<String> participants){
+    @PostMapping("/newChat") //Creamos un nuevo chat
+    public ResponseEntity<ChatDTO> createNewChat(@AuthenticationPrincipal User authUser, @RequestBody List<String> participants){
         return ResponseEntity.ok(chatService.newGroupChat(participants));
     }
 
@@ -63,7 +63,7 @@ public class ChatController {
     
 
     @MessageMapping("/sendMessage")
-    @SendTo("/topic/chat")
+    @SendTo("/topic/chat") //Gestionamos el envio de mensajes en conjunto con ChatWebSocketController
     public MessageDTO broadcastMessage(MessageDTO message) {
         return new MessageDTO(chatService.sendMessage(message.getChatId(), message.getSender(), message.getContent()));
     }

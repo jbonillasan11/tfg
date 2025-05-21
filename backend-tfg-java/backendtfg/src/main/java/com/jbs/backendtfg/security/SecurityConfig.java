@@ -23,13 +23,10 @@ public class SecurityConfig{
     @Autowired
     private JwtAuthenticationFilter jwtAuthFilter;
 
-    //@Autowired
-    //private UserDetailsServiceImplementation userDetailsService;
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // Desactivamos CSRF para APIs RESTful
+            .csrf(csrf -> csrf.disable()) // Desactivamos CSRF
             .cors(Customizer.withDefaults()) // Configuramos CORS
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // JWT no usa sesiones
             .exceptionHandling(e -> e
@@ -37,9 +34,9 @@ public class SecurityConfig{
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage());
                 }))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/login", "/auth/register", "/ws-chat/**").permitAll() // Endpoints públicos
+                .requestMatchers("/auth/login", "/auth/register", "/ws-chat/**").permitAll() // Endpoints públicos sin autenticación
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Permitimos preflight
-                .anyRequest().authenticated() // Los demás requieren autenticación
+                .anyRequest().authenticated() // Los demás endpoints requieren autenticación
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); // Agregamos el filtro JWT
 

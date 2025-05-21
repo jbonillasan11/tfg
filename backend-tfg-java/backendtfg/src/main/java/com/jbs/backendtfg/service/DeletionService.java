@@ -39,7 +39,7 @@ public class DeletionService {
         private GroupService groupService;
 
 
-        public void deleteUser(String id) {
+        public void deleteUser(String id) { //Eliminamos un usuario de nuestra BD, así como de todos sus grupos y tareas
             ObjectId userId = new ObjectId(id);
             UserDTO toDelete = userService.getUserById(id);
 
@@ -65,7 +65,7 @@ public class DeletionService {
             userService.deleteUser(userId);
         }
 
-        public void deleteTask(String id) {
+        public void deleteTask(String id) { //Eliminamos una tarea de nuestra BD, así como de todos sus usuarios
             ObjectId taskId = new ObjectId(id);
             TaskDTO toDelete = taskService.getTaskById(id);
         
@@ -81,7 +81,7 @@ public class DeletionService {
             taskService.deleteTask(taskId);
         }
         
-        public void deleteGroup(String id) {
+        public void deleteGroup(String id) { //Eliminamos un grupo de nuestra BD, así como de todos sus usuarios
             ObjectId groupId = new ObjectId(id);
             GroupDTO toDelete = groupService.getGroupById(id);
             List<String> idsUsers = toDelete.getUsersIds();

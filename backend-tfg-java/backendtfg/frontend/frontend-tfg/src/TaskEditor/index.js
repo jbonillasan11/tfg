@@ -45,6 +45,7 @@ const TaskEditor = () => {
         }
         fetchService(`tasks/${task.id}`, "PUT", authValue, taskCopy)
         .then(alert("Preguntas guardadas"));
+        window.location.reload();
     }
 
     function deleteQuestion(index) {

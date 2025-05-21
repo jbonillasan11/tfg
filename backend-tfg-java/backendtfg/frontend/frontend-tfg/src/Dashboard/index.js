@@ -10,7 +10,7 @@ const Dashboard = () => {
 
   const navigate = useNavigate();
 
-  const [authValue, setAuthValue] = useLocalState("", "authValue");
+  const [authValue] = useLocalState("", "authValue");
   const [currentUser, setCurrentUser] = useLocalState("", "currentUser");
   
   const [taskIds, setTaskIds] = useState([]);
@@ -22,14 +22,14 @@ const Dashboard = () => {
   
   
   useEffect(() => {
-    fetchService("users/getCurrentUser", "GET", authValue, null) //Petición asíncrona a nuestra APIRest
+    fetchService("users/getCurrentUser", "GET", authValue, null)
       .then(user => {
         setCurrentUser(user);
       })
   }, [authValue])
 
   useEffect(() => {
-    fetchService("users/getUserTasks", "GET", authValue, null) //Petición asíncrona a nuestra APIRest
+    fetchService("users/getUserTasks", "GET", authValue, null)
       .then(tasksListIds => {
           setTaskIds(tasksListIds); //Tenemos la lista de Ids de tareas
       }) ;
@@ -46,7 +46,7 @@ const Dashboard = () => {
   }, [taskIds])
 
     useEffect(() => {
-      fetchService("users/getUserGroups", "GET", authValue, null) //Petición asíncrona a nuestra APIRest
+      fetchService("users/getUserGroups", "GET", authValue, null)
         .then(groupList => {
           setGroupIds(groupList); //Tenemos la lista de Ids de grupos
         })
@@ -55,21 +55,21 @@ const Dashboard = () => {
     useEffect (() => {
       if (groupIds.length === 0 || groupIds === null) return; //Si no hay grupos, no hacemos nada
 
-      fetchService("groups/getGroupsFromIds", "POST", authValue, groupIds) //Petición asíncrona a nuestra APIRest
+      fetchService("groups/getGroupsFromIds", "POST", authValue, groupIds)
         .then(groupList => {
           setGroups(groupList);
         })
     }, [groupIds])
 
     function createAssignment() {
-      fetchService("tasks/newEmptyTask", "POST", authValue, null) //Peticion asíncrona a nuestra APIRest
+      fetchService("tasks/newEmptyTask", "POST", authValue, null)
           .then(task => {
             navigate(`/tasks/${task.id}`);
           })
     }
 
     function createGroup() {
-      fetchService("groups/newGroup", "POST", authValue, null) //Peticion asíncrona a nuestra APIRest
+      fetchService("groups/newGroup", "POST", authValue, null)
         .then(group => {
           navigate(`/groups/${group.id}`);
         })

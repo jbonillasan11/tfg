@@ -73,6 +73,7 @@ public class GroupController {
 
     @PutMapping("/{id}") //Actualizamos los datos del grupo
     public ResponseEntity<GroupDTO> updateGroup(@PathVariable String id, @AuthenticationPrincipal User authUser, @RequestBody Group group) {
+        System.out.println(group);
         return ResponseEntity.ok(groupService.updateGroup(group, id));
     }
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
 import fetchService from '../services/fetchService';
 import { useLocalState } from '../utils/useLocalState';
@@ -22,18 +22,11 @@ const TaskResolver = () => {
     const state = location.state || {};
     const task = state.task || null;
     const [responses, setResponses] = useState(state.response.response || []);
-    const [corrections, setCorrections] = useState(state.response.corrections || []);
     
     function saveResponseUpdate(index, value) {
         const copy = [...responses];
         copy[index] = value;
         setResponses(copy);
-    }
-
-    function saveCorrectionUpdate(index, value) {
-        const copy = [...corrections];
-        copy[index] = value;
-        setCorrections(copy);
     }
 
     function questionRender(question, index){

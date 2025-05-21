@@ -23,7 +23,7 @@ public class MessageService {
     @Autowired
     private ChatRepository chatRepository;
 
-    public MessageDTO saveMessage(Message msg) {
+    public MessageDTO saveMessage(Message msg) { //Guardamos un mensaje en la base de datos
         ObjectId chatId = msg.getChatId();
         Optional<Chat> chat = chatRepository.findById(chatId);
         MessageDTO sentMessage = new MessageDTO(messageRepository.save(msg));
@@ -35,7 +35,7 @@ public class MessageService {
         return sentMessage;
     }
 
-    public List<MessageDTO> getMessagesByChatId(String chatId) {
+    public List<MessageDTO> getMessagesByChatId(String chatId) { //Obtenemos la lista de mensajes de un chat
         Chat c = chatRepository.findById(new ObjectId(chatId)).get();
         List<ObjectId> messageIds = c.getMessages();
         List<MessageDTO> toReturn = new ArrayList<>();

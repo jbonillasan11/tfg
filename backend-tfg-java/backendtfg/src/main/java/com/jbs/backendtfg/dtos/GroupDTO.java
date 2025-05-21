@@ -14,7 +14,7 @@ public class GroupDTO {
     private String name;
     private String creatorId;
     private List <String> usersIds;
-    private List <String> tasksIds;
+    private String forumId;
     private List <UserType> allowedUserTypes;
 
     public GroupDTO (Group g){
@@ -25,10 +25,7 @@ public class GroupDTO {
         for (ObjectId u : g.getUsers()) {
             usersIds.add(u.toHexString());
         }
-        tasksIds = new ArrayList<>();
-        for (ObjectId t : g.getTasks()) {
-            tasksIds.add(t.toHexString());
-        }
+        forumId = g.getForumId().toHexString();
         allowedUserTypes = g.getAllowedUserTypes();
     }
 
@@ -48,8 +45,8 @@ public class GroupDTO {
         return usersIds;
     }
 
-    public List<String> getTasksIds() {
-        return tasksIds;
+    public String getForumId() {
+        return forumId;
     }
 
     public List<UserType> getAllowedUserTypes() {

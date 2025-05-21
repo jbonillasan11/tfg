@@ -32,39 +32,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { //JWTFILTER
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         
-        // Ignorar las peticiones OPTIONS (preflight)
-        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
-            chain.doFilter(request, response);
-            return;
-        }
-        
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (!StringUtils.hasText(authHeader) || (StringUtils.hasText(authHeader) && !authHeader.startsWith("Bearer "))) {
             chain.doFilter(request, response);
             return;
-        }
+        } //Filtramos las peticiones sin autorización o que no sean de tipo Bearer
 
         final String token = authHeader.split(" ")[1].trim();
 
-        String email = jwtService.extractUsername(token); //Comprobamos que existe usuari en el token
+        String email = jwtService.extractUsername(token); //Comprobamos que existe usuario en el token
         if (email == null) {
             chain.doFilter(request, response);
             return;
-        }
+        } //Filtramos peticiones que no tengan un email asociado
 
         UserDetails userDetails = userRepository.findByEmail(email).orElse(null); //Comprobamos que el usuario asociado al email existe
         if (userDetails == null) {
             chain.doFilter(request, response);
             return;
-        }
+        } //Filtramos peticiones que no tengan un email existente
         
         if (!jwtService.isTokenValid(token, userDetails)) {
             chain.doFilter(request, response);
             return;
-        }
+        } //Filtramos peticiones que no tengan un token válido
 
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()); 
         
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 

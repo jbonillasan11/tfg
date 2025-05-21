@@ -1,4 +1,3 @@
-import React from 'react';
 import { Card, Form } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 

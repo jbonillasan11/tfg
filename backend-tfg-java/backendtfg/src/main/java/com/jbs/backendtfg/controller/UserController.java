@@ -66,17 +66,17 @@ public class UserController { //Manejamos los mapeos de las peticiones HTTP
         return ResponseEntity.ok(userService.getUserGroupsIds(id));
     }
 
-    @GetMapping("/getCurrentUser")
+    @GetMapping("/getCurrentUser") //Obtenemos el usuario de la sesión actual a partir de su token de autenticación
     public ResponseEntity<UserDTO> getCurrentUser (@AuthenticationPrincipal User user){
         return ResponseEntity.ok(userService.getUserById(user.getId().toHexString()));
     }
 
-    @GetMapping("/getUsersNameSearch")
+    @GetMapping("/getUsersNameSearch") //Devolvemos una lista de usuarios cuyo nombre contenga nameFragment y sean de la misma organización
     public ResponseEntity<List<UserDTO>> getUsersNameSearch(@AuthenticationPrincipal User authUser, @RequestParam String nameFragment) {
         return ResponseEntity.ok(userService.getUsersNameSearch(authUser.getOrganization(), nameFragment));
     }
 
-    @PostMapping("/changePassword")
+    @PostMapping("/changePassword") //Gestionamos el cambio de contrseña del usuario
     public ResponseEntity<Void> changePassword(@AuthenticationPrincipal User authUser, @RequestBody Map <String, String> passwords) {
         userService.changePassword(authUser.getId(), passwords.get("oldPassword"), passwords.get("newPassword"));
         return ResponseEntity.ok().build();

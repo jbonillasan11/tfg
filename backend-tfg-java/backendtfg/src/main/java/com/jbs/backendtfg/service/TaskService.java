@@ -68,7 +68,7 @@ public class TaskService { //Definimos los métodos que se pueden realizar sobre
         return tasks;
     }
 
-    public TaskDTO setUsers(String id, List<String> userIds) {
+    public TaskDTO setUsers(String id, List<String> userIds) { //Establecemos la lista de usuarios de una tarea
         Task currentTask = taskRepository.findById(new ObjectId(id)).orElse(null);
 
         List<ObjectId> newUserIds = new ArrayList<>();
@@ -95,25 +95,25 @@ public class TaskService { //Definimos los métodos que se pueden realizar sobre
         return new TaskDTO(taskRepository.save(currentTask)); //Devolvemos la tarea actualizada
     }
 
-    public void addUser(String id, ObjectId idUser) {
+    public void addUser(String id, ObjectId idUser) { //Añadimos un usuario a una tarea
         User user = userRepository.findById(idUser).get();  
         user.addTask(new ObjectId(id));
         userRepository.save(user);
     }
 
-    public void removeUser(String id, ObjectId idUser) {
+    public void removeUser(String id, ObjectId idUser) { //Eliminamos un usuario de una tarea
         User user = userRepository.findById(idUser).get();
         user.removeTask(new ObjectId(id));
         userRepository.save(user);
     }
 
-    public TaskDTO deleteUsers(String id) {
+    public TaskDTO deleteUsers(String id) { //Eliminamos los usuarios de una tarea
         Task t = taskRepository.findById(new ObjectId(id)).get();
         t.setAssigneesUserIds(new ArrayList<>());
         return new TaskDTO(taskRepository.save(t));
     }
 
-    public List<TaskDTO> getTasksNameSearch(ObjectId idCreator, ArrayList<ObjectId> tasksIds, String nameFragment) {
+    public List<TaskDTO> getTasksNameSearch(ObjectId idCreator, ArrayList<ObjectId> tasksIds, String nameFragment) { //Obtenemos una lista de tareas que contienen en su nombre el nameFragment
         List<TaskDTO> toReturn = new ArrayList<>();
         for (Task task : taskRepository.findByCreatorIdAndNameContainingIgnoreCase(idCreator, nameFragment)) {
             if (tasksIds.contains(task.getId())) {

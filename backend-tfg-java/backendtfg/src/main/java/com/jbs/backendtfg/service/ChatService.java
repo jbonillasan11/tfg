@@ -61,7 +61,7 @@ public class ChatService {
         return chatDTOs;
     }
 
-    public ChatDTO newGroupChat(List<String> participantsIds) {
+    public ChatDTO newGroupChat(List<String> participantsIds) { //Creamos un nuevo chat, grupal o individual
         ArrayList<ObjectId> participants = new ArrayList<>();
         for (String id : participantsIds) {
             participants.add(new ObjectId(id));
@@ -84,16 +84,25 @@ public class ChatService {
         }
     }
 
-    public Message sendMessage(String userID, String content, String chatId) {                         //Enviamos un mensaje a un chat, guardándolo en la BD
+    public Chat newChatForum(List<ObjectId> participantsIds) { //Forzamos la creación de un chat con los miembros de un grupo que SOLO será accesible desde el grupo
+        ArrayList<ObjectId> participants = new ArrayList<>();
+        for (ObjectId id : participantsIds) {
+            participants.add(id);
+        }
+
+        return chatRepository.save(new Chat(participants));
+    }
+
+    public Message sendMessage(String userID, String content, String chatId) { //Enviamos un mensaje a un chat, guardándolo en la BD
         Message m = new Message(new ObjectId(userID), LocalDateTime.now(), content, new ObjectId(chatId)); //Creamos el nuevo mensaje
-        Message messageAux = messageRepository.save(m);                                         //Guardamos el mensaje en el repositorio
-        Chat chatAux = chatRepository.findById(new ObjectId(chatId)).get();                     //Recuperamos el chat al que pertenece
-        chatAux.addMessage(messageAux.getId());                                 //Añadimos el mensaje al chat
+        Message messageAux = messageRepository.save(m);                                                    //Guardamos el mensaje en el repositorio
+        Chat chatAux = chatRepository.findById(new ObjectId(chatId)).get();                                //Recuperamos el chat al que pertenece
+        chatAux.addMessage(messageAux.getId());                                                            //Añadimos el mensaje al chat
         chatRepository.save(chatAux);
         return messageAux;                                      
     }
 
-    public List<MessageDTO> getChatMessages(String chatId) {
+    public List<MessageDTO> getChatMessages(String chatId) { //Obtenemos los mensajes de un chat
         List<MessageDTO> messageDTOs = new ArrayList<>();
         for (Message message : messageRepository.findByChatId(new ObjectId(chatId))) {
             messageDTOs.add(new MessageDTO(message));

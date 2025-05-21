@@ -15,12 +15,11 @@ public class Group {
     private String name;
     private ObjectId creatorId;
     private List <ObjectId> usersIds = new ArrayList<>();
-    private List <ObjectId> tasksIds = new ArrayList<>();
+    private ObjectId forumId;
     private List <UserType> allowedUserTypes = new ArrayList<>();
 
     public Group() {
         this.name = "";
-        this.creatorId = null;
     }
 
     public Group(ObjectId creatorId) {
@@ -36,7 +35,7 @@ public class Group {
         this.name = g.name;
         this.usersIds = g.getUsers();
         this.creatorId = g.getCreator();
-        this.tasksIds = g.getTasks();
+        this.forumId = g.getForumId();
         this.allowedUserTypes = g.getAllowedUserTypes();
     }
        
@@ -64,28 +63,12 @@ public class Group {
         this.usersIds = usersIds;
     }
 
-    public List<ObjectId> getTasksIds() {
-        return tasksIds;
-    }
-
-    public void setTasksIds(List<ObjectId> tasksIds) {
-        this.tasksIds = tasksIds;
-    }
-
     public ObjectId getId(){
         return this.id;
     }
 
-    public void addTask(ObjectId taskId){
-        this.tasksIds.add(taskId);
-    }
-
     public void removeUser(ObjectId userId){
         this.usersIds.remove(userId);
-    }
-
-    public void removeTask(ObjectId taskId){
-        this.tasksIds.remove(taskId);
     }
 
     public String getName() {
@@ -98,10 +81,6 @@ public class Group {
 
     public List<ObjectId> getUsers() {
         return usersIds;
-    }
-
-    public List<ObjectId> getTasks() {
-        return tasksIds;
     }
 
     public List<UserType> getAllowedUserTypes() {
@@ -120,10 +99,6 @@ public class Group {
         this.usersIds = new ArrayList<ObjectId>();
     }
 
-    public void removeAllTasks() {
-        this.tasksIds = new ArrayList<ObjectId>();
-    }
-
     public void setAllowedUserTypes(List<UserType> types) {
         this.allowedUserTypes = types;
     }
@@ -134,6 +109,14 @@ public class Group {
         if (o == null || !(o instanceof Group)) return false;
         Group g = (Group) o;
         return g.id.equals(this.id);
+    }
+
+    public ObjectId getForumId() {
+        return forumId;
+    }
+
+    public void setForumId(ObjectId forumId) {
+        this.forumId = forumId;
     }
 
     

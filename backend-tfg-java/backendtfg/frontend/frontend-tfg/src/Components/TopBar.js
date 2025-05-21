@@ -1,4 +1,3 @@
-import React from 'react';
 import ChatButton from '../Components/ChatButton';
 import LogoutButton from '../Components/LogoutButton';
 import ProfileButton from '../Components/ProfileButton';

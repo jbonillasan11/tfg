@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import FillTheBlankRender from '../QuestionRenders/FillTheBlankRender';
 import DragAndDropRender from '../QuestionRenders/DragAndDropRender';
 import MultipleChoiceRender from '../QuestionRenders/MultipleChoiceRender';
@@ -14,11 +14,7 @@ const TaskCorrection = () => {
     const task = state.task || null;
     const responsesObject = state.response || null;
 
-    useEffect(() => {
-        console.log(responsesObject);
-    })
-
-    const [totalScore, setTotalScore] = useState(responsesObject.calification || 0);
+    const [totalScore] = useState(responsesObject.calification || 0);
 
     function questionRender(question, index){
         switch (question.type) { //Por cada pregunta renderiza los elementos propios del tipo. La respuesta quedará guardada en un índice dentro de responses

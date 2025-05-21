@@ -105,7 +105,7 @@ public class UserService { //Definimos los métodos que se pueden realizar sobre
         return users;
     }
 
-    public List<String> getUserChatsIds(User u) {
+    public List<String> getUserChatsIds(User u) { //Obtenemos la lista de IDs de los chats a los que pertenece el usuario
         UserDTO targetUser = getUserById(u.getId().toHexString());
         List<String> idsChats = targetUser.getChatsIDs();
         List<String> idsStrings = new ArrayList<>();
@@ -117,7 +117,7 @@ public class UserService { //Definimos los métodos que se pueden realizar sobre
         return idsStrings;
     }
 
-    public List<UserDTO> getUsersNameSearch(String organization, String nameFragment) {
+    public List<UserDTO> getUsersNameSearch(String organization, String nameFragment) { //Obtenemos una lista de usuarios que contienen el namFragment en su nombre
         List<User> lUsers = userRepository.findByOrganizationAndFullNameContaining(organization, nameFragment);
         List<UserDTO> lUsersDTO = new ArrayList<>();
         for (User user : lUsers) {
@@ -126,7 +126,7 @@ public class UserService { //Definimos los métodos que se pueden realizar sobre
         return lUsersDTO;
     }
 
-    public void changePassword(ObjectId userId, String oldPassword, String newPassword) {
+    public void changePassword(ObjectId userId, String oldPassword, String newPassword) { //Cambiamos la contraseña de un usuario
         String oldPasswordEncoded = userRepository.findById(userId).get().getPassword();
 
         if (passwordEncoder.matches(oldPassword, oldPasswordEncoded)){
@@ -140,13 +140,13 @@ public class UserService { //Definimos los métodos que se pueden realizar sobre
         }
     }
 
-    public void removeGroupFromUser(ObjectId objectId, ObjectId objectId2) {
+    public void removeGroupFromUser(ObjectId objectId, ObjectId objectId2) { //Eliminamos un grupo de un usuario
         User targetUser = userRepository.findById(objectId).get();
         targetUser.removeGroup(objectId2);
         userRepository.save(targetUser);
     }
 
-    public List<ChatDTO> getUserChats(ObjectId userId) {
+    public List<ChatDTO> getUserChats(ObjectId userId) { //Obtenemos la lista de chats a los que pertenece el usuario
         UserDTO targetUser = getUserById(userId.toHexString());
         List<ChatDTO> chats = new ArrayList<>();
         for (ChatDTO c: chatService.getChatsByIds(targetUser.getChatsIDs())) {
@@ -164,7 +164,7 @@ public class UserService { //Definimos los métodos que se pueden realizar sobre
         return corrections;
     }
 
-    public UserDTO updateUserResponses(String userId, String taskId, UserResponse response) {
+    public UserDTO updateUserResponses(String userId, String taskId, UserResponse response) { //Actualizamos las respuestas de un usuario a una tarea
         User user = userRepository.findById(new ObjectId(userId)).get();
         UserResponse ur = user.getResponses().get(taskId);
         ur.setCorrections(initializeCorrections(taskId)); //INICIALIZAMOS TAMBIÉN LAS RESPUESTAS PARA COMODIDAD DEL FRONTEND
@@ -176,7 +176,7 @@ public class UserService { //Definimos los métodos que se pueden realizar sobre
         return new UserDTO(userRepository.save(user));
     }
 
-    public UserDTO updateUserCorrections(String userId, String taskId, UserResponse response) {
+    public UserDTO updateUserCorrections(String userId, String taskId, UserResponse response) { //Actualizamos las correcciones a un usuario en una tarea
         User user = userRepository.findById(new ObjectId(userId)).get();
         UserResponse ur = user.getResponses().get(taskId);
         ur.setCalification(response.getCalification());

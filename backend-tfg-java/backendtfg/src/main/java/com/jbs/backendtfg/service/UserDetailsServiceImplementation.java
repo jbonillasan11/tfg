@@ -17,7 +17,7 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException { //Obtenemos los datos del usuario a partir de su email
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new UsernameNotFoundException("Datos incorrectos")); //Usuario no encontrado, para evitar que una persona cualquiera sepa si el usuario existe o no, simplemente devolvemos un mensaje de credenciales inválidas
         return user;

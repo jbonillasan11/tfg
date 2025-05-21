@@ -24,7 +24,7 @@ import com.jbs.backendtfg.service.UserService;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "http://localhost:3000") // Permitir peticiones desde React
+@CrossOrigin(origins = "http://localhost:3000")
 public class AuthController {
 
     @Autowired
@@ -46,20 +46,20 @@ public class AuthController {
             Authentication authenticate = authenticationManager
                 .authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-                );
-            User user = (User) authenticate.getPrincipal();
+                ); //Autenticamos al usuario
+            User user = (User) authenticate.getPrincipal(); //Cast a nuestro tipo User
             
             return ResponseEntity.ok()
-                .header("Access-Control-Expose-Headers", HttpHeaders.AUTHORIZATION) //Expone el header?
-                .header(HttpHeaders.AUTHORIZATION, jwtService.generateToken(user))
+                .header("Access-Control-Expose-Headers", HttpHeaders.AUTHORIZATION) 
+                .header(HttpHeaders.AUTHORIZATION, jwtService.generateToken(user)) //Generamos y devolvemos el token en la respuesta
                 .body(user);
         } catch (BadCredentialsException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); //Si el usuario no existe o la contraseña es incorrecta, devolvemos un error
         }
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody User user) {
+    @PostMapping("/register") //Gestionaremos también los nuevos registros
+    public ResponseEntity<Map<String, String>> registerUser(@RequestBody User user) {
 
         Map<String, String> response = new HashMap<>(); //Usamos mapa para manejar en conjunto el mensaje de respuesta
         

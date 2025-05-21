@@ -1,7 +1,6 @@
 import './App.css';
 import { Routes, Route } from 'react-router-dom';
 import Dashboard from './Dashboard';
-import Homepage from './Homepage';
 import Login from './login';
 import PrivateRoute from './PrivateRoute';
 import TaskViewer from './TaskViewer';
@@ -46,7 +45,7 @@ return (
       <Route path="/tasks/:id/correction/:userId" element={
         <PrivateRoute> <TaskCorrection /> </PrivateRoute>
       } />
-      <Route path="/" element={<Homepage />}/> 
+      <Route path="/" element={<Login />}/> 
       <Route path="/login" element={<Login />}/> 
       <Route path="/register" element={<Register />}/>
     </Routes>

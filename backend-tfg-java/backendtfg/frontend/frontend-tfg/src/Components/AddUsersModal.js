@@ -5,7 +5,6 @@ import { useLocalState } from '../utils/useLocalState';
 const UserSearchModal = ({ isOpen, onClose, onSubmit, initialUsers }) => {
 
   const [authValue] = useLocalState("", "authValue");
-  const [currentUser] = useLocalState("", "currentUser");
 
   const [busquedaNombres, setBusquedaNombres] = useState("");
   const [users, setUsers] = useState([]);

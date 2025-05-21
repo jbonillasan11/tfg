@@ -10,8 +10,8 @@ const UserViewer = () => {
 
     const navigate = useNavigate();
    
-    const [authValue, setAuthValue] = useLocalState("", "authValue");
-    const [currentUser, setCurrentUser] = useLocalState("", "currentUser");
+    const [authValue] = useLocalState("", "authValue");
+    const [currentUser] = useLocalState("", "currentUser");
 
     const userId = window.location.href.split("/user/")[1];
 

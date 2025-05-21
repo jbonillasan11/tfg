@@ -23,7 +23,7 @@ public class MessageController {
     @Autowired
     private MessageService messageService;
 
-    @PostMapping("/getMessagesByChatId/{chatId}")
+    @PostMapping("/getMessagesByChatId/{chatId}") //Obtenemos la lista de mensajes de un chat
     public ResponseEntity<List<MessageDTO>> getMessagesByChatId(@AuthenticationPrincipal User authUser, @PathVariable String chatId){ 
         return ResponseEntity.ok(messageService.getMessagesByChatId(chatId));
     }

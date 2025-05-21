@@ -50,12 +50,12 @@ public class TaskController {
         return ResponseEntity.ok(taskService.saveEmptyTask(authUser));
     }
 
-    @PutMapping("/setUsers/{id}")
-    public ResponseEntity<TaskDTO> addUsers(@PathVariable String id, @AuthenticationPrincipal User authUser, @RequestBody List<String> ids) {
+    @PutMapping("/setUsers/{id}") //Establecemos la lista de usuarios de una tarea
+    public ResponseEntity<TaskDTO> setUsers(@PathVariable String id, @AuthenticationPrincipal User authUser, @RequestBody List<String> ids) {
         return ResponseEntity.ok(taskService.setUsers(id, ids));
     }
 
-    @PutMapping("/deleteUsers/{id}")
+    @PutMapping("/deleteUsers/{id}") //Eliminamos a los usuarios de una tarea
     public ResponseEntity<TaskDTO> deleteUsers(@PathVariable String id, @AuthenticationPrincipal User authUser) {
         return ResponseEntity.ok(taskService.deleteUsers(id));
     }
