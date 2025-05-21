@@ -1,13 +1,14 @@
 import React from 'react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
+import { useRef } from 'react';
 
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import fetchService from '../services/fetchService';
 
 
-const Chat = ({parentChat, senderId, authValue, participantsData = [], currentUser, groupName = ""}) => {
+const Forum = ({forumId, senderId, authValue, currentUser, groupName}) => {
 
 
     const [messageToSend, setMessageToSend] = useState("");
@@ -16,18 +17,16 @@ const Chat = ({parentChat, senderId, authValue, participantsData = [], currentUs
     const [stompClient, setStompClient] = useState(null);
     const [isConnected, setIsConnected] = useState(false);
 
-    const [pairIdName, setPairIdName] = useState({}); //Pares id-nombre
-
     const messagesEndRef = useRef(null); //Para mantener el scroll al final del chat
 
     useEffect(() => {
-        if (parentChat) {
-            fetchService(`messages/getMessagesByChatId/${parentChat.id}`, "POST", authValue, null)
+        if (forumId) {
+            fetchService(`messages/getMessagesByChatId/${forumId}`, "POST", authValue, null)
                 .then(messages => {
                     setMessages(messages);
                 })
             }
-    }, [parentChat]);
+    }, [forumId]);
 
     useEffect(() => {
         const socket = new SockJS("http://localhost:8080/ws-chat");
@@ -35,9 +34,9 @@ const Chat = ({parentChat, senderId, authValue, participantsData = [], currentUs
         webSocketFactory: () => socket,
         onConnect: () => {
             setIsConnected(true);
-            client.subscribe(`/topic/messages/${parentChat.id}`, (message) => {
-            const newMessage = JSON.parse(message.body);
-            setMessages((prev) => [...prev, newMessage]);
+            client.subscribe(`/topic/messages/${forumId}`, (message) => {
+                const newMessage = JSON.parse(message.body);
+                setMessages((prev) => [...prev, newMessage]);
             });
         },
         });
@@ -46,7 +45,7 @@ const Chat = ({parentChat, senderId, authValue, participantsData = [], currentUs
         setStompClient(client);
 
         return () => client.deactivate();
-    }, [parentChat]);
+    }, [forumId]);
 
     useEffect(() => {
         if (messagesEndRef.current) {
@@ -65,39 +64,21 @@ const Chat = ({parentChat, senderId, authValue, participantsData = [], currentUs
                 body: JSON.stringify({
                     sender: senderId,
                     content: messageToSend,
-                    chatId: parentChat.id,
+                    chatId: forumId,
                 }),
             });
             setMessageToSend("");
         }
     };
 
-    useEffect(() => {
-        if (participantsData) {
-            const mapIdName = {};
-            participantsData.forEach(user => {
-                mapIdName[user.id] = user.name;
-            });
-            setPairIdName(mapIdName);
-        }
-    }, [participantsData]);
-
     return (
         <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 60px)" }}>
-            <h3>
-                Chat de {" "}
-                {participantsData &&
-                    participantsData.map(user =>
-                    user ? user.fullname : "Usuario no encontrado"
-                    ).join(", ")}
-                </h3>
+            <h3>Foro del grupo {groupName}</h3>
             <div style={{ flex: 1, overflowY: "auto" }}>
             <div className="chat">
-                {messages.map((m) => {
-                    const senderName = pairIdName[m.sender] || "Usuario no encontrado"; // Mapeamos los ids a nombres
-                    if (m.sender === currentUser.id) {
+                {messages.map((m) => { //El mensaje se mostarrá de forma uniforme para todos los usuarios
                         return (
-                            <div key={m.id} className="msg sent">
+                            <div key={m.id}>
                                 <div style={{ maxWidth: '60%' }}>
                                     {m.content}  
                                     <div style={{ fontSize: "0.75rem", marginTop: "4px" }} className="text-muted">
@@ -106,39 +87,32 @@ const Chat = ({parentChat, senderId, authValue, participantsData = [], currentUs
                                 </div>
                             </div>
                         );
-                    } else {
-                        return (
-                            <div key={m.id} className="msg rcvd">
-                                <div style={{ maxWidth: '60%' }}>
-                                    <strong>{senderName}</strong> 
-                                    <br />
-                                    {m.content} 
-                                    <div style={{ fontSize: "0.75rem", marginTop: "4px" }} className="text-muted">
-                                        {m.timestamp}
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    }
                 })}
                 <div ref={messagesEndRef} />
             </div>
-            </div>
-    
-            {/* Input + botón anclados abajo */}
+        </div>
+        {currentUser.userType === "PROFESSOR" && ( //SOLO LOS PROFESORES PODRÁN ESCRIBIR EN LOS FOROS
             <div style={{ display: "flex", width: "100%", padding: "1rem", backgroundColor: "#f8f8f8" }}>
                 <Form.Control
                     type="text"
                     value={messageToSend}
                     onChange={(e) => setMessageToSend(e.target.value)}
+                     onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            e.preventDefault();
+                            sendMessage();
+                        }
+                    }}
                     style={{ width: "90%", marginRight: "1rem" }}
                 />
+            
                 <Button onClick={sendMessage} style={{ width: "10%" }}>
                     Enviar
                 </Button>
             </div>
+        )}
         </div>
     );
 };
 
-export default Chat;
+export default Forum;

@@ -27,12 +27,12 @@ public class UserController { //Manejamos los mapeos de las peticiones HTTP
     private DeletionService deletionService;
 
     @GetMapping("/getAllUsers") //Obtenemos todos los usuarios de nuestra BD
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
+    public ResponseEntity<List<UserDTO>> getAllUsers(@AuthenticationPrincipal User authUser) {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping("/getUserEmail/{email}") //Obtenemos un usuario a partir de su email (nombre de usuario)
-    public ResponseEntity<UserDTO> getUserByEmail(@PathVariable String email) {
+    public ResponseEntity<UserDTO> getUserByEmail(@PathVariable String email, @AuthenticationPrincipal User authUser) {
         return ResponseEntity.ok(userService.getUserByEmail(email));
     }
 
@@ -67,8 +67,8 @@ public class UserController { //Manejamos los mapeos de las peticiones HTTP
     }
 
     @GetMapping("/getCurrentUser") //Obtenemos el usuario de la sesión actual a partir de su token de autenticación
-    public ResponseEntity<UserDTO> getCurrentUser (@AuthenticationPrincipal User user){
-        return ResponseEntity.ok(userService.getUserById(user.getId().toHexString()));
+    public ResponseEntity<UserDTO> getCurrentUser (@AuthenticationPrincipal User authUser){
+        return ResponseEntity.ok(userService.getUserById(authUser.getId().toHexString()));
     }
 
     @GetMapping("/getUsersNameSearch") //Devolvemos una lista de usuarios cuyo nombre contenga nameFragment y sean de la misma organización
@@ -88,12 +88,12 @@ public class UserController { //Manejamos los mapeos de las peticiones HTTP
     }
 
     @PutMapping("/{userId}/saveResponses/{taskId}") //Actualizamos las respuestas de un usuario
-    public ResponseEntity<UserDTO> updateUserResponses(@PathVariable String userId, @PathVariable String taskId, @RequestBody UserResponse response) {
+    public ResponseEntity<UserDTO> updateUserResponses(@AuthenticationPrincipal User authUser, @PathVariable String userId, @PathVariable String taskId, @RequestBody UserResponse response) {
         return ResponseEntity.ok(userService.updateUserResponses(userId, taskId, response));
     }
 
     @PutMapping("/{userId}/saveCorrections/{taskId}") //Actualizamos las correcciones de un usuario. Funcionamiento muy similar al saveResponese, separado por claridad
-    public ResponseEntity<UserDTO> updateUserCorrections(@PathVariable String userId, @PathVariable String taskId, @RequestBody UserResponse response) {
+    public ResponseEntity<UserDTO> updateUserCorrections(@AuthenticationPrincipal User authUser, @PathVariable String userId, @PathVariable String taskId, @RequestBody UserResponse response) {
         return ResponseEntity.ok(userService.updateUserCorrections(userId, taskId, response));
     }
 

@@ -49,7 +49,6 @@ public class GroupService { //Definimos los métodos que se pueden realizar sobr
         Group existingGroup = groupRepository.findById(groupId).get();
         //Actualizamos solo los campos modificables
         existingGroup.setName(updatedGroup.getName());
-        existingGroup.setUsersIds(updatedGroup.getUsersIds());
         existingGroup.setAllowedUserTypes(updatedGroup.getAllowedUserTypes());
         existingGroup.setForumId(updatedGroup.getForumId());
         //Guardamos el grupo actualizado

@@ -89,7 +89,7 @@ const TaskViewer = () => {
     function saveChanges(){
       if (updatedUserIds.length === 0) fetchService(`tasks/deleteUsers/${taskId}`, "PUT", authValue, null) //Si no hay usuarios
       else fetchService(`tasks/setUsers/${taskId}`, "PUT", authValue, updatedUserIds) //Si hay 
-      window.location.reload();
+      //window.location.reload(); 
     }
 
     function editTaskData(){
@@ -126,7 +126,7 @@ const TaskViewer = () => {
               <h3>Creada por: {creator.name} {creator.surname}</h3>
               <h2>Plazo hasta: <input type="date" value={task.due} onChange={(e) => saveFieldUpdate("due", e.target.value)} /></h2>
               <h3>Descripción: <input type="text" value = {task.description} onChange={(e) => saveFieldUpdate("description", e.target.value)} /></h3>
-              <h3>Tarea repasable: <input type="checkbox" checked={task.redoable} onChange={(e) => {saveFieldUpdate("redoable", e.target.checked); console.log(task.redoable)} }/></h3>
+              <h3>Tarea repasable: <input type="checkbox" checked={task.redoable} onChange={(e) => {saveFieldUpdate("redoable", e.target.checked); console.log(task); console.log(task.redoable)} }/></h3>
 
               <Button id="editTask" onClick={() => editTaskData()}>Tarea</Button>
               <Button id="saveTaskButton" onClick={() => saveTaskDB()}>Guardar cambios</Button>

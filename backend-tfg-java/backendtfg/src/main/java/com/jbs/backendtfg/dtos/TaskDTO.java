@@ -11,7 +11,6 @@ import com.jbs.backendtfg.document.Task;
 
 public class TaskDTO {
 
-    
     private String id;
     private String name;
     private String description;

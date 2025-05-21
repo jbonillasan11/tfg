@@ -19,8 +19,6 @@ const Dashboard = () => {
   const [tasks, setTasks] = useState("");
   const [groups, setGroups] = useState("");
 
-  
-  
   useEffect(() => {
     fetchService("users/getCurrentUser", "GET", authValue, null)
       .then(user => {

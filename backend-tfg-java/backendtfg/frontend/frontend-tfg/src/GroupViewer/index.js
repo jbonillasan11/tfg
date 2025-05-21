@@ -6,6 +6,7 @@ import AddUserToGroup from '../ModalWindows/AddUserToGroup';
 import { ListGroup } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import TopBar from '../Components/TopBar';
+import Forum from '../Forum/Forum';
 
 const GroupViewer = () => {
 
@@ -60,14 +61,8 @@ const GroupViewer = () => {
       }
     }, [group])
 
-    useEffect(() => {
-      console.log(group)
-    })
-
     function saveGroupDB(){
-      console.log(group)
       addUsersGroup(); //Actualizamos los usuarios por fuera del PUT, ya que es un método algo más complejo
-      console.log(group)
       fetchService(`groups/${groupId}`, "PUT", authValue, group)
       .then(groupData => {
         setGroup(groupData);
@@ -99,63 +94,71 @@ const GroupViewer = () => {
     function addUsersGroup(){
       if (updatedUserIds.length === 0) fetchService(`groups/setUsers/${groupId}`, "PUT", authValue, [currentUser.id]) //Si no hay usuarios, eliminamos a todos menos al actual
       else fetchService(`groups/setUsers/${groupId}`, "PUT", authValue, updatedUserIds) //Si hay 
+      window.location.reload();
     }
 
     function groupForum(){
 
     }
 
-    console.log(group) 
+    console.log(updatedUserIds) 
 
     return (
       <>
         <TopBar currentUser={currentUser} />
         <div>
           {group ? (
-          <>
-              <h1> Grupo <input type="text" value = {group.name} onChange={(e) => saveFieldUpdate("name", e.target.value)} /></h1>
-              <h3> Creado por: {creator.name} {creator.surname} </h3>
-              <h3> Tareas </h3>
-              <ListGroup>
-                {groupTasks && groupTasks.map(task => (
-                  <ListGroup.Item key= {task.id}
-                      action
-                      onClick={() => navigate(`/tasks/${task.id}`)}>
-                      {task.name}
-                  </ListGroup.Item>
-                  ))}
-              </ListGroup>
-              <h3>Miembros</h3>
-              <ListGroup>
-                {groupUsers && groupUsers.map(member => (
-                  <ListGroup.Item key= {member.id}
-                      action
-                      onClick={() => navigate(`/user/${member.id}`)}>
-                      {member.name} {member.surname}
-                  </ListGroup.Item>
-                  ))}
-              </ListGroup>
-                {currentUser.id === group.creatorId ? (
-                <>
-                  <AddUserToGroup
-                    parentGroup={group}
-                    onSaveUsers={(updatedUsers) => setUpdatedUserIds(updatedUsers)}
+            <>
+                <h1> Grupo <input type="text" value = {group.name} onChange={(e) => saveFieldUpdate("name", e.target.value)} /></h1>
+                <h3> Creado por: {creator.name} {creator.surname} </h3>
+                <h3> Tareas </h3>
+                <ListGroup>
+                  {groupTasks && groupTasks.map(task => (
+                    <ListGroup.Item key= {task.id}
+                        action
+                        onClick={() => navigate(`/tasks/${task.id}`)}>
+                        {task.name}
+                    </ListGroup.Item>
+                    ))}
+                </ListGroup>
+                <h3>Miembros</h3>
+                <ListGroup>
+                  {groupUsers && groupUsers.map(member => (
+                    <ListGroup.Item key= {member.id}
+                        action
+                        onClick={() => navigate(`/user/${member.id}`)}>
+                        {member.name} {member.surname}
+                    </ListGroup.Item>
+                    ))}
+                </ListGroup>
+                  {currentUser.id === group.creatorId ? (
+                  <>
+                    <AddUserToGroup
+                      parentGroup={group}
+                      onSaveUsers={(updatedUsers) => setUpdatedUserIds(updatedUsers)}
+                    />
+                    <button id="saveGroupButton" onClick={() => saveGroupDB()}>Guardar cambios</button>
+                    <button id="deleteGroupButton" onClick={() => confirmGroupDeletion()}>Eliminar grupo</button>
+                    <button id="groupForum" onClick={() => groupForum()}>Foro del grupo</button>
+                  </>
+                  ) : (
+                    <></>
+                  )}
+                  <Forum
+                    forumId={group.forumId}
+                    senderId={currentUser.id}
+                    authValue={authValue}
+                    currentUser={currentUser}
+                    groupName={group.name}
                   />
-                  <button id="saveGroupButton" onClick={() => saveGroupDB()}>Guardar cambios</button>
-                  <button id="deleteGroupButton" onClick={() => confirmGroupDeletion()}>Eliminar grupo</button>
-                  <button id="groupForum" onClick={() => groupForum()}>Foro del grupo</button>
-                </>
-                ) : (
-                  <></>
-                )}
-          </>
+            </>
           ) : (
               <> 
                   <h2>Grupo no encontrado</h2>
               </>
           )
           }
-          </div>
+        </div>
       </>
     );
 };

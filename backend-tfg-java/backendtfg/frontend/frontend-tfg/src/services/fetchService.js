@@ -1,11 +1,13 @@
-
 function fetchService(url, reqMethod, authValue, reqBody) { //Función que nos permite hacer peticiones a nuestra APIRest
 
     const fetchData = {
         method: reqMethod,
-        headers: {
-            "content-type": "application/json"
-        }
+        headers: {}
+    }
+
+    const isFormData = reqBody instanceof FormData; //Si enviamos un FormData, el content type es establecido a multipart/form-data automáticamente por el navegador
+    if (!isFormData) {
+        fetchData.headers["Content-Type"] = "application/json";
     }
 
     if (authValue) {
@@ -13,7 +15,7 @@ function fetchService(url, reqMethod, authValue, reqBody) { //Función que nos p
     }
 
     if (reqBody) {
-        fetchData.body = JSON.stringify(reqBody);
+      fetchData.body = isFormData ? reqBody : JSON.stringify(reqBody);
     }
 
      return fetch(`http://localhost:8080/${url}`, fetchData)      
@@ -22,7 +24,7 @@ function fetchService(url, reqMethod, authValue, reqBody) { //Función que nos p
               return response.json();
             } else if (response.status === 401) {
               alert("Sesión caducada");
-              //window.location.href = "/login";
+              window.location.href = "/login";
             }
           })
 

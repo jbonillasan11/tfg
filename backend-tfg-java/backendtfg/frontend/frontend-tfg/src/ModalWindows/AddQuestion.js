@@ -1,8 +1,13 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { Button, Modal, Form, ListGroup } from 'react-bootstrap';
+import fetchService from '../services/fetchService';
+import { useLocalState } from '../utils/useLocalState';
+import { upload } from '@testing-library/user-event/dist/upload';
 
 function AddQuestion ({onSaveQuestion}) {
+
+    const [authValue] = useLocalState("", "authValue");
 
     const [modalShow, setModalShow] = useState(false);
     const [questionText, setQuestionText] = useState("");
@@ -15,6 +20,7 @@ function AddQuestion ({onSaveQuestion}) {
     const [showSubmit, setShowSubmit] = useState(false);
 
     const [file, setFile] = useState(null);
+    const [url, setUrl] = useState(null);
 
     useEffect(() => {
         if (maxScore > 0) {
@@ -55,6 +61,7 @@ function AddQuestion ({onSaveQuestion}) {
         setMultipleAnswers([]);
         setMaxScore(0);
         setFile(null);
+        setUrl(null);
     }
 
     function removeAnswer(answer) {
@@ -62,24 +69,53 @@ function AddQuestion ({onSaveQuestion}) {
         setMultipleAnswers(newAnswers);
     }
 
-
-    function saveNewQuestion() {
+    function saveNewQuestion(uploadedUrl) {
         if (onSaveQuestion) { // Devolveremos la pregunta ya construida
+            console.log(uploadedUrl);
             onSaveQuestion(
                 {
                     type: questionType,
                     question: questionText,
                     correctAnswers: [correctAnswer],
                     options: multipleAnswers,
-                    media: file,
+                    mediaURL: uploadedUrl,
                     maxPoints: maxScore
                 }
             );
         }
     }
 
-    function handleCloseSave(){
-        saveNewQuestion();
+    function handleFileChange(e){
+        const changeToFile = e.target.files[0];
+
+        const allowedTypes = ["image/png", "image/jpg", "image/jpeg", "image/gif"];
+
+        if (changeToFile.size > 20 * 1024 * 1024){
+            alert("El archivo es demasiado grande");
+            return;
+        }
+
+        if (allowedTypes.includes(changeToFile.type)){
+            setFile(changeToFile);
+        } else {
+            alert("El archivo debe ser de tipo imagen o GIF");
+        }    
+    }
+
+    const handleMediaUpload = async () => {
+        const formData = new FormData();
+        formData.append("file", file);
+        const response = await fetchService("mediaUploader/upload", "POST", authValue, formData);  
+        return(response.url);
+    }
+
+    async function handleCloseSave(){
+        console.log(file);
+        let uploadedUrl = null;
+        if (file){
+            uploadedUrl =await handleMediaUpload();
+        }
+        saveNewQuestion(uploadedUrl);
         handleClose();
     }
 
@@ -215,7 +251,7 @@ function AddQuestion ({onSaveQuestion}) {
                         )}
                     </>  
                 )}
-                <input type="file" onChange={setFile} />
+                <input type="file" onChange={handleFileChange} />
                 <Form.Group className="mb-3">
                     <Form.Label>Puntuación de la pregunta</Form.Label>
                     <Form.Control
