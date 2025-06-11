@@ -15,6 +15,7 @@ const TaskEditor = () => {
     const [task, setTask] = useState("");
     const [createdQuestion, setCreatedQuestion] = useState(null); //Pregunta recién creada en el modal
     const [newQuestions, setNewQuestions] = useState(null); //Conjunto de preguntas nuevas, no en la tarea, a guardar
+    const [toDelete, setToDelete] = useState([]); //Pregunta a eliminar, no en la tarea
 
     const [shownQuestions, setShownQuestions] = useState(null); //Conjunto de preguntas que se muestran en la tarea, a mostrar
 
@@ -38,19 +39,47 @@ const TaskEditor = () => {
         }
     }, [createdQuestion]);
 
-    function saveChanges() {
+    const handleMediaUpload = async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        const response = await fetchService("mediaUploader/upload", "POST", authValue, formData);  
+        return(response.url);
+    }
+
+    async function saveChanges() {
         const taskCopy = { ...task };
+        console.log(taskCopy);
+        console.log(newQuestions);
         if (newQuestions){
+            for (const question of newQuestions) {
+                if (question.media) {
+                    const responseURL = await handleMediaUpload(question.media);
+                    question.mediaURL = responseURL;
+                }
+            }
             taskCopy.content = [...task.content, ...newQuestions];
+            console.log(taskCopy);
         }
-        fetchService(`tasks/${task.id}`, "PUT", authValue, taskCopy)
-        .then(alert("Preguntas guardadas"));
+        if (toDelete && toDelete.length > 0) {
+            for (const question of toDelete) {
+                if (question.mediaURL) {
+                    await fetchService(`mediaUploader/delete`, "DELETE", authValue, question.mediaURL); //El firewall de Spring rechaza slashes en la URL, por lo que lo enviamos como body
+                }
+            }
+            taskCopy.content = taskCopy.content.filter( // Filtramos las preguntas eliminadas de taskCopy.content si ya estaban
+                (q) => !toDelete.some((deletedQ) => q.question === deletedQ.question)
+            );
+        }
+        console.log(taskCopy);
+        await fetchService(`tasks/${task.id}`, "PUT", authValue, taskCopy);
+        alert("Preguntas guardadas");
         window.location.reload();
     }
 
     function deleteQuestion(index) {
         const updatedQuestions = shownQuestions.filter((_, i) => i !== index);
         setShownQuestions(updatedQuestions);
+        setToDelete(prev => [...prev, shownQuestions[index]]);
         task.content = updatedQuestions;
     }
 

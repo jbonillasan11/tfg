@@ -9,3 +9,7 @@ spring:
           expiration: 3600000
           issuer-uri: http://localhost:8083/auth/realms/baeldung
           jwk-set-uri: http://localhost:8083/auth/realms/baeldung/protocol/openid-connect/certs
+  servlet:
+    multipart:
+      max-file-size: 15MB
+      max-request-size: 15MB

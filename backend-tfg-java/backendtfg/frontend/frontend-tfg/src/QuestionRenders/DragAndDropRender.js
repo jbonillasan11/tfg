@@ -5,8 +5,8 @@ const DragAndDropRender = ({question, index, responseParent = [], onResponseUpda
 
     const [response, setResponse] = useState(responseParent); //Array de respuestas de la pregunta
 
-    const [comment, setComment] = useState(responsesObject.corrections[index].comment || "");
-    const [score, setScore] = useState(responsesObject.corrections[index].calification || 0);
+    const [comment, setComment] = useState(responsesObject?.corrections?.[index]?.comment || "");
+    const [score, setScore] = useState(responsesObject?.corrections?.[index]?.calification || "0");
 
     function saveCorrectionUpdate(value) {
         setComment(value);

@@ -20,7 +20,6 @@ function AddQuestion ({onSaveQuestion}) {
     const [showSubmit, setShowSubmit] = useState(false);
 
     const [file, setFile] = useState(null);
-    const [url, setUrl] = useState(null);
 
     useEffect(() => {
         if (maxScore > 0) {
@@ -61,7 +60,6 @@ function AddQuestion ({onSaveQuestion}) {
         setMultipleAnswers([]);
         setMaxScore(0);
         setFile(null);
-        setUrl(null);
     }
 
     function removeAnswer(answer) {
@@ -69,16 +67,15 @@ function AddQuestion ({onSaveQuestion}) {
         setMultipleAnswers(newAnswers);
     }
 
-    function saveNewQuestion(uploadedUrl) {
+    function saveNewQuestion() {
         if (onSaveQuestion) { // Devolveremos la pregunta ya construida
-            console.log(uploadedUrl);
             onSaveQuestion(
                 {
                     type: questionType,
                     question: questionText,
                     correctAnswers: [correctAnswer],
                     options: multipleAnswers,
-                    mediaURL: uploadedUrl,
+                    media: file,
                     maxPoints: maxScore
                 }
             );
@@ -102,20 +99,11 @@ function AddQuestion ({onSaveQuestion}) {
         }    
     }
 
-    const handleMediaUpload = async () => {
-        const formData = new FormData();
-        formData.append("file", file);
-        const response = await fetchService("mediaUploader/upload", "POST", authValue, formData);  
-        return(response.url);
-    }
+    
 
     async function handleCloseSave(){
         console.log(file);
-        let uploadedUrl = null;
-        if (file){
-            uploadedUrl =await handleMediaUpload();
-        }
-        saveNewQuestion(uploadedUrl);
+        saveNewQuestion();
         handleClose();
     }
 

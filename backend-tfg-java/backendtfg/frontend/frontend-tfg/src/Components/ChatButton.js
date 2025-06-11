@@ -1,8 +1,12 @@
+import {BsChatRightDotsFill} from "react-icons/bs";
+import {useNavigate} from 'react-router-dom';
 
 const ChatButton = () => {
+
+    const navigate = useNavigate();
+
     return (
-        <button onClick={() => window.location.href = "/chats"}
-                className="fixed bottom-4 right-4 p-3"> {"Chats"} </button>
+        <BsChatRightDotsFill onClick={() => navigate("/chats")} className="topbar-icon"/>
     );
 };
 

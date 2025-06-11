@@ -101,8 +101,6 @@ const GroupViewer = () => {
 
     }
 
-    console.log(updatedUserIds) 
-
     return (
       <>
         <TopBar currentUser={currentUser} />

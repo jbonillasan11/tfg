@@ -6,7 +6,7 @@ import { Button, Modal, Form, ListGroup } from 'react-bootstrap';
 
 function NewChat ({currentUser, onCreateChat}) {
 
-    const [authValue, setAuthValue] = useLocalState("", "authValue");
+    const [authValue] = useLocalState("", "authValue");
 
     const [modalShow, setModalShow] = useState(false);
 
@@ -45,14 +45,15 @@ function NewChat ({currentUser, onCreateChat}) {
         }
     }
 
-    function saveChanges(){
+    async function saveChanges(){
         if (chatUsers.length <= 1) return;
         const reqBody = chatUsers.map(user => user.id);
-        fetchService(`chats/newChat`, "POST", authValue, reqBody)
+        await fetchService(`chats/newChat`, "POST", authValue, reqBody)
         .then(response => {
             setModalShow(false);
             setChatUsers([]);
-            if (onCreateChat) onCreateChat(response); // Callback para actualizar la lista de chats en el componente padre //Que renderice el chat al lado o en una ventana
+            if (onCreateChat) onCreateChat(response); // Callback para actualizar la lista de chats en el componente padre
+            console.log(response);
             handleClose();
         });
     }

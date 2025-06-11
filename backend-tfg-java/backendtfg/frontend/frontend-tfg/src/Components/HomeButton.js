@@ -1,14 +1,12 @@
 import { useNavigate } from 'react-router-dom';
+import { FaHome } from "react-icons/fa";
 
 const HomeButton = () => {
 
     const navigate = useNavigate();
 
     return (
-        <button onClick={() => {
-            navigate("/dashboard");
-        }}>
-            Dashboard </button>
+        <FaHome onClick={() => navigate("/dashboard")} className="topbar-icon"/>
     );
             
 };

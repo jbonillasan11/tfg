@@ -1,13 +1,12 @@
 import { useNavigate } from 'react-router-dom';
+import { IoIosArrowBack } from 'react-icons/io';
 
 const PreviousPageButton = () => {
 
     const navigate = useNavigate();
 
     return (
-        <div>
-            <button className="btn btn-primary" onClick={() => navigate(-1)}>Atrás</button>
-        </div>
+        <IoIosArrowBack onClick={() => navigate(-1)} className="topbar-icon"/>
     );
 };
 

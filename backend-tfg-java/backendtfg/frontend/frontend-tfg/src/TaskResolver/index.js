@@ -1,4 +1,3 @@
-import React from 'react';
 import { useLocation } from 'react-router-dom';
 import fetchService from '../services/fetchService';
 import { useLocalState } from '../utils/useLocalState';

@@ -77,12 +77,12 @@ const Dashboard = () => {
     
     return (
         <>  
-          {/*<TopBar currentUser={currentUser} /> */}
+
           <TopBar currentUser={currentUser} />
           <Container fluid>
             
             <div>
-              <h1>Bienvenido, {currentUser.name}</h1>
+              <h1>Bienvenid@, {currentUser.name}</h1>
             </div>
             <Row>
               <Col md={6}>

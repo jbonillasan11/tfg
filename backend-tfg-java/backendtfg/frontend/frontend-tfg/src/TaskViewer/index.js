@@ -89,7 +89,7 @@ const TaskViewer = () => {
     function saveChanges(){
       if (updatedUserIds.length === 0) fetchService(`tasks/deleteUsers/${taskId}`, "PUT", authValue, null) //Si no hay usuarios
       else fetchService(`tasks/setUsers/${taskId}`, "PUT", authValue, updatedUserIds) //Si hay 
-      //window.location.reload(); 
+      window.location.reload(); 
     }
 
     function editTaskData(){
@@ -97,6 +97,7 @@ const TaskViewer = () => {
     }
 
     function handleUserCorrection(user){
+      if (user.responses[taskId].taskState === "PENDING") return;
       navigate(`/tasks/${taskId}/corrector/${user.id}`, {state: {task, user}})
     }
 
@@ -105,11 +106,7 @@ const TaskViewer = () => {
     let showCorrectionButton
 
     if (response && (response.taskState === "PENDING" || response.taskState === "IN_PROGRESS")) {
-      if (response.calification !== -1) {
-        showButton = false;
-      } else if (response.calification !== -1) {
         showButton = true;
-      } else showButton = true;
     } else if (response && response.taskState === "CORRECTED") {
         showCorrectionButton = true;
     }
@@ -142,18 +139,21 @@ const TaskViewer = () => {
 
               <h3>Usuarios</h3>
               {users && users.map(user => {
-                return (
-                  <ListGroup.Item
-                    key={user.id}
-                    action
-                    onClick={() => handleUserCorrection(user)}
-                  >
-                    <div><strong>{user.name} {user.surname}</strong></div>
-                    <div>Estado: {user.responses[taskId].taskState}</div> {/* Estilo según su valor, color */}	
-                    <div>Fecha de subida: {user.responses[taskId].uploadDate}</div> {/* Que se muestre solo cuando haya sido entregada */}	
-                    <div>Calificación: {user.responses[taskId].calification !== -1 ? user.responses[taskId].calification : "No calificado"}</div>
-                  </ListGroup.Item>
-                );
+                // eslint-disable-next-line no-lone-blocks
+                {if (user.userType === "STUDENT") {
+                  return (
+                    <ListGroup.Item
+                      key={user.id}
+                      action
+                      onClick={() => handleUserCorrection(user)}
+                    >
+                      <div><strong>{user.name} {user.surname}</strong></div>
+                      <div>Estado: {user.responses[taskId].taskState}</div> {/* Estilo según su valor, color */}	
+                      <div>Fecha de subida: {user.responses[taskId].uploadDate}</div> {/* Que se muestre solo cuando haya sido entregada */}	
+                      <div>Calificación: {user.responses[taskId].calification !== -1 ? user.responses[taskId].calification : "No calificado"}</div>
+                    </ListGroup.Item>
+                  )
+                }}
               })}
           </>
           ) : ( //RENDERIZADO PARA ESTUDIANTES

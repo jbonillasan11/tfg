@@ -65,3 +65,10 @@
     align-content: right;
     margin-right: auto;
   }
+
+  .topbar-icon {
+    color: white;
+    font-size: 32px;
+    cursor: pointer;
+    transition: color 0.3s;
+  }

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 
 const MultipleChoiceRender = ({question, index, responseParent = [], responsesObject = {}, onResponseUpdate, onCorrectionUpdate, isTeacher = false, isReview = false}) => {
 
-    const [calculatedScore, setCalculatedScore] = useState(responsesObject.corrections[index].calification || 0);
+    const [calculatedScore, setCalculatedScore] = useState(responsesObject?.corrections?.[index]?.calification || "0");
 
     useEffect(() => {
         if (responseParent[0] === question.correctAnswers[0]) {

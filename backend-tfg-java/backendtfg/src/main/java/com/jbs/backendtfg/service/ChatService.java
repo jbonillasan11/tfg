@@ -2,6 +2,7 @@ package com.jbs.backendtfg.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,21 +67,22 @@ public class ChatService {
         for (String id : participantsIds) {
             participants.add(new ObjectId(id));
         }
+        Collections.sort(participants); //Ordenamos los participantes para evitar duplicados en el caso de chats individuales
     
-        Optional<Chat> existingChat = chatRepository.findChatByParticipants(participants);
+        Optional<Chat> existingChat = chatRepository.findChatByExactParticipants(participants); //Buscamos si ya existe un chat con esos participantes
         if (existingChat.isPresent()) { //Si ya existe un chat con esos participantes, lo devolvemos
+            System.out.println(existingChat.get());
             return new ChatDTO(existingChat.get());
         } else { //Si no existe, lo creamos
-            Chat chat = new Chat(participants);
-            chat = chatRepository.save(chat); 
+            Chat createdChat = chatRepository.save(new Chat(participants)); 
 
             for (String id : participantsIds) { //Por cada participante, añadimos el chat a su lista de chats
                 User user = userRepository.findById(new ObjectId(id)).get();
-                user.addChat(chat.getId());
+                user.addChat(createdChat.getId());
                 userRepository.save(user);
             }
     
-            return new ChatDTO(chat);
+            return new ChatDTO(createdChat);
         }
     }
 

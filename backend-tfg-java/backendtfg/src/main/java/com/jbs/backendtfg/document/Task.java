@@ -19,8 +19,7 @@ public class Task {
     private ObjectId creatorId;
     private boolean redoable;
     private List <ObjectId> assigneesUserIds = new ArrayList<>();
-    private List <ObjectId> assigneesGroupIds = new ArrayList<>(); //Por el momento prescindible
-    private List<Content> content = new ArrayList<>();
+    private List <Content> content = new ArrayList<>();
     
 
     public Task() { 
@@ -54,23 +53,10 @@ public class Task {
         }
     }
 
-    public void addGroup(ObjectId groupId){
-        if (!this.assigneesGroupIds.contains(groupId)){
-            this.assigneesGroupIds.add(groupId);
-        } else throw new IllegalArgumentException("El grupo ya tiene asignada la tarea");
-    }
-
     public void removeUser(ObjectId userId){
         if (assigneesUserIds.contains(userId)){
             this.assigneesUserIds.remove(userId);
         } else throw new IllegalArgumentException("El usuario no tiene asignada la tarea que se quiere eliminar");
-        
-    }
-
-    public void removeGroup(ObjectId groupId){
-        if (assigneesGroupIds.contains(groupId)){
-            this.assigneesGroupIds.remove(groupId);
-        } else throw new IllegalArgumentException("El grupo no tiene asignada la tarea que se quiere eliminar");
     }
 
     public void setId(ObjectId id) {
@@ -83,10 +69,6 @@ public class Task {
 
     public void setAssigneesUserIds(List<ObjectId> assigneesUserIds) {
         this.assigneesUserIds = assigneesUserIds;
-    }
-
-    public void setAssigneesGroupIds(List<ObjectId> assigneesGroupIds) {
-        this.assigneesGroupIds = assigneesGroupIds;
     }
 
     public String getName() {
@@ -111,10 +93,6 @@ public class Task {
 
     public List<ObjectId> getAssigneesUserIds() {
         return assigneesUserIds;
-    }
-
-    public List<ObjectId> getAssigneesGroupIds() {
-        return assigneesGroupIds;
     }
 
     public List<Content> getContent() {

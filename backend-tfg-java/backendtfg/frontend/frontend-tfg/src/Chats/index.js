@@ -1,4 +1,3 @@
-import React from 'react';
 import { useLocalState } from '../utils/useLocalState';
 import { useState, useEffect } from 'react';
 import fetchService from '../services/fetchService';
@@ -10,8 +9,8 @@ import Chat from '../Chats/Chat';
 
 const Chats = () => {
 
-    const [authValue, setAuthValue] = useLocalState("", "authValue");
-    const [currentUser, setCurrentUser] = useLocalState("", "currentUser");
+    const [authValue] = useLocalState("", "authValue");
+    const [currentUser] = useLocalState("", "currentUser");
 
     const location = useLocation(); //Obtenemos el id del usuario al que redirigimos desde el chat (si existe)
 
@@ -60,14 +59,16 @@ const Chats = () => {
                 
                 <div style={{ flex: 1, overflowY: 'auto', backgroundColor: '#f0f0f0', padding: '1rem' }}>
                     <h1>Chats</h1>
-                    <NewChat
-                        currentUser={currentUser}
-                        onCreateChat={(newChat) => {
-                            setPastChats([...pastChats, newChat]);
-                            setCurrentChat(newChat);
-                            newChatRedirecter(newChat.id);
-                        }}
-                    />
+                    {currentUser.userType === "PROFESSOR" && (
+                        <NewChat
+                            currentUser={currentUser}
+                            onCreateChat={(newChat) => {
+                                setPastChats([...pastChats, newChat]);
+                                setCurrentChat(newChat);
+                                newChatRedirecter(newChat.id);
+                            }}
+                        />
+                    )}
                     <ListGroup>
                         {pastChats && pastChats.length > 0 && pastChats.map(chat => (
                             <ListGroup.Item

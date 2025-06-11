@@ -6,7 +6,6 @@ import java.util.List;
 import org.bson.types.ObjectId;
 
 import com.jbs.backendtfg.document.Group;
-import com.jbs.backendtfg.document.UserType;
 
 public class GroupDTO {
 
@@ -15,7 +14,6 @@ public class GroupDTO {
     private String creatorId;
     private List <String> usersIds;
     private String forumId;
-    private List <UserType> allowedUserTypes;
 
     public GroupDTO (Group g){
         id = g.getId().toHexString();
@@ -26,7 +24,6 @@ public class GroupDTO {
             usersIds.add(u.toHexString());
         }
         forumId = g.getForumId().toHexString();
-        allowedUserTypes = g.getAllowedUserTypes();
     }
 
     public String getId() {
@@ -47,10 +44,6 @@ public class GroupDTO {
 
     public String getForumId() {
         return forumId;
-    }
-
-    public List<UserType> getAllowedUserTypes() {
-        return allowedUserTypes;
     }
 
 }

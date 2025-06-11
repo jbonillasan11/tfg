@@ -1,4 +1,3 @@
-import React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import { Form, Button } from 'react-bootstrap';
 
@@ -7,7 +6,7 @@ import { Client } from "@stomp/stompjs";
 import fetchService from '../services/fetchService';
 
 
-const Chat = ({parentChat, senderId, authValue, participantsData = [], currentUser, groupName = ""}) => {
+const Chat = ({parentChat, senderId, authValue, participantsData = [], currentUser}) => {
 
 
     const [messageToSend, setMessageToSend] = useState("");
@@ -21,8 +20,8 @@ const Chat = ({parentChat, senderId, authValue, participantsData = [], currentUs
     const messagesEndRef = useRef(null); //Para mantener el scroll al final del chat
 
     useEffect(() => {
-        if (parentChat) {
-            fetchService(`messages/getMessagesByChatId/${parentChat.id}`, "POST", authValue, null)
+        if (parentChat.id) {
+            fetchService(`messages/getMessagesByChatId/${parentChat.id}`, "POST", authValue)
                 .then(messages => {
                     setMessages(messages);
                 })
@@ -73,6 +72,7 @@ const Chat = ({parentChat, senderId, authValue, participantsData = [], currentUs
     };
 
     useEffect(() => {
+        console.log(participantsData);
         if (participantsData) {
             const mapIdName = {};
             participantsData.forEach(user => {
@@ -88,7 +88,7 @@ const Chat = ({parentChat, senderId, authValue, participantsData = [], currentUs
                 Chat de {" "}
                 {participantsData &&
                     participantsData.map(user =>
-                    user ? user.fullname : "Usuario no encontrado"
+                    user ? user.name + " " + user.surname : "Usuario no encontrado"
                     ).join(", ")}
                 </h3>
             <div style={{ flex: 1, overflowY: "auto" }}>

@@ -1,16 +1,20 @@
 import { useLocalState } from "../utils/useLocalState";
+import { useNavigate } from "react-router-dom";
+import { IoLogOutOutline } from "react-icons/io5";
 
 const LogoutButton = () => {
-    const[authValue, setAuthValue] = useLocalState("", "authValue");
-    const [currentUser, setCurrentUser] = useLocalState("", "currentUser");
+
+    const[setAuthValue] = useLocalState("", "authValue");
+    const [setCurrentUser] = useLocalState("", "currentUser");
+    const navigate = useNavigate();
 
     return (
-        <button onClick={() => {
-            window.location.href = "/login"
-            setAuthValue("");
-            setCurrentUser("");
-        }}
-        className="fixed bottom-4 right-4 p-3"> {"Cerrar sesión"} </button>
+            <IoLogOutOutline onClick={() => {
+                    navigate("/login");
+                    setAuthValue("");
+                    setCurrentUser("");
+                }} 
+                className="topbar-icon"/>
     );
 };
 

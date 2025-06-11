@@ -3,8 +3,8 @@ import { useState } from 'react';
 
 const OpenAnswerRender = ({question, index, responseParent = [], responsesObject = {}, onResponseUpdate, onCorrectionUpdate, isTeacher = false, isReview = false}) => {
 
-    const [calculatedScore, setCalculatedScore] = useState(responsesObject.corrections[index].calification || 0);
-    const [comment, setComment] = useState(responsesObject.corrections[index].comment || "");
+    const [calculatedScore, setCalculatedScore] = useState(responsesObject?.corrections?.[index]?.calification || "0");
+    const [comment, setComment] = useState(responsesObject?.corrections?.[index]?.comment || "");
 
     function saveCorrectionUpdate(value) {
         setComment(value);

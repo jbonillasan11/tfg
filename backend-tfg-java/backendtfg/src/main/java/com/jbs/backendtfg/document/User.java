@@ -63,14 +63,14 @@ public class User implements UserDetails{
 
     public void addGroup(ObjectId groupId){
         if (!this.groupsIds.contains(groupId)){
-            this.groupsIds.add(groupId);
+            this.groupsIds.add(0, groupId); //Añado el grupo al principio de la lista para que los más recientes se muestren primero
         } else throw new IllegalArgumentException("El usuario ya pertenece al grupo");
     }
 
     public void addTask(ObjectId taskId){
         if (!this.tasksIds.contains(taskId)){
-            this.tasksIds.add(taskId); //Añado entrada para la tarea en el mapa
-            addResponse(taskId.toHexString(), new UserResponse());
+            this.tasksIds.add(0, taskId); //Añado la tarea al principio de la lista para que las más recientes se muestren primero
+            addResponse(taskId.toHexString(), new UserResponse()); //Añado entrada para la tarea en el mapa
         }
     }
 
