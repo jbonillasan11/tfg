@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import Form from 'react-bootstrap/Form';
+import Card from 'react-bootstrap/Card';
 
 const Register = () => {
 
@@ -58,69 +60,83 @@ const Register = () => {
     };
 
     return (
-        <div style ={{margin: "20px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
-            <>
-            <div style = {{padding: "0.5%"}}>
-                <label htmlFor="name">Nombre</label>
-                <br></br>
-                <input type="text" id="registerName" value = {name} onChange={(event) => setName(event.target.value)}/>
-            </div>
-            <div style = {{padding: "0.5%"}}>
-                <label htmlFor="surname">Apellidos</label>
-                <br></br>
-                <input type="text" id="registerSurname" value = {surname} onChange={(event) => setSurname(event.target.value)}/>
-            </div>
-            <div style = {{padding: "0.5%"}}>
-                <label htmlFor="organization">Organización</label>
-                <br></br>
-                <input type="text" id="registerOrg" value = {org} onChange={(event) => setOrg(event.target.value)}/>
-            </div>
-            <div style = {{padding: "0.5%"}}>
-                <label htmlFor="email">Correo electrónico</label>
-                <br></br>
-                <input type="email" id="registerEmail" value = {email} onChange={(event) => setEmail(event.target.value)}/>
-            </div>
-            <div style = {{padding: "0.5%"}}>
-                <label htmlFor="password">Contraseña</label>
-                <br></br>
-                <input type="password" id="registerPassword" value = {password} onChange={(event) => setPassword(event.target.value)}/>
-            </div>
-            <div style = {{padding: "0.5%"}}>
-                <label htmlFor="passwordRepeat">Repite tu contraseña</label>
-                <br></br>
-                <input type="password" id="registerPwdRepeat" value = {passwordRepeat} onChange={(event) => setPasswordRepeat(event.target.value)}/>
-            </div>
-            
-            <div style = {{padding: "0.5%"}}>
-            <h3>Selecciona una opción:</h3>
-                <label>
-                <input
-                type="radio"
-                value="STUDENT"
-                checked={selectedOption === "STUDENT"}
-                onChange={radioButtonHandler}
-                />
-                Estudiante
-                </label>
 
-                <label>
-                <input
-                type="radio"
-                value="PROFESSOR"
-                checked={selectedOption === "PROFESSOR"}
-                onChange={radioButtonHandler}
-                />
-                Docente
-                </label>
+        <div align="center" style={{marginTop: "7rem", marginBottom: "10rem"}}>
+            <h1>Bienvenido a App</h1>
+            <div style={{
+                background: "linear-gradient(to bottom, #1a237e 78%, #f9f9f9 85%)",
+                color: "white",
+                padding: "2rem",
+                borderRadius: "12px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                margin: "auto",
+                width: "50rem",
+                marginTop: "3rem",
+            }}>
+
+                <h3>Crea una cuenta</h3>
+                <h4>Introduce tus datos</h4>
+
+                <div style = {{padding: "0.5%", marginTop: "1.5rem"}}>
+                    <Form.Label htmlFor="name">Nombre</Form.Label>
+                    <Form.Control style={{ width: "40rem" }} type="text" id="registerName" value = {name} onChange={(event) => setName(event.target.value)}/>
+                </div>
+                <div style = {{padding: "0.5%", marginTop: "1.5rem"}}>
+                    <Form.Label htmlFor="surname">Apellidos</Form.Label>
+                    <Form.Control style={{ width: "40rem" }} type="text" id="registerSurname" value = {surname} onChange={(event) => setSurname(event.target.value)}/>
+                </div>
+                <div style = {{padding: "0.5%", marginTop: "1.5rem"}}>
+                    <Form.Label htmlFor="organization">Organización</Form.Label>
+                    <Form.Control style={{ width: "40rem" }} type="text" id="registerOrg" value = {org} onChange={(event) => setOrg(event.target.value)}/>
+                </div>
+                <div style = {{padding: "0.5%", marginTop: "1.5rem"}}>
+                    <Form.Label htmlFor="email">Correo electrónico</Form.Label>
+                    <Form.Control style={{ width: "40rem" }} type="email" id="registerEmail" value = {email} onChange={(event) => setEmail(event.target.value)}/>
+                </div>
+                <div style = {{padding: "0.5%", marginTop: "1.5rem"}}>
+                    <Form.Label htmlFor="password">Contraseña</Form.Label>
+                    <Form.Control style={{ width: "40rem" }} type="password" id="registerPassword" value = {password} onChange={(event) => setPassword(event.target.value)}/>
+                </div>
+                <div style = {{padding: "0.5%", marginTop: "1.5rem"}}>
+                    <Form.Label htmlFor="passwordRepeat">Repite tu contraseña</Form.Label>
+                    <Form.Control style={{ width: "40rem" }} type="password" id="registerPwdRepeat" value = {passwordRepeat} onChange={(event) => setPasswordRepeat(event.target.value)}/>
+                </div>
+            
+                <div style = {{padding: "0.5%", marginTop: "1.5rem"}}>
+                <h4 className="mb-3">Selecciona tu rol</h4>
+                <Card style={{ backgroundColor: "white", padding: "1.5rem", borderRadius: "12px", alignItems: "center" }}>
+                    <Form>
+                         <div className="d-flex justify-content-center gap-5">
+                        <Form.Check
+                            type="radio"
+                            label={<span style={{ fontSize: "1.2rem", fontWeight: "600" }}>Estudiante</span>}
+                            name="userType"
+                            value="STUDENT"
+                            checked={selectedOption === "STUDENT"}
+                            onChange={radioButtonHandler}
+                            id="studentRadio"
+                        />
+                        <Form.Check
+                            type="radio"
+                            label={<span style={{ fontSize: "1.2rem", fontWeight: "600" }}>Docente</span>}
+                            name="userType"
+                            value="PROFESSOR"
+                            checked={selectedOption === "PROFESSOR"}
+                            onChange={radioButtonHandler}
+                            id="professorRadio"
+                        />
+                        </div>
+                    </Form>
+                </Card>
+                </div>
+                <div style = {{padding: "0.5%", marginTop: "2rem", marginBottom: "2rem"}}>
+                    <button className="main-button" id="registerButton" onClick={() => registerInfoSend()}>Regístrate</button>
+                </div>
+                <p>
+                    <Link to={"/login"}>Ya tienes una cuenta? Inicia sesión</Link>
+                </p>
             </div>
-            <br></br>
-            <div style = {{padding: "0.5%"}}>
-                <button id="registerButton" onClick={() => registerInfoSend()}>Regístrate</button>
-            </div>
-            <p>
-                <Link to={"/login"}>Ya tienes una cuenta? Inicia sesión</Link>
-            </p>
-        </>
+
         </div>
     );
 };

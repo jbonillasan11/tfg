@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,11 @@ public class MessageController {
     
     @Autowired
     private MessageService messageService;
+
+    @GetMapping("/getSingleMessage/{messageId}") //Obtenemos un mensaje por su ID
+    public ResponseEntity<MessageDTO> getSingleMessage(@AuthenticationPrincipal User authUser, @PathVariable String messageId){ 
+        return ResponseEntity.ok(messageService.getSingleMessage(messageId));
+    }
 
     @PostMapping("/getMessagesByChatId/{chatId}") //Obtenemos la lista de mensajes de un chat
     public ResponseEntity<List<MessageDTO>> getMessagesByChatId(@AuthenticationPrincipal User authUser, @PathVariable String chatId){ 

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Form, Button } from 'react-bootstrap';
-
+import { Form } from 'react-bootstrap';
+import { IoSend } from "react-icons/io5";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import fetchService from '../services/fetchService';
@@ -125,7 +125,6 @@ const Chat = ({parentChat, senderId, authValue, participantsData = [], currentUs
             </div>
             </div>
     
-            {/* Input + botón anclados abajo */}
             <div style={{ display: "flex", width: "100%", padding: "1rem", backgroundColor: "#f8f8f8" }}>
                 <Form.Control
                     type="text"
@@ -133,9 +132,14 @@ const Chat = ({parentChat, senderId, authValue, participantsData = [], currentUs
                     onChange={(e) => setMessageToSend(e.target.value)}
                     style={{ width: "90%", marginRight: "1rem" }}
                 />
-                <Button onClick={sendMessage} style={{ width: "10%" }}>
-                    Enviar
-                </Button>
+                <button 
+                    className="main-button"
+                    onClick={sendMessage}
+                    style = {{ alignContent: 'center', justifyContent: 'center', display: 'flex'}}
+                >
+                    <IoSend size={24} />
+                </button>
+
             </div>
         </div>
     );

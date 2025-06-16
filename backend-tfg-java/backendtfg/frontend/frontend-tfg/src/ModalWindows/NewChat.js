@@ -72,7 +72,7 @@ function NewChat ({currentUser, onCreateChat}) {
 
     return (
         <>
-            <Button onClick={() => setModalShow(true)}>Nuevo chat</Button>
+            <button className="main-button" onClick={() => setModalShow(true)}>Nuevo chat</button>
             <Modal
                 size="lg"
                 show={modalShow}

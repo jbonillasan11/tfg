@@ -104,7 +104,7 @@ function AddUserToTask({parentTask, onSaveUsers}) {
 
   return (
     <>
-      <Button onClick={() => setModalShow(true)}>Gestionar usuarios</Button>
+      <button className="main-button" onClick={() => setModalShow(true)}>Gestionar usuarios</button>
       <Modal
         size="lg"
         show={modalShow}

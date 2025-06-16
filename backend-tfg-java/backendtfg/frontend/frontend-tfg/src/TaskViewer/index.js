@@ -118,54 +118,104 @@ const TaskViewer = () => {
           <TopBar currentUser={currentUser} />
           {task ? ( 
             currentUser.userType === "PROFESSOR" ? ( //RENDERIZADO PARA DOCENTES
-          <>
+          <div  style={{ padding: "2rem" }}>
               <h1>Tarea: <input type="text" value = {task.name} onChange={(e) => saveFieldUpdate("name", e.target.value)} /></h1>
               <h3>Creada por: {creator.name} {creator.surname}</h3>
               <h2>Plazo hasta: <input type="date" value={task.due} onChange={(e) => saveFieldUpdate("due", e.target.value)} /></h2>
               <h3>Descripción: <input type="text" value = {task.description} onChange={(e) => saveFieldUpdate("description", e.target.value)} /></h3>
               <h3>Tarea repasable: <input type="checkbox" checked={task.redoable} onChange={(e) => {saveFieldUpdate("redoable", e.target.checked); console.log(task); console.log(task.redoable)} }/></h3>
 
-              <Button id="editTask" onClick={() => editTaskData()}>Tarea</Button>
-              <Button id="saveTaskButton" onClick={() => saveTaskDB()}>Guardar cambios</Button>
-              <Button id="deleteTaskButton" onClick={() => confirmTaskDeletion()}>Eliminar tarea</Button>
+              <button id="editTask" className="main-button" onClick={() => editTaskData()}>Editar preguntas</button>
+              <button id="saveTaskButton" className="main-button" onClick={() => saveTaskDB()}>Guardar cambios</button>
+              <button id="deleteTaskButton" className="delete-button" onClick={() => confirmTaskDeletion()}>Eliminar tarea</button>
               
               <AddUserToTask
                 parentTask={task}
                 onSaveUsers={(updatedUsers) => setUpdatedUserIds(updatedUsers)}
               />
 
-              <p>{task.taskData} {// Escribir plantilla de la tarea
-              } </p>
+              <div >
+                <h3>Usuarios y entregas</h3>
+               <ListGroup className="mx-4">
+                {users &&
+                  users
+                    .filter(user => user.userType === "STUDENT")
+                    .map(user => {
+                      const response = user.responses[taskId];
+                      let stateColor = "";
+                      let stateText = "";
 
-              <h3>Usuarios</h3>
-              {users && users.map(user => {
-                // eslint-disable-next-line no-lone-blocks
-                {if (user.userType === "STUDENT") {
-                  return (
-                    <ListGroup.Item
-                      key={user.id}
-                      action
-                      onClick={() => handleUserCorrection(user)}
-                    >
-                      <div><strong>{user.name} {user.surname}</strong></div>
-                      <div>Estado: {user.responses[taskId].taskState}</div> {/* Estilo según su valor, color */}	
-                      <div>Fecha de subida: {user.responses[taskId].uploadDate}</div> {/* Que se muestre solo cuando haya sido entregada */}	
-                      <div>Calificación: {user.responses[taskId].calification !== -1 ? user.responses[taskId].calification : "No calificado"}</div>
-                    </ListGroup.Item>
-                  )
-                }}
-              })}
-          </>
+                      switch (response.taskState) {
+                        case "COMPLETED":
+                          stateColor = "text-success"; // verde
+                          stateText = "Completada";
+                          break;
+                        case "IN_PROGRESS":
+                          stateColor = "text-warning"; // amarillo
+                          stateText = "En progreso";
+                          break;
+                        case "CORRECTION_IN_PROGRESS":
+                          stateColor = "text-danger"; // rojo
+                          stateText = "Corrección en progreso";
+                          break;
+                        case "CORRECTED":
+                          stateColor = "text-primary"; // azul
+                          stateText = "Corregida";
+                          break;
+                        default:
+                          stateColor = "text-secondary"; // gris
+                          stateText = "Pendiente";
+                          break;
+                      }
+
+                      return (
+                        <ListGroup.Item
+                          key={user.id}
+                          action
+                          onClick={() => handleUserCorrection(user)}
+                          className="bg-white mb-3 shadow-sm rounded"
+                        >
+                          <div><strong>{user.name} {user.surname}</strong></div>
+                          <div>
+                            Estado: <strong className={stateColor}>{stateText}</strong>
+                          </div>
+                         {response.uploadDate && (
+                            <div>
+                              Fecha de subida:{" "}
+                              <span
+                                style={{
+                                  color: new Date(response.uploadDate) > new Date(task.due) ? "red" : "green",
+                                  fontWeight: "bold"
+                                }}
+                              >
+                                {new Date(response.uploadDate).toLocaleDateString('es-ES')}
+                              </span>
+                            </div>
+                          )}
+
+                          <div>
+                            Calificación:{" "}
+                            {response.calification !== -1
+                              ? response.calification
+                              : "No calificado"}
+                          </div>
+                        </ListGroup.Item>
+                      );
+
+                    })}
+              </ListGroup>
+            </div>
+          </div>
           ) : ( //RENDERIZADO PARA ESTUDIANTES
             <>
-              <h1>Tarea: {task.name}</h1>
-              <h3>Creada por: {creator.name} {creator.surname}</h3>
-              <h2>Plazo hasta: {task.due}</h2>
-              <h3>Descripción: {task.description}</h3>
+              <h1>Tarea {task.name}</h1>
+              <h3>Creada por {creator.name} {creator.surname}</h3>
+              <h2>Plazo hasta {new Date(task.due).toLocaleDateString('es-ES')}</h2>
+              <h3>Descripción {task.description}</h3>
               {showButton && (
-                <Button id="goToTask" onClick={() => navigate(`/tasks/${taskId}/responses/${currentUser.id}`, {state: {task, response}})}>
+                <button id="goToTask" className="main-button" onClick={() => navigate(`/tasks/${taskId}/responses/${currentUser.id}`, {state: {task, response}})}>
                   Resolver
-                </Button>
+                </button>
               )}
               {response && (
                 <div>Tu tarea: {
@@ -185,15 +235,15 @@ const TaskViewer = () => {
               {showCorrectionButton && (
                 <>
                   {task.redoable ? (
-                    <Button id="goToTaskRedo" onClick={ () =>{ 
+                    <button id="goToTaskRedo" className="main-button" onClick={ () =>{ 
                         const resetResponse = {...response, response: [], calification: -1, taskState: "PENDING"};
                         navigate(`/tasks/${taskId}/responses/${currentUser.id}`, {state: {task, response: resetResponse}})
                       }}>
                         Resolver de nuevo
-                    </Button>
-                  ) : (<Button id="goToTaskCorrection" onClick={() => navigate(`/tasks/${taskId}/correction/${currentUser.id}`, {state: {task, response}})}>
+                    </button>
+                  ) : (<button id="goToTaskCorrection" className="main-button" onClick={() => navigate(`/tasks/${taskId}/correction/${currentUser.id}`, {state: {task, response}})}>
                       Revisar corrección
-                    </Button>)}
+                    </button>)}
                 </>
                 
               )}

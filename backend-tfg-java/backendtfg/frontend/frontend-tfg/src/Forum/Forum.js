@@ -1,7 +1,7 @@
-import React from 'react';
 import { useState, useEffect } from 'react';
-import { Form, Button } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import { useRef } from 'react';
+import { IoSend } from "react-icons/io5";
 
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
@@ -72,47 +72,78 @@ const Forum = ({forumId, senderId, authValue, currentUser, groupName}) => {
     };
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 60px)" }}>
-            <h3>Foro del grupo {groupName}</h3>
-            <div style={{ flex: 1, overflowY: "auto" }}>
+        <div style={{
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            borderRadius: "12px",
+            backgroundColor: "#fff",
+            boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+            padding: "1rem"
+        }}>
+            <div style={{
+                padding: "1rem",
+                alignContent: "center",
+                display: "flex"
+            }}>
+                <h3>Foro del grupo {groupName}</h3>
+            </div>
+
+            <div style={{
+                height: "1px",
+                backgroundColor: "#300",
+                width: "100%",
+                margin: "1.5rem 0",
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)"
+            }} />
+
+            {/* ZONA DE MENSAJES SCROLLEABLE */}
+            <div style={{
+                flex: 1,
+                overflowY: "auto",
+                marginBottom: "1rem"
+            }}>
             <div className="chat">
-                {messages.map((m) => { //El mensaje se mostarrá de forma uniforme para todos los usuarios
-                        return (
-                            <div key={m.id}>
-                                <div style={{ maxWidth: '60%' }}>
-                                    {m.content}  
-                                    <div style={{ fontSize: "0.75rem", marginTop: "4px" }} className="text-muted">
-                                        {m.timestamp}
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                })}
+                {messages.map((m) => (
+                <div key={m.id}>
+                    <div style={{ maxWidth: '60%' }}>
+                    {m.content}
+                    <div style={{ fontSize: "0.75rem", marginTop: "4px" }} className="text-muted">
+                        {m.timestamp}
+                    </div>
+                    </div>
+                </div>
+                ))}
                 <div ref={messagesEndRef} />
             </div>
-        </div>
-        {currentUser.userType === "PROFESSOR" && ( //SOLO LOS PROFESORES PODRÁN ESCRIBIR EN LOS FOROS
-            <div style={{ display: "flex", width: "100%", padding: "1rem", backgroundColor: "#f8f8f8" }}>
+            </div>
+
+            {/* CAMPO DE ENTRADA SOLO SI ES PROFESOR */}
+            {currentUser.userType === "PROFESSOR" && (
+            <div style={{ display: "flex", width: "100%" }}>
                 <Form.Control
                     type="text"
                     value={messageToSend}
                     onChange={(e) => setMessageToSend(e.target.value)}
-                     onKeyDown={(e) => {
+                    onKeyDown={(e) => {
                         if (e.key === "Enter") {
-                            e.preventDefault();
-                            sendMessage();
+                        e.preventDefault();
+                        sendMessage();
                         }
                     }}
-                    style={{ width: "90%", marginRight: "1rem" }}
+                    style={{ flex: 1, marginRight: "1rem" }}
                 />
-            
-                <Button onClick={sendMessage} style={{ width: "10%" }}>
-                    Enviar
-                </Button>
+                <button
+                    className="main-button"
+                    onClick={sendMessage}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                >
+                    <IoSend size={24} />
+                </button>
             </div>
-        )}
+            )}
         </div>
-    );
+        );
 };
 
 export default Forum;

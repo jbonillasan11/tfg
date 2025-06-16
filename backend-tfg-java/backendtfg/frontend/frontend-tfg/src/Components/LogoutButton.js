@@ -4,8 +4,8 @@ import { IoLogOutOutline } from "react-icons/io5";
 
 const LogoutButton = () => {
 
-    const[setAuthValue] = useLocalState("", "authValue");
-    const [setCurrentUser] = useLocalState("", "currentUser");
+    const[authValue, setAuthValue] = useLocalState("", "authValue");
+    const [currentUser, setCurrentUser] = useLocalState("", "currentUser");
     const navigate = useNavigate();
 
     return (
@@ -14,7 +14,7 @@ const LogoutButton = () => {
                     setAuthValue("");
                     setCurrentUser("");
                 }} 
-                className="topbar-icon"/>
+                className="topbarlogout-icon"/>
     );
 };
 

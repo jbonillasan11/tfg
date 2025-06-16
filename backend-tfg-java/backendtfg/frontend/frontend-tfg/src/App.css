@@ -1,29 +1,35 @@
-.wrapper {
+  .wrapper {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-gap: 10px;
     grid-auto-rows: minmax(100px, auto);
   } 
+  
   .one { 
     grid-column: 1 / 2;
     grid-row: 2;
   }
+
   .two {
     grid-column: 2 / 2;
     grid-row: 3;
   }
+
   .three {
     grid-column: 1 / 2;
     grid-row: 2;
   }
+
   .four {
     grid-column: 2 / 2;
     grid-row: 3;
   }
+
   .five {
     grid-column: 2;
     grid-row: 4;
   }
+
   .six {
     grid-column: 3;
     grid-row: 4;
@@ -68,7 +74,53 @@
 
   .topbar-icon {
     color: white;
-    font-size: 32px;
+    font-size: clamp(1rem, 2vw, 2rem);
     cursor: pointer;
     transition: color 0.3s;
   }
+
+  .topbarlogout-icon {
+    color: white;
+    font-size: clamp(1rem, 2vw, 2.5rem);
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .header-title {
+    margin: 0;
+    margin-left: 0.5rem;
+  }
+
+  .main-button {
+    margin-right: 0.75rem;
+    font-size: 1.25rem !important;
+    padding: 0.5rem 1.25rem !important;
+    background-color: #1512a4 !important;
+    border-color: #1512a4 !important;
+    color: white !important;
+    border-radius: 12px
+  }
+
+  .delete-button {
+    margin-right: 0.75rem;
+    font-size: 1.25rem !important;
+    padding: 0.5rem 1.25rem !important;
+    background-color: #9b1a1a !important;
+    border-color: #9b1a1a !important;
+    color: white !important;
+    border-radius: 12px
+  }
+
+  body {
+    min-height: 100vh;
+    margin: 0;
+    background: linear-gradient(to top, #74b2ff 0%, transparent 80%);
+  }
+

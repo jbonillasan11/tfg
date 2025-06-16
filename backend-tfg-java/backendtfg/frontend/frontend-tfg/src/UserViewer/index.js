@@ -5,6 +5,7 @@ import { ListGroup } from 'react-bootstrap';
 import ChangePasswordModal from '../ModalWindows/ChangePasswordModal';
 import { useNavigate } from 'react-router-dom';
 import TopBar from '../Components/TopBar';
+import { FaUserTie, FaUserGraduate } from "react-icons/fa6";
 
 const UserViewer = () => {
 
@@ -87,37 +88,59 @@ const UserViewer = () => {
     return (
       <>
         <TopBar currentUser={currentUser} />
-        <div>
-            <h1>Perfil</h1>
-            {userData !== "" ? (
-              <></> ) : (
-                <h2>Usuario no encontrado</h2>
-              )
-            }
+        <div style={{ margin: '2rem' }}>
+          <h1 style={{ marginBottom: '2rem' }}>Tu perfil</h1>
+
+          {userData !== "" ? null : (
+            <h2>Usuario no encontrado</h2>
+          )}
+
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '1.5rem', 
+            padding: '1.5rem', 
+            borderRadius: '1rem',
+            backgroundColor: '#f5f5f5',
+            marginTop: '1rem'
+          }}>
             {userData.userType === "PROFESSOR" ? (
-                <h2>Docente {userData.name} {userData.surname}</h2>
-              ): (
-                <h2>Estudiante {userData.name} {userData.surname}</h2>)
-            }
-            <h4>{userData.email}</h4>
-            <h5>{userData.organization}</h5>
+              <FaUserTie style={{ fontSize: '8rem' }} />
+            ) : (
+              <FaUserGraduate style={{ fontSize: '8rem' }} />
+            )}
+
+            <div>
+              <h2>{userData.name} {userData.surname}</h2>
+              <h2>{userData.userType === "PROFESSOR" ? "Docente en" : "Estudiante en"} {userData.organization}</h2>
+              <h4>{userData.email}</h4>
+            </div>
+          </div>
+            
             {userId !== currentUser.id ? (
-                <> 
-                  <h3>Grupos en común: </h3>
+                <div style={{ marginTop: '2rem' }}> 
+                  <button padding="1rem" className="main-button" onClick={() => chatWithUser()}>Iniciar chat</button>
+                  <h3 style={{ marginTop: '2rem' , marginBottom: '1rem' }}>Grupos en común: </h3>
                   <ListGroup>
                   {groups && groups.map(group => (
                       <ListGroup.Item key= {group.id}
                           action
                           onClick={() => navigate(`/groups/${group.id}`)}>
-                          {group.name}
+                          <div>
+                            <div style={{ fontWeight: "bold", fontSize: "1.1rem" }}>
+                              {group.name === "" ? "Grupo sin nombre" : group.name}
+                            </div>
+                            <div style={{ fontSize: "0.8rem", fontStyle: "italic" }} align="right">
+                              Miembros: {group.usersIds.length}
+                            </div>
+                          </div>
                       </ListGroup.Item>
                       ))}
                   </ListGroup>
-                  <button onClick={() => chatWithUser()}>Chat</button>
-                </>
+                </div>
             ) : (
                 <>
-                  <button onClick={() => setModalOpen(true)}>Cambiar contraseña</button>
+                  <button className="main-button" style={{ margin: '2rem' }} onClick={() => setModalOpen(true)}>Cambiar contraseña</button>
                   <ChangePasswordModal
                     isOpen={modalOpen}
                     onClose={() => setModalOpen(false)}

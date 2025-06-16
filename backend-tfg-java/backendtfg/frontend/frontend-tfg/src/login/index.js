@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLocalState } from '../utils/useLocalState';
 import { Link } from 'react-router-dom';
+import Form from 'react-bootstrap/Form';
 
 const Login = () => {
 
@@ -39,22 +40,41 @@ const Login = () => {
     }
     
     return (
-        <>
-            <div>
-                <label htmlFor="email">Correo electrónico</label>
-                <input type="email" id="loginEmail" value = {email} onChange={(event) => setEmail(event.target.value)}/>
-            </div>
-            <div>
-                <label htmlFor="password">Contraseña</label>
-                <input type="password" id="loginPassword" value = {password} onChange={(event) => setPassword(event.target.value)}/>
-            </div>
-            <div>
-                <button id="loginButton" onClick={() => loginInfoSend()}>Iniciar sesión</button>
-            </div>
-            <p> 
-                <Link to={"/register"}>No tienes una cuenta? Regístrate</Link>
-            </p>
-        </>
+        <div align="center" style={{marginTop: "10rem", marginBottom: "10rem"}}>
+            <h1>Bienvenido a App</h1>
+            <div style={{
+                background: "linear-gradient(to bottom, #1a237e 50%, #f9f9f9 70%)",
+                color: "white",
+                padding: "2rem",
+                borderRadius: "12px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                margin: "auto",
+                width: "60rem",
+                marginTop: "5rem",
+            }}>
+
+                <h3>Inicia sesión</h3>
+
+                <div style={{ marginTop: "3rem", marginBottom: "1rem" }}>
+                    <Form.Label htmlFor="email">Introduce tu correo electrónico</Form.Label>
+                    <Form.Control style={{ width: "40rem" }} type="email" id="loginEmail" value = {email} onChange={(event) => setEmail(event.target.value)}/>
+                </div>
+
+                <div style={{ marginBottom: "3rem" }}>
+                    <Form.Label htmlFor="password">Introduce tu contraseña</Form.Label>
+                    <Form.Control style={{ width: "40rem" }} type="password" id="loginPassword" value = {password} onChange={(event) => setPassword(event.target.value)}/>
+                </div>
+
+                <div style={{ marginBottom: "2rem" }}>
+                    <button className="main-button" onClick={loginInfoSend}>Iniciar sesión</button>
+                </div>
+
+                <p>
+                    <Link to={"/register"}>¿No tienes una cuenta? Regístrate</Link>
+                </p>
+                </div>
+
+        </div>
     );
 };
 

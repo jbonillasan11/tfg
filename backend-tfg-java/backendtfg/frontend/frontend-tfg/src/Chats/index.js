@@ -20,6 +20,8 @@ const Chats = () => {
     const [chatNames, setChatNames] = useState({}); //Nombres de los chats, por defecto null
     const [participantsData, setParticipantsData] = useState([]); //Datos de los chats, por defecto null
 
+    const [lastMessages, setLastMessages] = useState({});
+
     useEffect(() => {
         fetchService("users/getUserChats", "GET", authValue, null)
         .then((response) => {
@@ -47,7 +49,6 @@ const Chats = () => {
         });
     }, [pastChats, authValue]);
 
-
     function newChatRedirecter(chat){ //Al crearse el chat, devolverá el id, que elevará a esta función y que redirigirá al usuario a al ventana del chat
         setCurrentChat(chat); //El chat actual es el recién creado
     }
@@ -58,25 +59,36 @@ const Chats = () => {
             <div style={{ display: 'flex', height: '100vh' }}>
                 
                 <div style={{ flex: 1, overflowY: 'auto', backgroundColor: '#f0f0f0', padding: '1rem' }}>
-                    <h1>Chats</h1>
-                    {currentUser.userType === "PROFESSOR" && (
-                        <NewChat
-                            currentUser={currentUser}
-                            onCreateChat={(newChat) => {
-                                setPastChats([...pastChats, newChat]);
-                                setCurrentChat(newChat);
-                                newChatRedirecter(newChat.id);
-                            }}
-                        />
-                    )}
+                    <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'space-between', 
+                        marginBottom: '1.5rem' 
+                        }}>
+                        <h1 style={{ margin: 0 }}>Tus chats</h1>
+                        {currentUser.userType === "PROFESSOR" && (
+                            <NewChat
+                                currentUser={currentUser}
+                                onCreateChat={(newChat) => {
+                                    setPastChats([...pastChats, newChat]);
+                                    setCurrentChat(newChat);
+                                    newChatRedirecter(newChat.id);
+                                }}
+                            />
+                        )}
+                    </div>
+
+                    
                     <ListGroup>
                         {pastChats && pastChats.length > 0 && pastChats.map(chat => (
                             <ListGroup.Item
                                 key={chat.id}
                                 action
                                 onClick={() => setCurrentChat(chat)}
-                            >
-                                Chat de {chatNames[chat.id]}
+                                >
+                                <div>
+                                    <div><strong>Chat de {chatNames[chat.id]}</strong></div>
+                                </div>      
                             </ListGroup.Item>
                         ))}
                     </ListGroup>

@@ -6,7 +6,7 @@ import { useLocalState } from '../utils/useLocalState';
 
 function AddUserToGroup({parentGroup, onSaveUsers}) {
 
-    const [authValue, setAuthValue] = useLocalState("", "authValue");
+    const [authValue] = useLocalState("", "authValue");
 
     const group = parentGroup;
     const [groupUsers, setGroupUsers] = useState([]);
@@ -26,7 +26,7 @@ function AddUserToGroup({parentGroup, onSaveUsers}) {
               setGroupUsersAux(response);
             });
         }
-      }, []);
+      }, [authValue, group]);
 
     function buscarUsuario(){
         if (searchText === "") return;
@@ -79,7 +79,7 @@ function AddUserToGroup({parentGroup, onSaveUsers}) {
 
 return (
     <>
-      <Button onClick={() => setModalShow(true)}>Gestionar usuarios</Button>
+      <button className="main-button" onClick={() => setModalShow(true)}>Gestionar miembros</button>
       <Modal
         size="lg"
         show={modalShow}
