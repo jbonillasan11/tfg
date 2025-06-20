@@ -8,8 +8,9 @@ import DragAndDropRender from '../QuestionRenders/DragAndDropRender';
 import MultipleChoiceRender from '../QuestionRenders/MultipleChoiceRender';
 import OpenAnswerRender from '../QuestionRenders/OpenAnswerRender';
 import TrueOrFalseRender from '../QuestionRenders/TrueOrFalseRender';
-import { Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import TopBar from '../Components/TopBar';
+import AlertModal from '../ModalWindows/AlertModal';
 
 const TaskCorrector = () => {
 
@@ -31,12 +32,15 @@ const TaskCorrector = () => {
 
     const navigate = useNavigate();
 
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState("");
+
     useEffect(() => {
         fetchService(`users/getUserId/${userId}`, "GET", authValue)
         .then(userData => {
             setResponsesObject(userData.responses[task.id]); //Respuestas del usuario
         });
-    }, [userId]);
+    }, [userId, authValue]);
 
     useEffect(() => {
         const list = responsesObject.corrections ?? [];
@@ -69,7 +73,8 @@ const TaskCorrector = () => {
         };
         fetchService( `users/${userId}/saveCorrections/${task.id}`, "PUT", authValue, updatedResponsesObject)
         .then(() => {
-            alert("Corrección guardada");
+            setShowAlert(true);
+            setAlertMessage("Corrección guardada");
             if (status === "CORRECTED") {
                 navigate(`/tasks/${task.id}`);
             }
@@ -143,26 +148,54 @@ const TaskCorrector = () => {
 
     return (
         <div>
-            {task && user ? (
-                <h2>
-                    Corrección de la tarea {task.name} del alumno {user.name} {user.surname}
-                </h2>
-                    ) : (
-                        <h2>Cargando...</h2>
-                    )
-            }
-            <Button id="saveInProgressCorrection" onClick={() => saveCorrectionUpdateDB(responsesObject, totalScore, "CORRECTION_IN_PROGRESS")}>
-                  Guardar y continuar
-            </Button>
-            <Button id="saveCompletedCorrection" onClick={() => saveCorrectionUpdateDB(responsesObject, totalScore, "CORRECTED")}>
-                  Guardar y enviar
-            </Button>
-            {task && responsesObject?.response && task.content.map((question, index) => (
-                <div key={index}> {questionRender(question, index)} </div>
-            ))}
-            <div style={{ marginTop: "20px" }}>
-                <h4>Nota total:</h4>
-                    {totalScore}
+            <TopBar currentUser={currentUser} />
+            <div className="container mt-4">
+                <AlertModal
+                    showModal={showAlert}
+                    onHide={() => setShowAlert(false)}
+                    message={alertMessage}
+                />
+                {task && user ? (
+                    <div style={{ padding: "1rem" }}>
+                        <h2>
+                            Corrección de la tarea {task.name} del alumno {user.name} {user.surname}
+                        </h2>
+                        {task.description && (
+                            <p className="text-secondary fst-italic">{task.description}</p>
+                        )}
+                    </div>
+                ) : (
+                    <h2 style={{ padding: "1rem" }}>Cargando...</h2>
+                )}
+                <div style={{ display: "flex", justifyContent: "right", marginBottom: "1rem" }}>
+                     <button className="main-button" id="saveInProgressCorrection" onClick={() => saveCorrectionUpdateDB(responsesObject, totalScore, "CORRECTION_IN_PROGRESS")}>
+                        Guardar y continuar
+                    </button>
+                    <button className="main-button" id="saveCompletedCorrection" onClick={() => saveCorrectionUpdateDB(responsesObject, totalScore, "CORRECTED")}>
+                        Guardar y enviar
+                    </button>
+                </div>
+                <div className="p-4 border rounded bg-light shadow-sm">
+                    {task && responsesObject?.response && task.content.map((question, index) => (
+                        <div key={index} className="mb-3"> 
+                            {questionRender(question, index)} 
+                        </div>
+                    ))}
+                </div>
+                <div className="text-center mt-4"
+                    style={{
+                        padding: "1rem",
+                        backgroundColor: totalScore >= 5 ? "#d4edda" : "#f8d7da",
+                        border: `1px solid ${totalScore >= 5 ? "#c3e6cb" : "#f5c6cb"}`,
+                        borderRadius: "12px",
+                        fontSize: "1.5rem",
+                        fontWeight: "bold",
+                        color: totalScore >= 5 ? "#155724" : "#721c24",
+                        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+                        marginBottom: "1rem"
+                    }}>
+                    Nota final: {totalScore}
+                </div>
             </div>
         </div>
     );

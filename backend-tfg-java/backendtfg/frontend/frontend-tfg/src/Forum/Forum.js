@@ -6,6 +6,7 @@ import { IoSend } from "react-icons/io5";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import fetchService from '../services/fetchService';
+import AlertModal from '../ModalWindows/AlertModal';
 
 
 const Forum = ({forumId, senderId, authValue, currentUser, groupName}) => {
@@ -17,6 +18,9 @@ const Forum = ({forumId, senderId, authValue, currentUser, groupName}) => {
     const [stompClient, setStompClient] = useState(null);
     const [isConnected, setIsConnected] = useState(false);
 
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState("");
+
     const messagesEndRef = useRef(null); //Para mantener el scroll al final del chat
 
     useEffect(() => {
@@ -26,7 +30,7 @@ const Forum = ({forumId, senderId, authValue, currentUser, groupName}) => {
                     setMessages(messages);
                 })
             }
-    }, [forumId]);
+    }, [forumId, authValue]);
 
     useEffect(() => {
         const socket = new SockJS("http://localhost:8080/ws-chat");
@@ -55,7 +59,8 @@ const Forum = ({forumId, senderId, authValue, currentUser, groupName}) => {
 
     const sendMessage = () => {
         if (!isConnected) {
-            alert("Error enviando el mensaje. Espera unos instantes y prueba de nuevo");
+            setShowAlert(true);
+            setAlertMessage("No estás conectado al chat. Por favor, intenta recargar la página o espera unos instantes y prueba de nuevo.");
             return;
         }
         if (stompClient && messageToSend.trim()) {
@@ -81,6 +86,12 @@ const Forum = ({forumId, senderId, authValue, currentUser, groupName}) => {
             boxShadow: "0 0 10px rgba(0,0,0,0.1)",
             padding: "1rem"
         }}>
+            <AlertModal
+                showModal={showAlert}
+                onHide={() => setShowAlert(false)}
+                message={alertMessage}
+                error ={true}
+            />
             <div style={{
                 padding: "1rem",
                 alignContent: "center",
@@ -97,28 +108,24 @@ const Forum = ({forumId, senderId, authValue, currentUser, groupName}) => {
                 boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)"
             }} />
 
-            {/* ZONA DE MENSAJES SCROLLEABLE */}
             <div style={{
                 flex: 1,
                 overflowY: "auto",
                 marginBottom: "1rem"
             }}>
-            <div className="chat">
-                {messages.map((m) => (
-                <div key={m.id}>
-                    <div style={{ maxWidth: '60%' }}>
-                    {m.content}
-                    <div style={{ fontSize: "0.75rem", marginTop: "4px" }} className="text-muted">
-                        {m.timestamp}
+
+                <div className="forum-messages">
+                    {messages.map((m) => (
+                    <div key={m.id} className="forum-message">
+                        {m.content}
+                        <div className="forum-timestamp">{m.timestamp}</div>
                     </div>
-                    </div>
+                    ))}
+                    <div ref={messagesEndRef} />
                 </div>
-                ))}
-                <div ref={messagesEndRef} />
-            </div>
             </div>
 
-            {/* CAMPO DE ENTRADA SOLO SI ES PROFESOR */}
+            {/* SOLO DOCENTES, PARA ESCRIBIR MENSAJE */}
             {currentUser.userType === "PROFESSOR" && (
             <div style={{ display: "flex", width: "100%" }}>
                 <Form.Control

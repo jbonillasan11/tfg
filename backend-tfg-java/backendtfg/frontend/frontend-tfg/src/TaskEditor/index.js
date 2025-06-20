@@ -1,15 +1,17 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Button } from 'react-bootstrap';
+import { ListGroup } from 'react-bootstrap';
 import AddQuestion from '../ModalWindows/AddQuestion';
 import fetchService from '../services/fetchService';
 import { useLocalState } from '../utils/useLocalState';
-
+import TopBar from '../Components/TopBar';
+import AlertModal from '../ModalWindows/AlertModal';
 
 const TaskEditor = () => {
 
     const[authValue] = useLocalState("", "authValue");
+    const[currentUser] = useLocalState("", "currentUser");
 
     const taskId = useLocation().state.task.id;
     const [task, setTask] = useState("");
@@ -19,13 +21,16 @@ const TaskEditor = () => {
 
     const [shownQuestions, setShownQuestions] = useState(null); //Conjunto de preguntas que se muestran en la tarea, a mostrar
 
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState("");
+
     useEffect(() => {
             fetchService(`tasks/${taskId}`, "GET", authValue, null) //Petición asíncrona a nuestra APIRest
             .then(taskData => {
               setTask(taskData);
               setShownQuestions(taskData.content);
             });
-    }, []);
+    }, [taskId, authValue]);
 
     useEffect(() => {
         if (createdQuestion) {
@@ -48,8 +53,6 @@ const TaskEditor = () => {
 
     async function saveChanges() {
         const taskCopy = { ...task };
-        console.log(taskCopy);
-        console.log(newQuestions);
         if (newQuestions){
             for (const question of newQuestions) {
                 if (question.media) {
@@ -58,7 +61,6 @@ const TaskEditor = () => {
                 }
             }
             taskCopy.content = [...task.content, ...newQuestions];
-            console.log(taskCopy);
         }
         if (toDelete && toDelete.length > 0) {
             for (const question of toDelete) {
@@ -70,10 +72,9 @@ const TaskEditor = () => {
                 (q) => !toDelete.some((deletedQ) => q.question === deletedQ.question)
             );
         }
-        console.log(taskCopy);
         await fetchService(`tasks/${task.id}`, "PUT", authValue, taskCopy);
-        alert("Preguntas guardadas");
-        window.location.reload();
+        setShowAlert(true);
+        setAlertMessage("Preguntas guardadas! Recarga la página para ver los cambios.");
     }
 
     function deleteQuestion(index) {
@@ -83,47 +84,118 @@ const TaskEditor = () => {
         task.content = updatedQuestions;
     }
 
+    function typeToText (type) {
+        switch (type) {
+            case "TRUE_FALSE":
+                return "Verdadero/Falso";
+            case "MULTIPLE_CHOICE":
+                return "Opción múltiple";
+            case "FILL_THE_BLANK":
+                return "Rellenar los espacios en blanco";
+            case "DRAG":
+                return "Arrastrar";
+            case "OPEN_ANSWER":
+                return "Respuesta abierta";
+            default:
+                return "";
+        }
+    }
+
+    function handleCreatedQuestion(question) {
+        setCreatedQuestion(question);
+        shownQuestions.push(question);
+    }
 
     return (
         <div>
-            <h1>Editando: {task.name}</h1>
-            <AddQuestion
-                onSaveQuestion={setCreatedQuestion}
-            />
-            <Button onClick={() => saveChanges()}>Guardar cambios</Button> 
-            {newQuestions && newQuestions.map((newQuestion, index) => (
-                <div key={index}>
-                    <p>Pregunta del tipo {newQuestion.type}</p>
-                    <p>Pregunta: {newQuestion.question}</p>
-                    {newQuestion.correctAnswer && <p>Respuesta correcta: {newQuestion.correctAnswer}</p>}   
-                    {newQuestion.options && (<p>Opciones: </p>) && (             
-                        newQuestion.options.map((option, index) => (
-                            <p key={index}>{option}</p>
-                        )   
-                    ))}
-                    {newQuestion.maxPoints && <p>Puntuación máxima: {newQuestion.maxPoints}</p>}
+            <TopBar currentUser={currentUser} />
+            <div className="container mt-4">
+                <div className="mb-3">
+                    <h1>Editando {task.name}</h1>
                 </div>
-            ))}
-            {shownQuestions && shownQuestions.map((element, index) => (
-                <div key={index}>
-                    <h2>Pregunta {index+1}: {element.type}</h2>
-                    <p>Enunciado: {element.question}</p>
-                    {element.correctAnswer && <p>Respuesta correcta: {element.correctAnswer}</p>}   
-                    {element.options && element.options.length > 0 && (
-                        <>
-                            <p>Opciones:</p>
-                            {element.options.map((option, index) => (
-                            <p key={index}>{option}</p>
-                            ))}
-                        </>
-                        )}
-                    {element.maxPoints && <p>Puntuación máxima: {element.maxPoints}</p>}
-                    <p>{element.media}</p>
-                    {<Button onClick={() => deleteQuestion(index)}>Eliminar pregunta</Button>}
+                <AlertModal
+                    showModal={showAlert}
+                    onHide={() => setShowAlert(false)}
+                    message={alertMessage}
+                />
+                <div className="mb-3" style={{ display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+                    <AddQuestion
+                        onSaveQuestion={handleCreatedQuestion}
+                    />
+                    <button className="main-button"
+                        onClick={() => {
+                            saveChanges("IN_PROGRESS");
+                            setShowAlert(true);
+                            setAlertMessage("Respuestas guardadas!");
+                    }}> 
+                        Guardar progreso
+                    </button>
                 </div>
-            ))}
-            
-  
+                    <div className="p-4 border rounded bg-light shadow-sm">
+                        {shownQuestions && shownQuestions.map((element, index) => (
+                            <div key={index} className="mb-4 p-3 border rounded bg-white shadow-sm">
+                                <div style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "flex-start",
+                                    gap: "2rem"
+                                }}>
+                                    <div style={{ flex: 1 }}>
+                                        <h4>Pregunta {index + 1}: {typeToText(element.type)}</h4>
+                                        <p style={{ fontSize: "1.1rem", marginTop: "0.75rem" }}><strong>Enunciado:</strong> {element.question}</p>
+                                        {element.correctAnswer && <p><strong>Respuesta correcta:</strong> {element.correctAnswer}</p>}
+                                        {element.options && element.options.length > 0 && (
+                                            <>
+                                                <p><strong>Opciones:</strong></p>
+                                                <ListGroup style={{ paddingLeft: "1.2rem" }}>
+                                                    {element.options.map((option, i) => (
+                                                        <ListGroup.Item key={i}>{option}</ListGroup.Item>
+                                                    ))}
+                                                </ListGroup>
+                                            </>
+                                        )}
+                                        {element.maxPoints && <p style={{ fontSize: "1.1rem", marginTop: "1rem" }}><strong>Puntuación máxima:</strong> {element.maxPoints}</p>}
+                                    </div>
+
+                                    <div style={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                        minWidth: "160px",
+                                        maxWidth: "220px",
+                                        width: "100%",
+                                        height: "100%"
+                                    }}>
+                                        {element.mediaURL && (
+                                            <img
+                                                src={element.mediaURL}
+                                                alt={`Decoración pregunta ${index}`}
+                                                style={{
+                                                    width: "100%",
+                                                    height: "auto",
+                                                    maxHeight: "200px",
+                                                    objectFit: "contain",
+                                                    borderRadius: "12px",
+                                                    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                                                    marginBottom: "0.75rem"
+                                                }}
+                                            />
+                                        )}
+                                        <button
+                                            className="delete-button"
+                                            onClick={() => deleteQuestion(index)}
+                                        >
+                                            Eliminar pregunta
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                        <p style={{ fontSize: "1.1rem", marginTop: "0.75rem", fontStyle: "italic", color: "#6c757d" }}>El contenido multimedia se cargará una vez se hayan guardado los cambios.</p>
+                    </div>
+
+                </div>
         </div>
     );
 };

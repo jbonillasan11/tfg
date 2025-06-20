@@ -17,23 +17,25 @@ const Chats = () => {
     const [pastChats, setPastChats] = useState([]);
     const [currentChat, setCurrentChat] = useState(null); //Chat al que accedemos, por defecto null
 
-    const [chatNames, setChatNames] = useState({}); //Nombres de los chats, por defecto null
-    const [participantsData, setParticipantsData] = useState([]); //Datos de los chats, por defecto null
+    const [chatNames, setChatNames] = useState({}); //Nombres de los chats
+    const [participantsData, setParticipantsData] = useState([]); //Datos de los chats
 
-    const [lastMessages, setLastMessages] = useState({});
 
     useEffect(() => {
-        fetchService("users/getUserChats", "GET", authValue, null)
+        fetchService("users/getUserChats", "GET", authValue)
         .then((response) => {
             setPastChats(response);
         })
-        if (location.state) { //Si venimos redirigidos del botón chat de un usuario, obtenemos su id y abrimos el chat privado con él automáticamente
+        if (location.state && currentUser) { //Si venimos redirigidos del botón chat de un usuario, obtenemos su id y abrimos el chat privado con él automáticamente
             fetchService("chats/getSingleChatByParticipants", "POST", authValue, [currentUser.id, location.state.otherUserId]) //Si hay más de un chat en el que estén ambos usuarios (grupal), cuál devuelve??
             .then((response) => {
-                setCurrentChat(response);
+                setPastChats(prev => {
+                    const exists = prev.some(chat => chat.id === response.id);
+                    return exists ? prev : [...prev, response];
+                });
             })
         }
-    }, []);
+    }, [authValue, currentUser, location]);
 
     useEffect(() => {
         if (!pastChats || pastChats.length === 0) return;
@@ -56,9 +58,8 @@ const Chats = () => {
     return (
         <>
             <TopBar currentUser={currentUser} />
-            <div style={{ display: 'flex', height: '100vh' }}>
-                
-                <div style={{ flex: 1, overflowY: 'auto', backgroundColor: '#f0f0f0', padding: '1rem' }}>
+            <div style={{ display: 'flex', height: "calc(100vh - 90px)" }}>
+                <div style={{ flex: 1, overflowY: 'auto', padding: '1rem' }}>
                     <div style={{ 
                         display: 'flex', 
                         alignItems: 'center', 
@@ -70,14 +71,12 @@ const Chats = () => {
                             <NewChat
                                 currentUser={currentUser}
                                 onCreateChat={(newChat) => {
-                                    setPastChats([...pastChats, newChat]);
                                     setCurrentChat(newChat);
                                     newChatRedirecter(newChat.id);
                                 }}
                             />
                         )}
                     </div>
-
                     
                     <ListGroup>
                         {pastChats && pastChats.length > 0 && pastChats.map(chat => (
@@ -94,7 +93,7 @@ const Chats = () => {
                     </ListGroup>
                 </div>
 
-                <div style={{ flex: 2, overflowY: 'auto', padding: '1rem', backgroundColor: '#ffffff' }}>
+                <div style={{ flex: 2, overflowY: 'auto', padding: '1rem'}}>
                     {/* AQUI RENDERIZO EL CHAT */}
                     {currentChat && authValue && (
                     <Chat
@@ -107,7 +106,6 @@ const Chats = () => {
                 </div>    
             </div>
         </>
-        
     );
     
     

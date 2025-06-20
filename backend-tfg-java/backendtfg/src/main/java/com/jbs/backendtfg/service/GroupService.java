@@ -3,6 +3,7 @@ package com.jbs.backendtfg.service;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,9 +40,9 @@ public class GroupService { //Definimos los métodos que se pueden realizar sobr
         return lGroupsDTO;
     }
 
-    public GroupDTO getGroupById(String id) { //Obtenemos un grupo a partir de su ID
-        return new GroupDTO(groupRepository.findById(new ObjectId(id)) // La operación existe predefinida en el repositorio, devuelve un Optional de Group, por lo que manejamos la excepción para el caso de que no se encuentre
-            .orElseThrow(() -> new RuntimeException("El grupo no existe en nuestro sistema")));
+    public GroupDTO getGroupById(String id) {
+        Optional<Group> optionalGroup = groupRepository.findById(new ObjectId(id));
+        return optionalGroup.map(GroupDTO::new).orElse(null);
     }
     
     public GroupDTO updateGroup(Group updatedGroup, String id) {
@@ -61,7 +62,6 @@ public class GroupService { //Definimos los métodos que se pueden realizar sobr
         newGroup.addUser(new ObjectId(id));
         newGroup.setCreator(new ObjectId(id));
         Chat forum = chatService.newChatForum(newGroup.getUsersIds()); //Creamos un chat para el grupo
-        System.out.println("ID DEL FORO: " + forum.getId());
         newGroup.setForumId(forum.getId());
         newGroup = groupRepository.save(newGroup);
         userService.addGroupToUser(new ObjectId(id), newGroup.getId()); //Añadimos el grupo a los grupos del usuario creador
@@ -75,20 +75,22 @@ public class GroupService { //Definimos los métodos que se pueden realizar sobr
     public List<GroupDTO> getGroupsFromIds(List<String> ids) { //Obtenemos una lista de grupos a partir de sus ids
         List<GroupDTO> groups = new LinkedList<>();
         for (String id : ids) {
-            groups.add(getGroupById(id));
+            if (getGroupById(id) != null) {
+                groups.add(getGroupById(id));
+            }
         }
         return groups;
     }
 
     public GroupDTO addUserToGroup(String idGrupo, String idUsuario) { //Añadimos un usuario a un grupo
-        Group group = groupRepository.findById(new ObjectId(idGrupo)).orElseThrow(() -> new RuntimeException("El grupo no existe en nuestro sistema")); //Obtenemos el grupo objetivo
+        Group group = groupRepository.findById(new ObjectId(idGrupo)).orElse(null); //Obtenemos el grupo objetivo
         userService.addGroupToUser(new ObjectId(idUsuario), new ObjectId(idGrupo)); //Añadimos el grupo al usuario
         group.addUser(new ObjectId(idUsuario)); //Añadimos el usuario al grupo
         return new GroupDTO(groupRepository.save(group)); //Guardamos el grupo actualizado
     }
 
     public GroupDTO addUsersToGroup(String idGrupo, List<String> idUsuarios) { //Añadimos varios usuarios a un grupo
-        Group group = groupRepository.findById(new ObjectId(idGrupo)).orElseThrow(() -> new RuntimeException("El grupo no existe en nuestro sistema")); //Obtenemos el grupo objetivo
+         Group group = groupRepository.findById(new ObjectId(idGrupo)).orElse(null); //Obtenemos el grupo objetivo
         for (String idUsuario : idUsuarios) {
             userService.addGroupToUser(new ObjectId(idUsuario), new ObjectId(idGrupo)); //Añadimos el grupo al usuario
             group.addUser(new ObjectId(idUsuario)); //Añadimos el usuario al grupo
@@ -97,7 +99,7 @@ public class GroupService { //Definimos los métodos que se pueden realizar sobr
     }
 
     public GroupDTO removeUserFromGroup(String idGrupo, String idUsuario) { //Eliminamos un usuario de un grupo
-        Group group = groupRepository.findById(new ObjectId(idGrupo)).orElseThrow(() -> new RuntimeException("El grupo no existe en nuestro sistema")); //Obtenemos el grupo objetivo
+        Group group = groupRepository.findById(new ObjectId(idGrupo)).orElse(null); //Obtenemos el grupo objetivo
         userService.removeGroupFromUser(new ObjectId(idUsuario), new ObjectId(idGrupo)); //Eliminamos el grupo de los grupos del usuario
         group.removeUser(new ObjectId(idUsuario)); //Eliminamos el usuario del grupo
         return new GroupDTO(groupRepository.save(group)); //Guardamos el grupo actualizado

@@ -1,4 +1,8 @@
+import AlertModal from "../ModalWindows/AlertModal";
+
 function fetchService(url, reqMethod, authValue, reqBody) { //Función que nos permite hacer peticiones a nuestra APIRest
+
+    let showModal = false;
 
     const fetchData = {
         method: reqMethod,
@@ -23,7 +27,13 @@ function fetchService(url, reqMethod, authValue, reqBody) { //Función que nos p
             if (response.status === 200) {
               return response.json();
             } else if (response.status === 401) {
-              alert("Sesión caducada");
+              showModal = true;
+              <AlertModal
+                showModal={showModal}
+                onHide={() => {showModal=false}}
+                message={"Sesión caducada. Por favor, inicia sesión de nuevo."}
+                error ={true}
+              />
               window.location.href = "/login";
             }
           })

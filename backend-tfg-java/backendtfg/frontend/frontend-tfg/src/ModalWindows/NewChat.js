@@ -1,8 +1,7 @@
-import React from 'react';
 import { useLocalState } from '../utils/useLocalState';
 import { useState, useEffect } from 'react';
 import fetchService from '../services/fetchService';
-import { Button, Modal, Form, ListGroup } from 'react-bootstrap';
+import { Modal, Form, ListGroup } from 'react-bootstrap';
 
 function NewChat ({currentUser, onCreateChat}) {
 
@@ -18,7 +17,7 @@ function NewChat ({currentUser, onCreateChat}) {
     
     useEffect(() => {
         setChatUsers([currentUser]);
-    }, [])
+    }, [currentUser])
 
     function buscarUsuario(){
         if (searchText === "") return;
@@ -78,66 +77,68 @@ function NewChat ({currentUser, onCreateChat}) {
                 show={modalShow}
                 onHide={() => {setModalShow(false); resetFields()} }
                 aria-labelledby="example-modal-sizes-title-lg"
+                style={{alignContent: "center"}}
             >
 
                 <Modal.Header closeButton>
-                <Modal.Title id="example-modal-sizes-title-lg">
-                    Nuevo chat
-                </Modal.Title>
+                    <Modal.Title id="example-modal-sizes-title-lg">
+                        Nuevo chat
+                    </Modal.Title>
                 </Modal.Header>
 
                 <Modal.Body>
-                
-                    <div className="row mt-4">
-                        <div className="col">
-                        <Form.Group className="mb-3">
-                            <Form.Label>Nombre o apellidos</Form.Label>
-                            <Form.Control
-                            type="text"
-                            value={searchText}
-                            onChange={(e) => setSearchText(e.target.value)}
-                            />
-                        </Form.Group>
+                    <div style={{ display: "flex", alignItems: "stretch", height: "80%", padding: "1rem", }}>
+                        <div style={{flex:1}}>
+                            <Form.Group className="mb-3" style={{ paddingRight: "1rem" }}>
+                                <h5>Nombre o apellidos</h5>
+                                <Form.Control
+                                    type="text"
+                                    value={searchText}
+                                    onChange={(e) => setSearchText(e.target.value)}
+                                />
+                            </Form.Group>
 
-                        <h6>Usuarios encontrados</h6>
-                        <ListGroup>
-                            {users.map((user) => ( //En cada elemento, checkbox que ejecute la función de añadir al usuario
-                            <ListGroup.Item key={user.id}
-                                action
-                                onClick={() => addUser(user)}>
-                                {user.name} {user.surname}
-                            </ListGroup.Item>
-                            ))}
-                        </ListGroup>
+                            <h6>Usuarios encontrados</h6>
+                            <ListGroup>
+                                {users.map((user) => ( //En cada elemento, checkbox que ejecute la función de añadir al usuario
+                                <ListGroup.Item key={user.id}
+                                    action
+                                    onClick={() => addUser(user)}>
+                                    {user.name} {user.surname}
+                                </ListGroup.Item>
+                                ))}
+                            </ListGroup>
 
-                        <Button onClick={buscarUsuario} className="me-2">Buscar</Button>
-                        <Button onClick={resetFields} variant="secondary">Limpiar</Button>
+                            <div style={{marginTop: "2.5rem"}}>
+                                <button className="main-button" onClick={buscarUsuario}>Buscar</button>
+                                <button className="secondary-button" onClick={resetFields}>Limpiar</button>
+                            </div>
                         </div>
 
-                        <div className="col">
-                        <h6>Miembros actuales</h6>
-                        <ListGroup>
-                            {chatUsers.map((user) => ( //En cada elemento, checkbox que ejecute la función de eliminar el usuario
-                            <ListGroup.Item key={user.id}
-                                action
-                                onClick={() => removeUser(user)}>
-                                {user.name} {user.surname}
-                            </ListGroup.Item>
-                            ))}
-                        </ListGroup>
+                        <div style={{ width: "1px", backgroundColor: "#aaa", margin: "0 1rem", }}></div>
+                        <div style={{ flex: 1 }}>
+                            <h6>Miembros actuales</h6>
+                            <ListGroup>
+                                {chatUsers.map((user) => (
+                                <ListGroup.Item key={user.id}
+                                    action
+                                    onClick={() => removeUser(user)}>
+                                    {user.name} {user.surname}
+                                </ListGroup.Item>
+                                ))}
+                            </ListGroup>
                         </div>
                     </div>
                     </Modal.Body>
         
                     <Modal.Footer>
-                        <Button variant="secondary" onClick={handleClose}>
+                        <button className="secondary-button" onClick={handleClose}>
                             Cerrar
-                        </Button>
-                        <Button variant="primary" onClick={saveChanges}>
+                        </button>
+                        <button className="main-button" onClick={saveChanges}>
                             Crear
-                        </Button>
+                        </button>
                     </Modal.Footer>
-
             </Modal>
         </>
     );

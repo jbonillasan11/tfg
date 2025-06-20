@@ -6,6 +6,8 @@ import OpenAnswerRender from '../QuestionRenders/OpenAnswerRender';
 import TrueOrFalseRender from '../QuestionRenders/TrueOrFalseRender';
 import { useLocation } from 'react-router-dom';
 import { useState } from 'react';
+import TopBar from '../Components/TopBar';
+import { useLocalState } from '../utils/useLocalState';
 
 const TaskCorrection = () => {
 
@@ -13,6 +15,7 @@ const TaskCorrection = () => {
     const state = location.state;
     const task = state.task || null;
     const responsesObject = state.response || null;
+    const [currentUser] = useLocalState("", "currentUser");
 
     const [totalScore] = useState(responsesObject.calification || 0);
 
@@ -78,20 +81,39 @@ const TaskCorrection = () => {
 
     return (
         <div>
-             {task ? (
-                <h2>
-                    Corrección de la tarea {task.name}
-                </h2>
-                    ) : (
-                        <h2>Cargando...</h2>
-                    )
-            }
-             {task && responsesObject?.response && task.content.map((question, index) => (
-                <div key={index}> {questionRender(question, index)} </div>
-            ))}
-            <div style={{ marginTop: "20px" }}>
-                <h4>Nota total:</h4>
-                    {totalScore}
+            <TopBar currentUser={currentUser} />
+            <div className="container mt-4">
+                {task ? (
+                    <div style={{ padding: "1rem" }}>
+                        <h2>
+                            Corrección de la tarea {task.name}
+                        </h2>
+                        {task.description && (
+                            <p className="text-secondary fst-italic">{task.description}</p>
+                        )}
+                    </div>
+                ) : (
+                    <h2 style={{ padding: "1rem" }}>Cargando...</h2>
+                )}
+                <div className="p-4 border rounded bg-light shadow-sm">
+                    {task && responsesObject?.response && task.content.map((question, index) => (
+                        <div key={index}> {questionRender(question, index)} </div>
+                    ))}
+                </div>
+                <div className="text-center mt-4"
+                    style={{
+                        padding: "1rem",
+                        backgroundColor: totalScore >= 5 ? "#d4edda" : "#f8d7da",
+                        border: `1px solid ${totalScore >= 5 ? "#c3e6cb" : "#f5c6cb"}`,
+                        borderRadius: "12px",
+                        fontSize: "1.5rem",
+                        fontWeight: "bold",
+                        color: totalScore >= 5 ? "#155724" : "#721c24",
+                        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+                        marginBottom: "1rem"
+                    }}>
+                    Nota final: {totalScore}
+                </div>
             </div>
         </div>
     );

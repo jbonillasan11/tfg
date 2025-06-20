@@ -83,7 +83,7 @@ public class User implements UserDetails{
     public void removeTask(ObjectId taskId){
         if (this.tasksIds.contains(taskId)){
             this.tasksIds.remove(taskId);
-            deleteResponse(taskId.toHexString()); //Elimino la entrada de la tarea del mapa
+            deleteResponse(taskId.toHexString()); //Elimino la entrada de la tarea del mapa de respuestas
         } else throw new IllegalArgumentException("El usuario no tiene acceso a la tarea que se quiere eliminar");
     }
 

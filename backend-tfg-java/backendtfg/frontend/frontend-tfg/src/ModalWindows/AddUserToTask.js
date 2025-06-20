@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
-import { Form, Button, ListGroup } from 'react-bootstrap';
+import { Form, ListGroup } from 'react-bootstrap';
 import fetchService from '../services/fetchService';
 import { useLocalState } from '../utils/useLocalState';
 
 function AddUserToTask({parentTask, onSaveUsers}) {
 
-  const [authValue, setAuthValue] = useLocalState("", "authValue");
+  const [authValue] = useLocalState("", "authValue");
 
   const task = parentTask;
   const [taskUsers, setTaskUsers] = useState([]);
@@ -66,7 +66,7 @@ function AddUserToTask({parentTask, onSaveUsers}) {
       setTaskUsers(response);
       setTaskUsersAux(response);
     });
-  }, []);
+  }, [authValue, task]);
 
   function addUser(user){
     if (!taskUsers.some(u => u.id === user.id)) {
@@ -77,14 +77,14 @@ function AddUserToTask({parentTask, onSaveUsers}) {
 
   function removeUser(user){   
     setTaskUsers(taskUsers.filter((u) => u.id !== user.id)); // Eliminamos el usuario de la lista de usuarios de la tarea 
-    if (!users.some(u => u.id === user.id)) { // No puedo eliminar usuario si está en users????????????????????????
+    if (!users.some(u => u.id === user.id)) {
       setUsers([user, ...users]); // Añadimos el usuario a la lista de usuarios buscados para corregir rápidamente
     }
   }
 
   function addGroup(group){
     const groupUsers = group.usersIds; // Filtramos los usuarios que pertenecen a la tarea
-    const newUsersToAdd = groupUsers.filter( // Permite repetidos??????????????????????
+    const newUsersToAdd = groupUsers.filter(
       id => !taskUsers.some(user => user.id === id)
     );
     fetchService(`users/getUsers`, "POST", authValue, newUsersToAdd)
@@ -101,15 +101,15 @@ function AddUserToTask({parentTask, onSaveUsers}) {
     handleCloseSave();
   }
     
-
   return (
     <>
       <button className="main-button" onClick={() => setModalShow(true)}>Gestionar usuarios</button>
       <Modal
         size="lg"
         show={modalShow}
-        onHide={() => {setModalShow(false); resetFields()} }
+        onHide={() => {handleClose()} }
         aria-labelledby="example-modal-sizes-title-lg"
+        style={{alignContent: "center"}}
       >
 
         <Modal.Header closeButton>
@@ -119,21 +119,20 @@ function AddUserToTask({parentTask, onSaveUsers}) {
         </Modal.Header>
 
         <Modal.Body>
-           
-            <div className="row mt-4">
-                <div className="col">
-                <Form.Group className="mb-3">
-                    <Form.Label>Nombre o apellidos</Form.Label>
+          <div style={{ display: "flex", alignItems: "stretch", height: "80%", padding: "1rem", }}>
+              <div style={{flex:1}}>
+                <Form.Group className="mb-3" style={{ paddingRight: "1rem" }}>
+                    <h5>Nombre o apellidos</h5>
                     <Form.Control
-                    type="text"
-                    value={searchText}
-                    onChange={(e) => setSearchText(e.target.value)}
+                      type="text"
+                      value={searchText}
+                      onChange={(e) => setSearchText(e.target.value)}
                     />
                 </Form.Group>
 
                 <h6>Usuarios encontrados</h6>
                 <ListGroup>
-                    {users.map((user) => ( //En cada elemento, checkbox que ejecute la función de añadir al usuario
+                    {users.map((user) => ( //En cada elemento, pulsarlo lo añade a la tarea
                     <ListGroup.Item key={user.id}
                         action
                         onClick={() => addUser(user)}>
@@ -142,8 +141,8 @@ function AddUserToTask({parentTask, onSaveUsers}) {
                     ))}
                 </ListGroup>
 
-                <Form.Group className="mb-3">
-                    <Form.Label>Nombre del grupo</Form.Label>
+                <Form.Group className="mb-3" style={{marginTop: "1rem"}}>
+                    <h5>Nombre del grupo</h5>
                     <Form.Control
                     type="text"
                     value={searchTextGroup}
@@ -153,7 +152,7 @@ function AddUserToTask({parentTask, onSaveUsers}) {
 
                 <h6>Grupos encontrados</h6>
                 <ListGroup>
-                    {groups.map((group) => ( //En cada elemento, checkbox que ejecute la función de añadir al usuario
+                    {groups.map((group) => ( //En cada elemento, pulsarlo lo añade a la tarea
                     <ListGroup.Item key={group.id}
                         action
                         onClick={() => addGroup(group)}>
@@ -161,15 +160,17 @@ function AddUserToTask({parentTask, onSaveUsers}) {
                     </ListGroup.Item>
                     ))}
                 </ListGroup>
-
-                <Button onClick={buscarUsuario} className="me-2">Buscar</Button>
-                <Button onClick={resetFields} variant="secondary">Limpiar</Button>
+                <div style={{marginTop: "2.5rem"}}>
+                  <button className="main-button" onClick={buscarUsuario}>Buscar</button>
+                  <button className="secondary-button" onClick={resetFields}>Limpiar</button>
                 </div>
+              </div>
 
-                <div className="col">
-                <h6>Miembros actuales</h6>
+              <div style={{ width: "1px", backgroundColor: "#aaa", margin: "0 1rem", }}></div>
+               <div style={{ flex: 1 }}>
+                <h5>Miembros actuales</h5>
                 <ListGroup>
-                    {taskUsers.map((user) => ( //En cada elemento, checkbox que ejecute la función de eliminar el usuario
+                    {taskUsers.map((user) => ( //En cada elemento, pulsarlo lo elimina de la tarea
                     <ListGroup.Item key={user.id}
                         action
                         onClick={() => removeUser(user)}>
@@ -177,19 +178,14 @@ function AddUserToTask({parentTask, onSaveUsers}) {
                     </ListGroup.Item>
                     ))}
                 </ListGroup>
-                </div>
-            </div>
-            </Modal.Body>
-   
-            <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
-                    Cerrar
-                </Button>
-                <Button variant="primary" onClick={saveChanges}>
-                    Guardar cambios
-                </Button>
-            </Modal.Footer>
-
+              </div>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+            <button className="main-button" onClick={saveChanges}>
+                Guardar cambios
+            </button>
+        </Modal.Footer>
       </Modal>
     </>
   );

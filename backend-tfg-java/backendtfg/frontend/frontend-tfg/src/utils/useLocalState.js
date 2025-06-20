@@ -6,6 +6,9 @@ function useLocalState (defaultValue, key){
     const[value, setValue] = useState(() => {
 
         const storedValue = localStorage.getItem(key);
+        if (storedValue === "undefined") {
+            return defaultValue; // Si no hay valor en localStorage, devolvemos el valor por defecto
+        }
         return storedValue !== null ? JSON.parse(storedValue) : defaultValue; 
         //Si existe el valor en nuestro localStorage, lo devolvemos directamente
         //Si no, devolvemos defaultValue: value  

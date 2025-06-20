@@ -6,10 +6,11 @@ const TrueOrFalseRender = ({question, index, responseParent = [], responsesObjec
     const [calculatedScore, setCalculatedScore] = useState(responsesObject?.corrections?.[index]?.calification || "0");
 
     useEffect(() => {
+        if (!isTeacher) return; // Calcula la puntuación solo si es docente corrigiendo
         if (responseParent[0] === question.correctAnswers[0]) {
             setCalculatedScore(String(question.maxPoints));
         }
-    }, [])
+    }, [responseParent, question, isTeacher]);
 
     const handleChange = (e) => {
         const input = e.target.value.replace(",", ".");
@@ -44,84 +45,165 @@ const TrueOrFalseRender = ({question, index, responseParent = [], responsesObjec
 
     return (
         <Card key={index}>
-            <Card.Title>Verdadero o falso</Card.Title>
-            <Card.Body>
-                <p>{question.question}</p>
-
-                {/* RENDERIZADOS CONDICIONALES */}
-
-                {isReview ? (
-                    <>
-                        <Form.Select value={responseParent} disabled>
-                            <option value={responseParent}>{responseParent}</option>
-                        </Form.Select>
-                        <Form.Control
-                            type="text"
-                            placeholder="Corrección"
-                            value={"Respuesta correcta: " + question.correctAnswers}
+            <div
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginTop: "1rem",
+                    marginLeft: "1rem",
+                    marginRight: "1rem"
+                    
+                }}
+            >
+                <div>
+                    <Card.Title style={{ marginBottom: "0.5rem" }}>Pregunta {index + 1}</Card.Title>
+                    <Card.Title>¿Verdadero o falso?</Card.Title>
+                </div>
+                {question.mediaURL && (
+                    <div style={{ width: "100%", maxWidth: "150px", marginLeft: "auto" }}>
+                        <img
+                            src={question.mediaURL}
+                            alt={`Decoración pregunta ${index}`}
                             style={{
-                                display: "inline-block",
-                                width: "auto",
-                                margin: "0 5px",
-                                marginTop: "5px",
-                                backgroundColor: "#fff3cd"
+                                width: "100%",
+                                height: "auto",
+                                borderRadius: "12px",
+                                objectFit: "cover",
+                                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)"
                             }}
                         />
-                        <input
-                            type="text"
-                            inputMode="decimal"
-                            value={calculatedScore}
-                            readOnly
-                            placeholder={"Puntuación"}
-                        />
-                    </>
-                ) : (
-                    <>
-                        {!isTeacher ? (
-                            <Form.Group className="mb-3">
-                            <Form.Select
-                                aria-label="Selecciona la respuesta"
-                                value={responseParent || ""}
-                                onChange={(e) => onResponseUpdate(index, e.target.value)}
-                            >
-                                <option disabled value="">Respuesta</option>
-                                <option value="true">Verdadero</option>
-                                <option value="false">Falso</option>
-                            </Form.Select>
-                        </Form.Group>
-                        ) : (
-                            <>
-                                <Form.Select value={responseParent} disabled>
-                                    <option value={responseParent}>{responseParent}</option>
-                                </Form.Select>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Corrección"
-                                    value={"Respuesta correcta: " + question.correctAnswers}
-                                    style={{
-                                        display: "inline-block",
-                                        width: "auto",
-                                        margin: "0 5px",
-                                        marginTop: "5px",
-                                        backgroundColor: "#fff3cd"
-                                    }}
-                                />
-                                <input
-                                    type="text"
-                                    inputMode="decimal"
-                                    value={calculatedScore}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    placeholder={"Puntuación"}
-                                />
-                            </>
-                        )}
-                    </>
+                    </div>
                 )}
+            </div>
+                <Card.Body style={{marginLeft: "1rem"}}> 
+                    <div key={index} className="card-body d-flex align-items-start">
+                        <div
+                        style={{
+                            width: "80%",
+                            padding: "0 1rem"
+                        }}
+                        >
+                            <p style={{
+                                fontSize: "1.1rem",
+                                marginBottom: "0.75rem",
+                                color: "#333"
+                            }}>
+                                {question.question}
+                            </p>
 
+                            {/* RENDERIZADOS CONDICIONALES */}
+                            {isReview ? (
+                                <>
+                                    <Form.Select value={responseParent} disabled>
+                                        <option value={responseParent}>{responseParent}</option>
+                                    </Form.Select>
+                                    <div style={{
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                        gap: "1rem",
+                                        marginTop: "1rem"
+                                    }}>
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="Corrección"
+                                            value={"Respuesta correcta: " + question.correctAnswers}
+                                            readOnly
+                                            style={{
+                                                display: "inline-block",
+                                                width: "80%",
+                                                backgroundColor: "#fff3cd",
+                                            }}
+                                        />
+                                        Puntuación:
+                                        <input
+                                            type="text"
+                                            inputMode="decimal"
+                                            value={calculatedScore}
+                                            readOnly
+                                            textAlign="right"
+                                            style={{
+                                                width: "7%",
+                                                padding: "6px 10px",
+                                                fontSize: "1rem",
+                                                borderRadius: "8px",
+                                                border: "1px solid #ccc",
+                                                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                                            }}
+                                        />
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    {!isTeacher ? (
+                                        <Form.Group className="mb-3">
+                                        <Form.Select
+                                            aria-label="Selecciona la respuesta"
+                                            value={responseParent || ""}
+                                            onChange={(e) => onResponseUpdate(index, e.target.value)}
+                                        >
+                                            <option disabled value="">Respuesta</option>
+                                            <option value="true">Verdadero</option>
+                                            <option value="false">Falso</option>
+                                        </Form.Select>
+                                    </Form.Group>
+                                    ) : ( //RENDERIZADO DOCENTE CORRIGIENDO
+                                        <>
+                                            <Form.Select value={responseParent} disabled>
+                                                <option value={responseParent}>{responseParent}</option>
+                                            </Form.Select>
+                                            <div style={{
+                                                display: "flex",
+                                                justifyContent: "space-between",
+                                                alignItems: "center",
+                                                gap: "1rem",
+                                                marginTop: "1rem"
+                                            }}>
+                                                <Form.Control
+                                                    type="text"
+                                                    placeholder="Corrección"
+                                                    value={"Respuesta correcta: " + question.correctAnswers}
+                                                    style={{
+                                                        display: "inline-block",
+                                                        width: "80%",
+                                                        backgroundColor: "#fff3cd",
+                                                    }}
+                                                />
+                                                Puntuación:
+                                                <input
+                                                    type="text"
+                                                    inputMode="decimal"
+                                                    value={calculatedScore}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                    textAlign="right"
+                                                    style={{
+                                                        width: "7%",
+                                                        padding: "6px 10px",
+                                                        fontSize: "1rem",
+                                                        borderRadius: "8px",
+                                                        border: "1px solid #ccc",
+                                                        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                                                    }}
+                                                />
+                                            </div>
+                                        </>
+                                    )}
+                                </>
+                            )}
+                        </div>
+                    </div>
             </Card.Body>
-            <Card.Footer>
-                <p>Puntuación máxima: {question.maxPoints}</p>
+            <Card.Footer style={{ 
+                backgroundColor: "#f8f9fa",
+                fontSize: "1rem",
+                color: "#555",
+                fontWeight: "500"
+            }}>
+                <p style={{ margin: 0 }}>
+                    Puntuación máxima: {question.maxPoints}
+                </p>
             </Card.Footer>
         </Card>
     );

@@ -1,13 +1,8 @@
-import React from 'react';
 import { useState, useEffect } from 'react';
-import { Button, Modal, Form, ListGroup } from 'react-bootstrap';
-import fetchService from '../services/fetchService';
-import { useLocalState } from '../utils/useLocalState';
-import { upload } from '@testing-library/user-event/dist/upload';
+import { Modal, Form, ListGroup } from 'react-bootstrap';
+import AlertModal from '../ModalWindows/AlertModal';
 
 function AddQuestion ({onSaveQuestion}) {
-
-    const [authValue] = useLocalState("", "authValue");
 
     const [modalShow, setModalShow] = useState(false);
     const [questionText, setQuestionText] = useState("");
@@ -20,6 +15,10 @@ function AddQuestion ({onSaveQuestion}) {
     const [showSubmit, setShowSubmit] = useState(false);
 
     const [file, setFile] = useState(null);
+    const [fileName, setFileName] = useState(null);
+    
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState("");
 
     useEffect(() => {
         if (maxScore > 0) {
@@ -60,6 +59,8 @@ function AddQuestion ({onSaveQuestion}) {
         setMultipleAnswers([]);
         setMaxScore(0);
         setFile(null);
+        setFileName(null);
+        setAlertMessage("");
     }
 
     function removeAnswer(answer) {
@@ -84,22 +85,24 @@ function AddQuestion ({onSaveQuestion}) {
 
     function handleFileChange(e){
         const changeToFile = e.target.files[0];
-
         const allowedTypes = ["image/png", "image/jpg", "image/jpeg", "image/gif"];
 
-        if (changeToFile.size > 20 * 1024 * 1024){
-            alert("El archivo es demasiado grande");
+        if (changeToFile.size > 20 * 1024 * 1024){ //20MB
+            setShowAlert(true);
+            setAlertMessage("El archivo es demasiado grande");
             return;
         }
 
         if (allowedTypes.includes(changeToFile.type)){
             setFile(changeToFile);
+            setFileName(changeToFile.name);
         } else {
-            alert("El archivo debe ser de tipo imagen o GIF");
+            setShowAlert(true);
+            setAlertMessage("El archivo debe ser formato imagen o GIF");
+            return;
         }    
     }
 
-    
 
     async function handleCloseSave(){
         console.log(file);
@@ -114,14 +117,20 @@ function AddQuestion ({onSaveQuestion}) {
 
     return (
         <>
-            <Button onClick={() => setModalShow(true)}>Añadir pregunta</Button>
+            <button className="main-button" onClick={() => setModalShow(true)}>Añadir pregunta</button>
             <Modal
                 size="lg"
                 show={modalShow}
                 onHide={() => {setModalShow(false); resetFields()} }
                 aria-labelledby="example-modal-sizes-title-lg"
+                style={{alignContent: "center"}}
             >
-
+                <AlertModal
+                    showModal={showAlert}
+                    onHide={() => setShowAlert(false)}
+                    message={alertMessage}
+                    error={true}
+                />
             <Modal.Header closeButton>
                 <Modal.Title id="example-modal-sizes-title-lg">
                     Añadir pregunta
@@ -129,6 +138,7 @@ function AddQuestion ({onSaveQuestion}) {
             </Modal.Header>
 
             <Modal.Body>
+                <h5 style={{marginBottom:"0.75rem"}}>Selecciona el tipo de pregunta</h5>   
                 <Form.Select
                     aria-label="Selecciona el tipo de pregunta"
                     value={questionType}
@@ -142,20 +152,20 @@ function AddQuestion ({onSaveQuestion}) {
                     <option value="DRAG">Arrastrar</option>
                 </Form.Select>
                 <Form.Group className="mb-3">
-                    <Form.Label>Pregunta</Form.Label>
+                    <h5 style={{marginTop:"1rem", marginBottom:"1rem"}}>Enunciado</h5> 
                     <Form.Control
-                    type="text"
-                    value={questionText}
-                    onChange={(e) => setQuestionText(e.target.value)}
+                        type="text"
+                        value={questionText}
+                        onChange={(e) => setQuestionText(e.target.value)}
                     />
                 </Form.Group>
                 {questionType && (
                     <>
                         {questionType === "TRUE_FALSE" && (
                             <Form.Group className="mb-3">
-                                <Form.Label>Respuesta correcta</Form.Label>
+                                <h5 style={{marginTop:"1rem", marginBottom:"1rem"}}>Respuesta correcta</h5>
                                 <Form.Select
-                                    aria-label="Selecciona la respuesta"
+                                    aria-label="Selecciona la respuesta correcta"
                                     value={correctAnswer}
                                     onChange={(e) => setCorrectAnswer(e.target.value)}
                                 >
@@ -169,16 +179,17 @@ function AddQuestion ({onSaveQuestion}) {
                         {questionType === "MULTIPLE_CHOICE" && (
                             <>
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Introduce respuesta</Form.Label>
+                                    <h5>Introduce las respuestas</h5>
+                                    <p style={{ fontStyle: "italic", color: "#6c757d" }}>Escribe una respuesta y pulsa Intro para añadirla</p>
                                     <Form.Control
                                         type="text"
                                         value={answerText}
                                         onChange={(e) => setAnswerText(e.target.value)}
                                         onKeyDown={(e) => {
                                             if (e.key === "Enter") {
-                                            e.preventDefault();
-                                            setMultipleAnswers([...multipleAnswers, answerText]);
-                                            setAnswerText("");
+                                                e.preventDefault();
+                                                setMultipleAnswers([...multipleAnswers, answerText]);
+                                                setAnswerText("");
                                             }
                                         }}
                                     />
@@ -191,13 +202,13 @@ function AddQuestion ({onSaveQuestion}) {
                                     ))}
                                 </ListGroup>
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Respuesta correcta</Form.Label>
+                                    <h5 style={{marginBottom:"1rem"}}>Selecciona la respuesta correcta</h5>
                                     <Form.Select
                                         aria-label="Selecciona la respuesta"
                                         value={correctAnswer}
                                         onChange={(e) => setCorrectAnswer(e.target.value)}
                                     >
-                                    <option disabled value="">Respuesta</option>
+                                    <option disabled value="">Respuestas</option>
                                     {multipleAnswers.map((answer, index) => (
                                         <option key={index} value={answer}>{answer}</option>
                                     ))}
@@ -207,12 +218,12 @@ function AddQuestion ({onSaveQuestion}) {
                         )}
 
                         {questionType === "FILL_THE_BLANK" && (
-                            <> Coloca el símbolo "_" en el hueco a rellenar por el alumno. Puedes dejar varios huecos en blanco </>
+                            <p style={{ fontStyle: "italic", color: "#6c757d" }}>Coloca el símbolo "_" en el hueco a rellenar por el alumno. Puedes dejar varios huecos en blanco.</p>
                         )}
 
                         {questionType === "DRAG" && (
                             <>
-                                <> Coloca el símbolo "_" en el hueco a rellenar por el alumno. Puedes dejar varios huecos en blanco </>
+                                <p style={{ fontStyle: "italic", color: "#6c757d" }}>Coloca el símbolo "_" en el hueco a rellenar por el alumno. Puedes dejar varios huecos en blanco.</p>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Introduce respuesta</Form.Label>
                                     <Form.Control
@@ -239,17 +250,33 @@ function AddQuestion ({onSaveQuestion}) {
                         )}
                     </>  
                 )}
-                <input type="file" onChange={handleFileChange} />
+                <label className="main-button" style={{ marginTop: "1rem", display: "inline-block", cursor: "pointer" }}>
+                    Subir archivo
+                    <input
+                        type="file"
+                        onChange={handleFileChange}
+                        style={{ display: "none" }}
+                    />
+                </label>
+                {fileName && (
+                    <span style={{ fontStyle: "italic", fontSize: "0.95rem", color: "#6c757d" }}>{fileName}</span>
+                )}
+                <p style={{ fontStyle: "italic", color: "#6c757d", marginTop:"0.5rem", marginLeft:"0.25rem" }}>Formato imagen o GIF</p>
                 <Form.Group className="mb-3">
-                    <Form.Label>Puntuación de la pregunta</Form.Label>
+                    <h5 style={{marginTop:"1rem", marginBottom:"1rem"}}>Puntuación de la pregunta</h5>
                     <Form.Control
                         type="double"
                         value={maxScore}
                         onChange={(e) => setMaxScore(e.target.value)}
+                        style={{width:"20%"}}
                     />
                 </Form.Group>
                 {showSubmit && (
-                    <Button onClick={() => handleCloseSave()} className="me-2">Añadir</Button>
+                    <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "1rem" }}>
+                        <button className="main-button" onClick={() => handleCloseSave()}>
+                            Añadir pregunta
+                        </button>
+                    </div>
                 )}
             </Modal.Body>
 

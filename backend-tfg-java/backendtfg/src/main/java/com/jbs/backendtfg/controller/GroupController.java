@@ -49,8 +49,6 @@ public class GroupController {
         return ResponseEntity.ok(groupService.getGroupsNameSearch(authUser.getGroupsIds(), nameFragment));
     }
 
-
-
     @PostMapping("/newGroup") //Creamos un grupo nuevo
     public ResponseEntity<GroupDTO> createEmptyGroup(@AuthenticationPrincipal User authUser) {
         return ResponseEntity.ok(groupService.saveNewGroup(authUser.getId().toHexString()));

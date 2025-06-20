@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { useLocalState } from '../utils/useLocalState';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
+import AlertModal from '../ModalWindows/AlertModal';
+import { HiRefresh } from 'react-icons/hi';
+
 
 const Login = () => {
 
@@ -12,35 +15,49 @@ const Login = () => {
     //Podríamos usar un useState, pero queremos que el valor persista en memoria
     const [authValue, setAuthValue] = useLocalState("", "authValue");
 
+    const [alertMessage, setAlertMessage] = useState("");
+    const [showAlert, setShowAlert] = useState(false);
+
+    const navigate = useNavigate();
+
     function loginInfoSend() { 
+        const reqBody = {
+            "email": email,
+            "password": password
+        }
 
-            const reqBody = {
-                "email": email,
-                "password": password
-            }
-
-            fetch("http://localhost:8080/auth/login", { //No usamos fetchService, queremos hacer un tratamiento más complejo de la respuesta
-                method: "POST",
-                headers: {
-                    "content-type": "application/json"
-                },
-                body: JSON.stringify(reqBody)
-            })
-            .then(response =>{
-                if (response.status === 200) {
-                    return Promise.all([response.json(), response.headers])
-                } else {
-                    return Promise.reject("Credenciales incorrectas");
-                }})
-            .then(([body, headers]) => {
-                setAuthValue(headers.get("authorization"));
-                window.location.href = "/dashboard";
-            })
-            .catch((message) => {alert(message)});
+        fetch("http://localhost:8080/auth/login", { //No usamos fetchService, queremos hacer un tratamiento más complejo de la respuesta
+            method: "POST",
+            headers: {
+                "content-type": "application/json"
+            },
+            body: JSON.stringify(reqBody)
+        })
+        .then(response =>{
+            if (response.status === 200) {
+                return Promise.all([response.json(), response.headers])
+            } else {
+                setAlertMessage("Error al iniciar sesión. Por favor, comprueba tus credenciales.");
+                setShowAlert(true);
+            }})
+        .then(([body, headers]) => {
+            setAuthValue(headers.get("authorization"));
+            window.location.href = "/dashboard";
+        })
+        .catch((error) => {
+            setAlertMessage("Error al iniciar sesión. Por favor, comprueba tus credenciales.");
+            setShowAlert(true);
+        });
     }
     
     return (
         <div align="center" style={{marginTop: "10rem", marginBottom: "10rem"}}>
+            <AlertModal
+                showModal={showAlert}
+                onHide={() => setShowAlert(false)}
+                message={alertMessage}
+                error ={true}
+            />
             <h1>Bienvenido a App</h1>
             <div style={{
                 background: "linear-gradient(to bottom, #1a237e 50%, #f9f9f9 70%)",

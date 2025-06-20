@@ -3,9 +3,11 @@ import { useState } from 'react';
 import { useLocalState } from '../utils/useLocalState';
 import fetchService from '../services/fetchService';
 import AddUserToTask from '../ModalWindows/AddUserToTask';
-import { Button, ListGroup } from 'react-bootstrap';
+import { ListGroup } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import TopBar from '../Components/TopBar';
+import AlertModal from '../ModalWindows/AlertModal';
+import ConfirmDeletionWindow from '../ModalWindows/ConfirmDeletionWindow';
 
 const TaskViewer = () => {
 
@@ -23,13 +25,18 @@ const TaskViewer = () => {
 
     const [updatedUserIds, setUpdatedUserIds] = useState([]);
 
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState("");
+    const [navigateTo, setNavigateTo] = useState(null);
+    const [showAlertDeletion, setShowAlertDeletion] = useState(false);
+
     useEffect(() => {
         fetchService(`tasks/${taskId}`, "GET", authValue, null) //Petición asíncrona a nuestra APIRest
         .then(taskData => {
           setTask(taskData);
           setUpdatedUserIds(taskData.assigneesUserIds);
         });
-    }, [])
+    }, [taskId, authValue]);
 
     useEffect(() => {
       if (task !== ""){
@@ -47,7 +54,7 @@ const TaskViewer = () => {
           setUsers(usersData);
         })
       }
-    }, [task])
+    }, [task, authValue, currentUser, taskId])
 
     useEffect(() => {
       if (currentUser.userType === "PROFESSOR") return;
@@ -55,7 +62,7 @@ const TaskViewer = () => {
       .then(userData => {
           setResponse(userData.responses[taskId]); //Respuestas del usuario
       });
-    }, [])
+    }, [currentUser, authValue, taskId]);
 
     function saveFieldUpdate(field, value) { //Función que guarda los datos de la tarea y nos permite modificarlo las veces que queramos
       const taskCopy = {...task};
@@ -68,28 +75,28 @@ const TaskViewer = () => {
       fetchService(`tasks/${taskId}`, "PUT", authValue, task)
       .then(taskData => {
         setTask(taskData);
-        alert("Tarea guardada con éxito");
+        setShowAlert(true);
+        setAlertMessage("Tarea guardada! Recarga la página para ver los cambios.");
       })
     }
 
     function confirmTaskDeletion(){
-      if (window.confirm("¿Estás seguro de que quieres eliminar la tarea? Esta acción no se puede deshacer.")) { //Sustituir por ventana emergente
-        deleteTaskDB();
-      }
+      setShowAlertDeletion(true);
+      setAlertMessage("¿Estás seguro de que quieres eliminar la tarea? Esta acción no se puede deshacer.");
     }
 
     function deleteTaskDB(){
       fetchService(`tasks/deleteTaskId/${taskId}`, "DELETE", authValue, null)
       .then(() => {
-        alert("Tarea eliminada con éxito");
-        navigate("/dashboard"); //Redirigimos al dashboard
+        setShowAlert(true);
+        setAlertMessage("Tarea eliminada con éxito");
+        setNavigateTo("/dashboard"); //Redirigimos al dashboard
       })
     }
 
     function saveChanges(){
       if (updatedUserIds.length === 0) fetchService(`tasks/deleteUsers/${taskId}`, "PUT", authValue, null) //Si no hay usuarios
       else fetchService(`tasks/setUsers/${taskId}`, "PUT", authValue, updatedUserIds) //Si hay 
-      window.location.reload(); 
     }
 
     function editTaskData(){
@@ -101,7 +108,21 @@ const TaskViewer = () => {
       navigate(`/tasks/${taskId}/corrector/${user.id}`, {state: {task, user}})
     }
 
-    //Agrupar en un effect?
+    function taskStateStyles(state){
+      switch (state) {
+        case "COMPLETED":
+          return["text-success", "Completada"];
+        case "IN_PROGRESS":
+          return ["text-warning", "En progreso"];
+        case "CORRECTION_IN_PROGRESS":
+          return ["text-danger", "Corrección en progreso"];
+        case "CORRECTED":
+          return ["text-primary", "Corregida"];
+        default:
+          return ["text-secondary", "Pendiente"];
+      }
+    }
+
     let showButton = false;
     let showCorrectionButton
 
@@ -111,63 +132,63 @@ const TaskViewer = () => {
         showCorrectionButton = true;
     }
     
-    
     return (
       <>
         <div>
           <TopBar currentUser={currentUser} />
+          <AlertModal
+            showModal={showAlert}
+            onHide={() => setShowAlert(false)}
+            message={alertMessage}
+            redirectTo={navigateTo}
+          />
+          <ConfirmDeletionWindow
+            showModal={showAlertDeletion}
+            onHide={() => setShowAlertDeletion(false)}
+            onConfirm={deleteTaskDB}
+            message={alertMessage}
+            navigateTo={navigateTo}
+          />
           {task ? ( 
             currentUser.userType === "PROFESSOR" ? ( //RENDERIZADO PARA DOCENTES
-          <div  style={{ padding: "2rem" }}>
-              <h1>Tarea: <input type="text" value = {task.name} onChange={(e) => saveFieldUpdate("name", e.target.value)} /></h1>
-              <h3>Creada por: {creator.name} {creator.surname}</h3>
-              <h2>Plazo hasta: <input type="date" value={task.due} onChange={(e) => saveFieldUpdate("due", e.target.value)} /></h2>
-              <h3>Descripción: <input type="text" value = {task.description} onChange={(e) => saveFieldUpdate("description", e.target.value)} /></h3>
-              <h3>Tarea repasable: <input type="checkbox" checked={task.redoable} onChange={(e) => {saveFieldUpdate("redoable", e.target.checked); console.log(task); console.log(task.redoable)} }/></h3>
-
+          <div style={{ padding: "2rem" }}>
+              <h1>Tarea <input type="text" value = {task.name} onChange={(e) => saveFieldUpdate("name", e.target.value)} /></h1>
+              <h4>Creada por {creator.name} {creator.surname}</h4>
+              <h3>Descripción: <input type="text" style={{width: "40%"}} value = {task.description} onChange={(e) => saveFieldUpdate("description", e.target.value)} /></h3>
+              <h2>Fecha máxima de entrega:  <input style = {{width: "10%", border: "none"}} type="date" value={task.due} onChange={(e) => saveFieldUpdate("due", e.target.value)} /></h2>
+              <div style={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
+                <label htmlFor="redoableCheck" style={{ fontSize: "2rem", margin: 0, marginRight: "1rem", fontWeight: "600" }}>
+                  Repasable?
+                </label>
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  id="redoableCheck"
+                  checked={task.redoable}
+                  onChange={(e) => saveFieldUpdate("redoable", e.target.checked)}
+                  style={{ transform: "scale(1.5)" }}
+                />
+              </div>
               <button id="editTask" className="main-button" onClick={() => editTaskData()}>Editar preguntas</button>
-              <button id="saveTaskButton" className="main-button" onClick={() => saveTaskDB()}>Guardar cambios</button>
-              <button id="deleteTaskButton" className="delete-button" onClick={() => confirmTaskDeletion()}>Eliminar tarea</button>
-              
-              <AddUserToTask
-                parentTask={task}
-                onSaveUsers={(updatedUsers) => setUpdatedUserIds(updatedUsers)}
-              />
+              <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+                <button id="saveTaskButton" className="main-button" onClick={() => saveTaskDB()}>Guardar cambios</button>
+                <button id="deleteTaskButton" className="delete-button" onClick={() => confirmTaskDeletion()}>Eliminar tarea</button>
+              </div>
+              <div className="d-flex align-items-center justify-content-between mt-4 mb-3">
+                <h3 className="mb-0">Usuarios y entregas</h3>
+                <AddUserToTask
+                  parentTask={task}
+                  onSaveUsers={(updatedUsers) => setUpdatedUserIds(updatedUsers)}
+                />
+              </div>
 
-              <div >
-                <h3>Usuarios y entregas</h3>
-               <ListGroup className="mx-4">
+              <ListGroup className="mx-4">
                 {users &&
                   users
                     .filter(user => user.userType === "STUDENT")
                     .map(user => {
                       const response = user.responses[taskId];
-                      let stateColor = "";
-                      let stateText = "";
-
-                      switch (response.taskState) {
-                        case "COMPLETED":
-                          stateColor = "text-success"; // verde
-                          stateText = "Completada";
-                          break;
-                        case "IN_PROGRESS":
-                          stateColor = "text-warning"; // amarillo
-                          stateText = "En progreso";
-                          break;
-                        case "CORRECTION_IN_PROGRESS":
-                          stateColor = "text-danger"; // rojo
-                          stateText = "Corrección en progreso";
-                          break;
-                        case "CORRECTED":
-                          stateColor = "text-primary"; // azul
-                          stateText = "Corregida";
-                          break;
-                        default:
-                          stateColor = "text-secondary"; // gris
-                          stateText = "Pendiente";
-                          break;
-                      }
-
+                      const [stateColor, stateText] = taskStateStyles(response ? response.taskState : "PENDING");
                       return (
                         <ListGroup.Item
                           key={user.id}
@@ -205,55 +226,89 @@ const TaskViewer = () => {
                     })}
               </ListGroup>
             </div>
-          </div>
           ) : ( //RENDERIZADO PARA ESTUDIANTES
-            <>
-              <h1>Tarea {task.name}</h1>
-              <h3>Creada por {creator.name} {creator.surname}</h3>
-              <h2>Plazo hasta {new Date(task.due).toLocaleDateString('es-ES')}</h2>
-              <h3>Descripción {task.description}</h3>
-              {showButton && (
-                <button id="goToTask" className="main-button" onClick={() => navigate(`/tasks/${taskId}/responses/${currentUser.id}`, {state: {task, response}})}>
+            
+            <div style={{ padding: "2rem" }}>
+              <div style={{ marginBottom: "2rem" }}>
+                <h1 style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: "0.5rem" }}>
+                  Tarea {task.name}
+                </h1>
+
+                <h3 style={{ fontSize: "1.25rem", color: "#555", marginBottom: "1rem" }}>
+                  Creada por {creator.name} {creator.surname}
+                </h3>
+
+                <div style={{ fontStyle: "italic", color: "#6c757d", fontSize: "1.1rem", marginBottom: "1.5rem" }}>
+                  {task.description}
+                </div>
+
+                <h4 style={{ color: "#333", marginTop: "1rem" }}>
+                  Plazo hasta {new Date(task.due).toLocaleDateString('es-ES')}
+                </h4>
+              </div>
+
+              {response && (
+                <div className="card mt-4 shadow-sm">
+                  <div className="card-body">
+                    <h5 className="card-title">Tu intento</h5>
+                    
+                    <p className="card-text">
+                      <strong>Estado:</strong>{" "}
+                      <span
+                        className={taskStateStyles(response.taskState)[0]}
+                        style={{
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {taskStateStyles(response.taskState)[1]}
+                      </span>
+                    </p>
+
+                    {response.taskState === "COMPLETED" && (
+                      <p className="card-text">
+                        <strong>Fecha de subida:</strong> {new Date(response.uploadDate).toLocaleDateString('es-ES')}
+                      </p>
+                    )}
+
+                    <p className="card-text">
+                      <strong>Calificación:</strong>{" "}
+                      {response.calification != null && response.calification !== -1 ? (
+                        <span>{response.calification}</span>
+                      ) : (
+                        <span className="text-muted">No calificado</span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+               {showButton && (
+                <button id="goToTask" className="main-button" style={{marginTop:"1.5rem"}} onClick={() => navigate(`/tasks/${taskId}/responses/${currentUser.id}`, {state: {task, response}})}>
                   Resolver
                 </button>
-              )}
-              {response && (
-                <div>Tu tarea: {
-                  <div>
-                    <div>Estado: {response.taskState}</div> {/* Estilo según su valor, color */}	
-                    {(response.status === "COMPLETED" && (<div>Fecha de subida: {response.uploadDate}</div>))}
-                    <div>
-                      {response.calification != null && response.calification !== -1 ? (
-                        <>Calificación: {response.calification}</>
-                      ) : (
-                        "No calificado"
-                      )}
-                    </div>
-                  </div>
-              }</div>
               )}
               {showCorrectionButton && (
                 <>
                   {task.redoable ? (
-                    <button id="goToTaskRedo" className="main-button" onClick={ () =>{ 
+                    <button id="goToTaskRedo" className="main-button" style={{marginTop:"2rem"}}onClick={ () =>{ 
                         const resetResponse = {...response, response: [], calification: -1, taskState: "PENDING"};
                         navigate(`/tasks/${taskId}/responses/${currentUser.id}`, {state: {task, response: resetResponse}})
                       }}>
                         Resolver de nuevo
                     </button>
-                  ) : (<button id="goToTaskCorrection" className="main-button" onClick={() => navigate(`/tasks/${taskId}/correction/${currentUser.id}`, {state: {task, response}})}>
+                  ) : (
+                    <button id="goToTaskCorrection" className="main-button" style={{marginTop:"1.5rem"}} onClick={() => navigate(`/tasks/${taskId}/correction/${currentUser.id}`, {state: {task, response}})}>
                       Revisar corrección
                     </button>)}
                 </>
-                
               )}
-            </>
+            </div>
             
           )
           ) : (
-              <> 
+              <div style={{ padding: "2rem" }}> 
                   <h2>Tarea no encontrada</h2>
-              </>
+              </div>
           )
         }
       </div>

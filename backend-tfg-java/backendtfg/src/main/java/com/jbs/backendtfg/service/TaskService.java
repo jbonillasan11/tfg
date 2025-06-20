@@ -3,6 +3,7 @@ package com.jbs.backendtfg.service;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +41,8 @@ public class TaskService { //Definimos los métodos que se pueden realizar sobre
     }
 
     public TaskDTO getTaskById(String id) { //Obtenemos una tarea a partir de su ID
-        return new TaskDTO(taskRepository.findById(new ObjectId(id)) // Si no encuentra la tarea, lanza una excepción
-            .orElseThrow(() -> new RuntimeException("La tarea no existe en nuestro sistema")));
+        Optional<Task> optionalTask = taskRepository.findById(new ObjectId(id));
+        return optionalTask.map(TaskDTO::new).orElse(null);
     }    
     
     public TaskDTO saveEmptyTask(User u) { //Guardamos una nueva tarea vacía
@@ -63,7 +64,9 @@ public class TaskService { //Definimos los métodos que se pueden realizar sobre
     public List<TaskDTO> getTasksFromIds(List<String> ids) { //Obtenemos una lista de tareas a partir de sus IDs
        List<TaskDTO> tasks = new LinkedList<>();
         for (String id : ids) {
-            tasks.add(getTaskById(id));
+            if (getTaskById(id) != null) {
+                tasks.add(getTaskById(id));
+            }
         }
         return tasks;
     }
