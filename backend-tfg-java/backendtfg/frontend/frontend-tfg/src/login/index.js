@@ -26,7 +26,7 @@ const Login = () => {
             "password": password
         }
 
-        fetch("http://localhost:8080/auth/login", { //No usamos fetchService, queremos hacer un tratamiento más complejo de la respuesta
+        fetch("https://tfg-laee.onrender.com/auth/login", { //No usamos fetchService, queremos hacer un tratamiento más complejo de la respuesta
             method: "POST",
             headers: {
                 "content-type": "application/json"
