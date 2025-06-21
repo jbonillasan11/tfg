@@ -15,8 +15,8 @@ const GroupViewer = () => {
     const [currentUser] = useLocalState("", "currentUser"); //Usuario logueado
     
     const groupId = window.location.href.split("/groups/")[1]; //Obtenemos el id de la tarea de la URL
-    const [group, setGroup] = useState(""); //Grupo al que accedemos
-    const [creator, setCreator] = useState(""); //Creador del grupo
+    const [group, setGroup] = useState(null); //Grupo al que accedemos
+    const [creator, setCreator] = useState(null); //Creador del grupo
 
     const [groupUsers, setGroupUsers] = useState([]); //Usuarios del grupo (tipo UserDTO)
 
@@ -133,9 +133,9 @@ const GroupViewer = () => {
                     group.name || "Grupo sin nombre"
                   )}
                 </h1>
-                <h4 style={{ fontStyle: "italic", color: "#555", marginLeft: "0.5rem" }}>
+               {creator && ( <h4 style={{ fontStyle: "italic", color: "#555", marginLeft: "0.5rem" }}>
                   Creado por {creator.name} {creator.surname} ({creator.organization})
-                </h4>
+                </h4>)}
                 {currentUser.id === group.creatorId && (
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "3rem" }}>
                     <h3 style={{ margin: 0 }}>Miembros</h3>
