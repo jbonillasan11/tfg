@@ -14,7 +14,7 @@ import com.jbs.backendtfg.dtos.TaskDTO;
 import com.jbs.backendtfg.service.DeletionService;
 import com.jbs.backendtfg.service.TaskService;
 
-@CrossOrigin(origins = "http://localhost:3000") // Permitir peticiones desde React
+@CrossOrigin(origins = "https://tfg-wkhx.vercel.app") // Permitir peticiones desde React
 @RestController
 @RequestMapping("/tasks")
 public class TaskController { 
