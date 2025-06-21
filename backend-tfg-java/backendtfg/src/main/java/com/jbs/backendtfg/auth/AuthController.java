@@ -24,7 +24,7 @@ import com.jbs.backendtfg.service.UserService;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "https://tfg-wkhx.vercel.app")
 public class AuthController {
 
     @Autowired
