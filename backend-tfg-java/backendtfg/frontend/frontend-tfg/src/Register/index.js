@@ -61,7 +61,7 @@ const Register = () => {
             return;
         }
 
-        fetch("http://localhost:8080/auth/register", {
+        fetch("https://tfg-laee.onrender.com:8080/auth/register", {
             method: "POST",
             headers: {
                 "content-type": "application/json"
