@@ -36,6 +36,7 @@ public class SecurityConfig{
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/login", "/auth/register", "/ws-chat/**", "/ping").permitAll() // Endpoints públicos sin autenticación
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Permitimos preflight
+                
                 .anyRequest().authenticated() // Los demás endpoints requieren autenticación
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); // Agregamos el filtro JWT
