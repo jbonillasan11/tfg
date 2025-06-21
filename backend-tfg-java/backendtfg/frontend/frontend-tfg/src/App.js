@@ -17,23 +17,17 @@ import fetchService from './services/fetchService';
 
 function App() { 
 
-const [loadingBackend, setLoadingBackend] = useState(true);
-
   useEffect(() => { //Servicio de ping al acceder a la app para verificar que el backend esta activo
     fetchService("api/ping", "GET")
       .then((res) => res.text())
       .then(() => {
         console.log("Backend activado");
-        setLoadingBackend(false);
       })
       .catch((err) => {
         console.error("Error al despertar el backend", err);
       });
   }, []);
 
-  if (loadingBackend) {
-    return <div>Cargando el backend... por favor espera unos segundos.</div>;
-  }
 
 
 return (
