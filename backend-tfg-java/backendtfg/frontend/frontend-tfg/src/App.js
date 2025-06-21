@@ -20,7 +20,7 @@ function App() {
 const [loadingBackend, setLoadingBackend] = useState(true);
 
   useEffect(() => { //Servicio de ping al acceder a la app para verificar que el backend esta activo
-    fetchService("/api/ping", "GET")
+    fetchService("api/ping", "GET")
       .then((res) => res.text())
       .then(() => {
         console.log("Backend activado");
