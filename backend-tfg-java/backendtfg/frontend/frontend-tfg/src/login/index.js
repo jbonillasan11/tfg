@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { useLocalState } from '../utils/useLocalState';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import AlertModal from '../ModalWindows/AlertModal';
-import { HiRefresh } from 'react-icons/hi';
-
 
 const Login = () => {
 
@@ -18,15 +16,13 @@ const Login = () => {
     const [alertMessage, setAlertMessage] = useState("");
     const [showAlert, setShowAlert] = useState(false);
 
-    const navigate = useNavigate();
-
     function loginInfoSend() { 
         const reqBody = {
             "email": email,
             "password": password
         }
 
-        fetch("https://tfg-laee.onrender.com/auth/login", { //No usamos fetchService, queremos hacer un tratamiento más complejo de la respuesta
+        fetch("https://tfg-laee.onrender.com/8080/auth/login", { //No usamos fetchService, queremos hacer un tratamiento más complejo de la respuesta
             method: "POST",
             headers: {
                 "content-type": "application/json"
