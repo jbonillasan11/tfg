@@ -34,7 +34,7 @@ public class SecurityConfig{
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage());
                 }))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/login", "/auth/register", "/ws-chat/**").permitAll() // Endpoints públicos sin autenticación
+                .requestMatchers("/auth/login", "/auth/register", "/ws-chat/**", "/ping").permitAll() // Endpoints públicos sin autenticación
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Permitimos preflight
                 .anyRequest().authenticated() // Los demás endpoints requieren autenticación
             )
