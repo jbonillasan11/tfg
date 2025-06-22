@@ -19,7 +19,7 @@ import com.jbs.backendtfg.document.User;
 import com.jbs.backendtfg.service.MediaUploadService;
 
 @RestController
-@CrossOrigin(origins = "https://tfg-wkhx.vercel.app")
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/mediaUploader")
 public class MediaUploadController {
     

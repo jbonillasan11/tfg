@@ -15,7 +15,7 @@ import com.jbs.backendtfg.dtos.UserDTO;
 import com.jbs.backendtfg.service.DeletionService;
 import com.jbs.backendtfg.service.UserService;
 
-@CrossOrigin(origins = "https://tfg-wkhx.vercel.app") // Permitir peticiones desde React
+@CrossOrigin(origins = "http://localhost:3000") // Permitir peticiones desde React
 @RestController
 @RequestMapping("/users")
 public class UserController { //Manejamos los mapeos de las peticiones HTTP

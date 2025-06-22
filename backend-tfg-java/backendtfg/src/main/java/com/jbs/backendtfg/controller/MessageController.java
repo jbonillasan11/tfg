@@ -17,7 +17,7 @@ import com.jbs.backendtfg.dtos.MessageDTO;
 import com.jbs.backendtfg.service.MessageService;
 
 @RestController
-@CrossOrigin(origins = "https://tfg-wkhx.vercel.app")
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/messages")
 public class MessageController {
     

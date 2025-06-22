@@ -21,7 +21,7 @@ import com.jbs.backendtfg.dtos.MessageDTO;
 import com.jbs.backendtfg.service.ChatService;
 
 @RestController
-@CrossOrigin(origins = "https://tfg-wkhx.vercel.app")
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/chats")
 public class ChatController {
     

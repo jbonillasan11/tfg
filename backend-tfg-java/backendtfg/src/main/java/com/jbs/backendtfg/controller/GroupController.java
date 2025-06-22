@@ -23,7 +23,7 @@ import com.jbs.backendtfg.dtos.GroupDTO;
 import com.jbs.backendtfg.service.DeletionService;
 import com.jbs.backendtfg.service.GroupService;
 
-@CrossOrigin(origins = "https://tfg-wkhx.vercel.app") // Permitir peticiones desde React
+@CrossOrigin(origins = "http://localhost:3000") // Permitir peticiones desde React
 @RestController
 @RequestMapping("/groups")
 public class GroupController {
