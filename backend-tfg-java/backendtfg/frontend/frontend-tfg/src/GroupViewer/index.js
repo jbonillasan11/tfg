@@ -8,6 +8,7 @@ import TopBar from '../Components/TopBar';
 import Forum from '../Forum/Forum';
 import AlertModal from '../ModalWindows/AlertModal';
 import ConfirmDeletionWindow from '../ModalWindows/ConfirmDeletionWindow';
+import { useNavigate } from 'react-router-dom';
 
 const GroupViewer = () => {
 
@@ -26,7 +27,7 @@ const GroupViewer = () => {
     const [alertMessage, setAlertMessage] = useState("");
     const [showAlertDeletion, setShowAlertDeletion] = useState(false);
 
-    const [navigate, setNavigate] = useState("");
+    const navigate = useNavigate();
 
     useEffect(() => {
       fetchService(`groups/${groupId}`, "GET", authValue, null)
@@ -40,7 +41,7 @@ const GroupViewer = () => {
     }, [groupId, authValue]);
     
     useEffect(() => {
-      if (group !== ""){
+      if (group){
         fetchService(`users/getUserId/${group.creatorId}`, "GET", authValue)
         .then(creatorData => {
           setCreator(creatorData);
@@ -49,13 +50,15 @@ const GroupViewer = () => {
     }, [authValue, group])
 
     useEffect (() => {
-      if (group.usersIds && group.usersIds.length >= 1){
-        fetchService("users/getUsers", "POST", authValue, group.usersIds)
-        .then(usersData => {
-          setGroupUsers(usersData);
-        })
-      } else {
-        setGroupUsers([creator]);
+      if (group){
+        if (group.usersIds && group.usersIds.length >= 1){
+          fetchService("users/getUsers", "POST", authValue, group.usersIds)
+          .then(usersData => {
+            setGroupUsers(usersData);
+          })
+        } else {
+          setGroupUsers([creator]);
+        }
       }
     }, [group, authValue, creator]);
 
@@ -78,7 +81,6 @@ const GroupViewer = () => {
     function confirmGroupDeletion(){
       setShowAlertDeletion(true);
       setAlertMessage("¿Estás seguro de que quieres eliminar este grupo? Esta acción no se puede deshacer.");
-      setNavigate("/dashboard");  
     }
 
     function deleteGroupDB(){
@@ -86,7 +88,7 @@ const GroupViewer = () => {
       .then(() => {
         setShowAlert(true);
         setAlertMessage("Grupo eliminado con éxito");
-        setNavigate("/dashboard") ; //Redirigimos al dashboard
+        navigate("/dashboard") ; //Redirigimos al dashboard
       })
     }
 

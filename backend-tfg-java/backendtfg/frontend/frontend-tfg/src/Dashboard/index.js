@@ -41,7 +41,7 @@ const Dashboard = () => {
       .then(taskList => {
         setTasks(taskList);
       })
-  }, [taskIds])
+  }, [taskIds, authValue])
 
     useEffect(() => {
       fetchService("users/getUserGroups", "GET", authValue, null)
@@ -57,7 +57,7 @@ const Dashboard = () => {
         .then(groupList => {
           setGroups(groupList);
         })
-    }, [groupIds])
+    }, [groupIds, authValue])
 
     function createAssignment() {
       fetchService("tasks/newEmptyTask", "POST", authValue, null)
@@ -110,11 +110,11 @@ const Dashboard = () => {
                               Límite de entrega: {task.due}
                             </div>
                             <div style={{ fontSize: "0.8rem", fontStyle: "italic" }} align="right">
-                              Alumnos: {task.assigneesUserIds.length}
+                              Miembros: {task.assigneesUserIds.length}
                             </div>
                           </div>
                       </ListGroup.Item>
-                      ))}
+                    ))}
                   </ListGroup>
                 </div>
                 

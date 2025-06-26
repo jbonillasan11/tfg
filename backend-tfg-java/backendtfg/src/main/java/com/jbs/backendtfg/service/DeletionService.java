@@ -84,6 +84,7 @@ public class DeletionService {
         public void deleteGroup(String id) { //Eliminamos un grupo de nuestra BD, así como de todos sus usuarios
             ObjectId groupId = new ObjectId(id);
             GroupDTO toDelete = groupService.getGroupById(id);
+            
             List<String> idsUsers = toDelete.getUsersIds();
             for (String idUser : idsUsers) {
                 Optional<User> optionalUser = userRepository.findById(new ObjectId(idUser));

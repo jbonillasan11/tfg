@@ -141,7 +141,7 @@ const TaskResolver = () => {
                         </div>
                         ))}
                     </div>
-                    <div className="mb-3">
+                    <div className="mb-3" style={{ display: "flex", justifyContent: "right", marginTop: "1rem" }}>
                         <button className="main-button"
                             onClick={() => {
                                 saveChanges("COMPLETED");

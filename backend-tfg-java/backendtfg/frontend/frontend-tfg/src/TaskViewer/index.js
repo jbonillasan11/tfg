@@ -70,14 +70,18 @@ const TaskViewer = () => {
       setTask(taskCopy);
     }
 
-    function saveTaskDB(){
-      saveChanges(); //Guardamos los cambios de los usuarios
-      fetchService(`tasks/${taskId}`, "PUT", authValue, task)
-      .then(taskData => {
-        setTask(taskData);
-        setShowAlert(true);
-        setAlertMessage("Tarea guardada! Recarga la página para ver los cambios.");
-      })
+    async function saveTaskDB() {
+      const updatedAssignees = await saveChanges(); 
+
+      const updatedTask = {
+        ...task,
+        assigneesUserIds: updatedAssignees
+      };
+      const taskData = await fetchService(`tasks/${taskId}`, "PUT", authValue, updatedTask);
+
+      setTask(taskData);
+      setShowAlert(true);
+      setAlertMessage("Tarea guardada! Recarga la página para ver los cambios.");
     }
 
     function confirmTaskDeletion(){
@@ -94,9 +98,15 @@ const TaskViewer = () => {
       })
     }
 
-    function saveChanges(){
-      if (updatedUserIds.length === 0) fetchService(`tasks/deleteUsers/${taskId}`, "PUT", authValue, null) //Si no hay usuarios
-      else fetchService(`tasks/setUsers/${taskId}`, "PUT", authValue, updatedUserIds) //Si hay 
+    async function saveChanges() { //Gestiona los nuevos usuarios, añadiendo la tarea a todos ellos
+      let response;
+      if (updatedUserIds.length === 0) {
+        response = await fetchService(`tasks/deleteUsers/${taskId}`, "PUT", authValue, null);
+      } else {
+        response = await fetchService(`tasks/setUsers/${taskId}`, "PUT", authValue, updatedUserIds);
+      }
+
+      return response.assigneesUserIds; // Devuelve solo lo que necesitas
     }
 
     function editTaskData(){

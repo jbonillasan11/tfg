@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useLocalState } from '../utils/useLocalState';
 import { Link } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
@@ -22,7 +22,7 @@ const Login = () => {
             "password": password
         }
 
-        fetch("https://localhost:8080/auth/login", { //No usamos fetchService, queremos hacer un tratamiento más complejo de la respuesta
+        fetch("http://localhost:8080/auth/login", { //No usamos fetchService, queremos hacer un tratamiento más complejo de la respuesta
             method: "POST",
             headers: {
                 "content-type": "application/json"
@@ -54,7 +54,8 @@ const Login = () => {
                 message={alertMessage}
                 error ={true}
             />
-            <h1>Bienvenido a App</h1>
+            <img src="/ludikids solo texto.png" className="logo-white" alt="Logo" style = {{marginBottom: "2rem"}}/>
+            <h1>Bienvenido!</h1>
             <div style={{
                 background: "linear-gradient(to bottom, #1a237e 50%, #f9f9f9 70%)",
                 color: "white",

@@ -103,7 +103,7 @@ const TaskEditor = () => {
 
     function handleCreatedQuestion(question) {
         setCreatedQuestion(question);
-        shownQuestions.push(question);
+        setShownQuestions((prev) => [...prev, question]);
     }
 
     return (

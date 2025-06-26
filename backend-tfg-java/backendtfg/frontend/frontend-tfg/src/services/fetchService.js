@@ -22,7 +22,7 @@ function fetchService(url, reqMethod, authValue, reqBody) { //Función que nos p
       fetchData.body = isFormData ? reqBody : JSON.stringify(reqBody);
     }
 
-     return fetch(`https://localhost:8080/${url}`, fetchData)      
+     return fetch(`http://localhost:8080/${url}`, fetchData)      
           .then(response => {
             if (response.status === 200) {
               return response.json();

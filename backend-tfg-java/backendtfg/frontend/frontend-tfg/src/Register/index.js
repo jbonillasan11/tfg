@@ -61,7 +61,7 @@ const Register = () => {
             return;
         }
 
-        fetch("https://localhost:8080/auth/register", {
+        fetch("http://localhost:8080/auth/register", {
             method: "POST",
             headers: {
                 "content-type": "application/json"
@@ -95,7 +95,8 @@ const Register = () => {
     return (
 
         <div align="center" style={{marginTop: "7rem", marginBottom: "10rem"}}>
-            <h1>Bienvenido a App</h1>
+            <img src="/ludikids solo texto.png" className="logo-white" alt="Logo" style = {{marginBottom: "2rem"}}/>
+            <h1>Bienvenido!</h1>
             <div style={{
                 background: "linear-gradient(to bottom, #1a237e 78%, #f9f9f9 85%)",
                 color: "white",

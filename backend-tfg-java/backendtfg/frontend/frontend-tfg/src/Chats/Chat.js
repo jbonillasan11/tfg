@@ -36,8 +36,8 @@ const Chat = ({parentChat, senderId, authValue, participantsData = [], currentUs
         onConnect: () => {
             setIsConnected(true);
             client.subscribe(`/topic/messages/${parentChat.id}`, (message) => {
-            const newMessage = JSON.parse(message.body);
-            setMessages((prev) => [...prev, newMessage]);
+                const newMessage = JSON.parse(message.body);
+                setMessages((prev) => [...prev, newMessage]);
             });
         },
         });

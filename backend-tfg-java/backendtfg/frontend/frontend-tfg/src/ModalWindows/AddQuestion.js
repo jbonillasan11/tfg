@@ -87,7 +87,7 @@ function AddQuestion ({onSaveQuestion}) {
         const changeToFile = e.target.files[0];
         const allowedTypes = ["image/png", "image/jpg", "image/jpeg", "image/gif"];
 
-        if (changeToFile.size > 20 * 1024 * 1024){ //20MB
+        if (changeToFile.size > 15 * 1024 * 1024){ //15MB
             setShowAlert(true);
             setAlertMessage("El archivo es demasiado grande");
             return;
@@ -261,7 +261,7 @@ function AddQuestion ({onSaveQuestion}) {
                 {fileName && (
                     <span style={{ fontStyle: "italic", fontSize: "0.95rem", color: "#6c757d" }}>{fileName}</span>
                 )}
-                <p style={{ fontStyle: "italic", color: "#6c757d", marginTop:"0.5rem", marginLeft:"0.25rem" }}>Formato imagen o GIF</p>
+                <p style={{ fontStyle: "italic", color: "#6c757d", marginTop:"0.5rem", marginLeft:"0.25rem" }}>Formato imagen o GIF, tamaño máximo: 15 MB</p>
                 <Form.Group className="mb-3">
                     <h5 style={{marginTop:"1rem", marginBottom:"1rem"}}>Puntuación de la pregunta</h5>
                     <Form.Control

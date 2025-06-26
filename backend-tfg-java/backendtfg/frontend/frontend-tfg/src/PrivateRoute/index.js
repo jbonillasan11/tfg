@@ -1,4 +1,3 @@
-import React from 'react';
 import { useLocalState } from '../utils/useLocalState';
 import { Navigate } from 'react-router-dom';
 

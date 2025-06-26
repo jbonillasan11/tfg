@@ -4,7 +4,7 @@ import fetchService from '../services/fetchService';
 import NewChat from '../ModalWindows/NewChat';
 import { ListGroup } from 'react-bootstrap';
 import TopBar from '../Components/TopBar';
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Chat from '../Chats/Chat';
 
 const Chats = () => {
@@ -19,6 +19,8 @@ const Chats = () => {
 
     const [chatNames, setChatNames] = useState({}); //Nombres de los chats
     const [participantsData, setParticipantsData] = useState([]); //Datos de los chats
+
+    const navigate = useNavigate();
 
 
     useEffect(() => {
@@ -71,8 +73,9 @@ const Chats = () => {
                             <NewChat
                                 currentUser={currentUser}
                                 onCreateChat={(newChat) => {
-                                    setCurrentChat(newChat);
-                                    newChatRedirecter(newChat.id);
+                                    //setCurrentChat(newChat);
+                                    //newChatRedirecter(newChat.id);
+                                    navigate(0);
                                 }}
                             />
                         )}

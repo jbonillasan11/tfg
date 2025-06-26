@@ -12,7 +12,7 @@ import javax.crypto.SecretKey;
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "9043W5NVDFG2Q2JF3EN90OP4CMKAJ893"; 
+    private static final String SECRET_KEY = "9043W5NVDFG2Q2JF3EN90OP4CMKAJ893"; // Envolver en varibale de entorno
 
     // Generar un token JWT con el nombre de usuario y un tiempo de expiración
     public String generateToken(UserDetails userDetails) {
