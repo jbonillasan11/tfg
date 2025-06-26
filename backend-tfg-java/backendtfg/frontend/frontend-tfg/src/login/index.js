@@ -54,7 +54,7 @@ const Login = () => {
                 message={alertMessage}
                 error ={true}
             />
-            <img src="/ludikids solo texto.png" className="logo-white" alt="Logo" style = {{marginBottom: "2rem"}}/>
+            <img src="https://res.cloudinary.com/dmtwfww3b/image/upload/v1750965761/ludikids_solo_texto_spyiy9.png" className="logo-white" alt="Logo" style = {{marginBottom: "2rem"}}/>
             <h1>Bienvenido!</h1>
             <div style={{
                 background: "linear-gradient(to bottom, #1a237e 50%, #f9f9f9 70%)",
