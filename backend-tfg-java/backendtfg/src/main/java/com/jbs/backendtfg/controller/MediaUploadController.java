@@ -26,7 +26,7 @@ public class MediaUploadController {
     @Autowired
     private MediaUploadService mediaUploadService;
 
-    @PostMapping("/upload")
+    @PostMapping("/upload") //Gestionamos la subida de archivos a Cloudinary y devolvemos la URL para almacenar en BDD
     public ResponseEntity<Map<String, String>> uploadMedia(@AuthenticationPrincipal User authUser, MultipartFile file) throws IOException{
         String contentType = file.getContentType();
 

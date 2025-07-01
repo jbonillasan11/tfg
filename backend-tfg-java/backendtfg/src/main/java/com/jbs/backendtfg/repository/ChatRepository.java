@@ -13,8 +13,10 @@ import java.util.Optional;
 
 @Repository
 public interface ChatRepository extends MongoRepository<Chat, ObjectId> {
+    //Buscamos los chats que contienen a un usuario
     List<Chat> findByParticipantsContaining(ObjectId userId);
 
+    //Buscamos los chats cuyos participantes son exactamente los que se le pasan
     @Query("{ 'participants': ?0 }")
     Optional<Chat> findChatByExactParticipants(ArrayList<ObjectId> participants);
 }

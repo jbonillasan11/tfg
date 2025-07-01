@@ -49,12 +49,12 @@ public class MessageService {
         return toReturn;
     }
 
-    public MessageDTO getSingleMessage(String messageId) {
+    public MessageDTO getSingleMessage(String messageId) { //Obtenemos un mensaje individual por su ID
         Optional<Message> message = messageRepository.findById(new ObjectId(messageId));
         if (message.isPresent()) {
             return new MessageDTO(message.get());
         } else {
-            return null; //Podríamos lanzar una excepción personalizada
+            return null;
         }
     }
     

@@ -12,8 +12,10 @@ import com.jbs.backendtfg.document.Group;
 
 @Repository
 public interface GroupRepository extends MongoRepository<Group, ObjectId> {
+    //Buscamos grupos por nombre
     Optional<Group> findByName(String name);
 
+    //Buscamos grupos que contienen un fragmento en su nombre y que son parte de los grupos del usuario
     @Query("{ '_id': { $in: ?1 }, 'name': { $regex: ?0, $options: 'i' } }")
     List<Group> findByNameContainingAndIdIn(String nameFragment, List<ObjectId> userGroups);
 }

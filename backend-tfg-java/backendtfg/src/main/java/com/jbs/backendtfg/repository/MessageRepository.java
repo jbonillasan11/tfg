@@ -10,5 +10,6 @@ import java.util.List;
 
 @Repository
 public interface MessageRepository extends MongoRepository<Message, ObjectId> {
+    //Buscamos mensajes de un chat
     List<Message> findByChatId(ObjectId chatId);
 }

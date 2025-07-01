@@ -34,7 +34,7 @@ public class SecurityConfig{
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage());
                 }))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/login", "/auth/register", "/ws-chat/**", "/ping").permitAll() // Endpoints públicos sin autenticación
+                .requestMatchers("/auth/login", "/auth/register", "/ws-chat/**", "/ping", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll() // Endpoints públicos sin autenticación
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Permitimos preflight
                 
                 .anyRequest().authenticated() // Los demás endpoints requieren autenticación
@@ -49,7 +49,7 @@ public class SecurityConfig{
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    /*@Bean //En versiones nuevas de Spring, se utiliza el método de arriba, en el cuel es la propia Spring quien se encarga de la confguración
+    /*@Bean //En versiones nuevas de Spring, se utiliza el método de arriba, en el cuel es la propia Spring quien se encarga de la configuración
     public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);

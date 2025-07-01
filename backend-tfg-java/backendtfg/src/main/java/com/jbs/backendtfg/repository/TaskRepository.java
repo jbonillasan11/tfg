@@ -11,8 +11,10 @@ import com.jbs.backendtfg.document.Task;
 
 @Repository
 public interface TaskRepository extends MongoRepository<Task, ObjectId> {
+    //Buscamos tareas por nombre
     Optional<Task> findByName(String name);
+    //Buscamos tareas por ID de creador
     List<Task> findByCreator(ObjectId id);
-
-    List<Task> findByCreatorIdAndNameContainingIgnoreCase(ObjectId creatorId, String name); //Nombre explicativo
+    //Buscamos tareas que contienen un fragmento en su nombre y de las que el ID enviado es creador
+    List<Task> findByCreatorIdAndNameContainingIgnoreCase(ObjectId creatorId, String name);
 }

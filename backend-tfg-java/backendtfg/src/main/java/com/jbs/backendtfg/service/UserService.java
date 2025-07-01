@@ -129,13 +129,13 @@ public class UserService { //Definimos los métodos que se pueden realizar sobre
     public void changePassword(ObjectId userId, String oldPassword, String newPassword) { //Cambiamos la contraseña de un usuario
         String oldPasswordEncoded = userRepository.findById(userId).get().getPassword();
 
-        String passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^\\w\\s]).{8,}$";
+        String passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^\\w\\s]).{8,}$"; //Expresión que regula que la contraseña sea al menos de 8 caracteres, con al menos una mayúscula, una minúscula, un número y un símbolo
 
         if (!newPassword.matches(passwordRegex)) {
             throw new IllegalArgumentException("La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.");
         }
 
-        if (passwordEncoder.matches(oldPassword, oldPasswordEncoded)){
+        if (passwordEncoder.matches(oldPassword, oldPasswordEncoded)){ //Comprobamos que la contraseña anterior sea correcta
             User u = userRepository.findById(userId).get();
             u.setPassword(passwordEncoder.encode(newPassword));
             userRepository.save(u);

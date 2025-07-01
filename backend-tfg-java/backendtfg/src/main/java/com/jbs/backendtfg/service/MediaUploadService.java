@@ -15,12 +15,12 @@ public class MediaUploadService {
     @Autowired
     private Cloudinary cloudinary;
 
-    public String uploadMedia (MultipartFile file) throws IOException {
+    public String uploadMedia (MultipartFile file) throws IOException { //Subimos un archivo a Cloudinary y devolvemos su URL
         Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
         return (String) uploadResult.get("secure_url"); // URL pública
     }
 
-    private String extractPublicIdFromUrl(String url) {
+    private String extractPublicIdFromUrl(String url) { //A partir de la URL, extraemos el publicID, que nos permitirá hacer la eliminación
         
         String cleanUrl = url.split("\\?")[0]; // Eliminamos parámetros de la URL si los hubiera
         int index = cleanUrl.indexOf("/upload/"); // Buscamos la parte después de /upload/

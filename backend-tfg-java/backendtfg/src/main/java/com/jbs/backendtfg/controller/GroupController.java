@@ -59,12 +59,12 @@ public class GroupController {
         return ResponseEntity.ok(groupService.getGroupsFromIds(ids));
     }
 
-    @PostMapping("/addUserGroup/{id}")
+    @PostMapping("/addUserGroup/{id}") //Añadimos un usuario a un grupo
     public ResponseEntity<GroupDTO> addUserToGroup(@AuthenticationPrincipal User authUser, @RequestBody String idUser, @PathVariable String id) {
         return ResponseEntity.ok(groupService.addUserToGroup(id, idUser));
     }
 
-    @PostMapping("/addUsersGroup/{id}")
+    @PostMapping("/addUsersGroup/{id}") //Añadimos varios usuarios a un grupo
     public ResponseEntity<GroupDTO> addUsersToGroup(@AuthenticationPrincipal User authUser, @RequestBody List<String> userIds, @PathVariable String id) {
         return ResponseEntity.ok(groupService.addUsersToGroup(id, userIds));
     }
@@ -75,7 +75,7 @@ public class GroupController {
         return ResponseEntity.ok(groupService.updateGroup(group, id));
     }
 
-    @PutMapping("/setUsers/{id}")
+    @PutMapping("/setUsers/{id}") //Establecemos la lista de usuarios de un grupo
     public ResponseEntity<GroupDTO> setUsers (@PathVariable String id, @AuthenticationPrincipal User authUser, @RequestBody List<String> userIds){
         return ResponseEntity.ok(groupService.setUsers(id, userIds));
     }

@@ -18,8 +18,8 @@ import com.jbs.backendtfg.repository.TaskRepository;
 import com.jbs.backendtfg.repository.UserRepository;
 
 @Service
-public class DeletionService {
-
+public class DeletionService { // Este servicio se encarga de eliminar usuarios, grupos y tareas
+    //Dado que hay referencias cruzadas entre las entidades, es necesario eliminar primero las referencias y luego eliminar el objeto
         @Autowired
         private UserRepository userRepository;
 

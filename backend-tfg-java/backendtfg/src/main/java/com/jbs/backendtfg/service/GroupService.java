@@ -40,12 +40,12 @@ public class GroupService { //Definimos los métodos que se pueden realizar sobr
         return lGroupsDTO;
     }
 
-    public GroupDTO getGroupById(String id) {
+    public GroupDTO getGroupById(String id) { //Obtenemos un grupo por su ID
         Optional<Group> optionalGroup = groupRepository.findById(new ObjectId(id));
         return optionalGroup.map(GroupDTO::new).orElse(null);
     }
     
-    public GroupDTO updateGroup(Group updatedGroup, String id) {
+    public GroupDTO updateGroup(Group updatedGroup, String id) { //Actualizamos un grupo
         ObjectId groupId = new ObjectId(id);
         Group existingGroup = groupRepository.findById(groupId).get();
         //Actualizamos solo los campos modificables

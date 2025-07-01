@@ -3,6 +3,7 @@ package com.jbs.backendtfg.security;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.util.Date;
@@ -12,7 +13,8 @@ import javax.crypto.SecretKey;
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "9043W5NVDFG2Q2JF3EN90OP4CMKAJ893"; // Envolver en varibale de entorno
+    @Value("${jwt.secret}")
+    private String jwtSecret;
 
     // Generar un token JWT con el nombre de usuario y un tiempo de expiración
     public String generateToken(UserDetails userDetails) {
@@ -57,7 +59,7 @@ public class JwtService {
 
     // Obtener la clave secreta para firmar y validar tokens
     private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 }
 
