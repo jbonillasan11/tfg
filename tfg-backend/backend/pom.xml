@@ -10,7 +10,6 @@
 	</parent>
 	<groupId>com.jbs</groupId>
 	<artifactId>backendtfg</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<name>backendtfg</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
