@@ -1,23 +1,8 @@
-FROM maven:3.9.2-eclipse-temurin-17 AS build
+FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
-COPY mvnw .
-COPY .mvn .mvn
-
-COPY pom.xml .
-
-RUN chmod +x mvnw
-RUN ./mvnw dependency:go-offline -B
-
-COPY src src
+COPY /backend/target/backendtfg-3.4.2.jar backendtfg-3.4.2.jar
 
 EXPOSE 8080
-
-RUN ./mvnw clean package -DskipTests
-
-FROM eclipse-temurin:17-jre-alpine
-WORKDIR /backend
-
-COPY --from=build /backend/target/backendtfg-3.4.2.jar backendtfg-3.4.2.jar
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
